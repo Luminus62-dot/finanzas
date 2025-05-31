@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infografía: Finanzas para Parejas en Las Vegas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Application Structure Plan: 
+        La aplicación se estructurará en secciones temáticas navegables mediante scroll.
+        1. Título y Gancho: Presentación del tema.
+        2. Sección 1: El Mapa Financiero Ideal - Presenta las 4 cuentas bancarias recomendadas. Interacción: Al hacer clic en cada tipo de cuenta, se muestra una descripción detallada. Esto hace que la información sea digerible y enfocada.
+        3. Sección 2: Dominando el Presupuesto Juntos - Explica cómo organizar gastos y presupuestos. Interacción: Un gráfico de dona ilustra la regla 50/30/20 y una lista de pasos interactiva para el presupuesto. Facilita la comprensión de conceptos y procesos.
+        4. Sección 3: ¡Sáquenle Jugo a la Renta! La Bilt Mastercard - Detalla los beneficios y requisitos de la tarjeta. Interacción: Botones/pestañas para explorar diferentes beneficios, un gráfico de barras para comparar la acumulación de puntos y una lista expandible para los requisitos. Permite una exploración detallada sin abrumar al usuario.
+        5. Sección 4: Su Próximo Paso - Llamada a la acción y resumen.
+        User Flow: El usuario se desplaza hacia abajo. Las interacciones (clics, toggles) revelan más información.
+        Justificación: Esta estructura temática y progresiva es intuitiva. Comienza con lo fundamental (cuentas), avanza a la gestión (presupuesto) y luego a una herramienta específica (Bilt), facilitando la comprensión gradual. Las interacciones están diseñadas para mantener al usuario involucrado y permitirle controlar el flujo de información.
+    -->
+    <!-- Visualization & Content Choices:
+        Sección 1: El Mapa Financiero Ideal
+        - Report Info: Tipos de cuentas (Corriente Conjunta, Corrientes Individuales, Ahorros Conjunta), bancos recomendados, propósito.
+        - Goal: Organizar / Informar.
+        - Viz/Presentation: Diagrama de bloques estilizados con HTML/CSS/Tailwind. Al hacer clic en un bloque, se muestra texto descriptivo.
+        - Interaction: Clic para revelar detalles.
+        - Justification: Visualmente más atractivo que una lista simple; permite al usuario enfocarse en una cuenta a la vez.
+        - Library/Method: HTML/CSS/Tailwind, Vanilla JS. (Confirming NO SVG/Mermaid).
+
+        Sección 2: Dominando el Presupuesto Juntos
+        - Report Info: Presupuesto conjunto, contribuciones, regla 50/30/20.
+        - Goal: Informar / Organizar.
+        - Viz/Presentation: Gráfico de Dona (Chart.js) para la regla 50/30/20 (datos de ejemplo). Lista interactiva para pasos del presupuesto.
+        - Interaction: Tooltips en el gráfico. Clic en pasos de la lista para mostrar más información o marcar como entendido.
+        - Justification: El gráfico de dona es ideal para proporciones. La lista interactiva desglosa el proceso.
+        - Library/Method: Chart.js (Canvas), HTML/CSS/Tailwind, Vanilla JS. (Confirming NO SVG/Mermaid).
+
+        Sección 3: ¡Sáquenle Jugo a la Renta! La Bilt Mastercard
+        - Report Info: Beneficios de la Bilt Mastercard (puntos en renta, otras categorías, Rent Day, valor de puntos, beneficios WE), requisitos.
+        - Goal: Informar / Comparar.
+        - Viz/Presentation: Gráfico de Barras (Chart.js) para multiplicadores de puntos. Paneles de texto dinámicos activados por botones para diferentes beneficios. Diagrama HTML/CSS para socios de transferencia. Lista expandible para requisitos.
+        - Interaction: Clic en botones para cambiar contenido del panel. Tooltips en gráfico. Clic para expandir/colapsar lista.
+        - Justification: El gráfico de barras compara eficazmente las tasas de ganancia. Los paneles dinámicos y la lista expandible organizan la información densa.
+        - Library/Method: Chart.js (Canvas), HTML/CSS/Tailwind, Vanilla JS. (Confirming NO SVG/Mermaid).
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FDFBF6; color: #3C3633; }
+        .text-main { color: #3C3633; }
+        .text-accent-1 { color: #7A7067; }
+        .bg-accent-1 { background-color: #7A7067; }
+        .border-accent-1 { border-color: #7A7067; }
+        .bg-accent-2 { background-color: #E0A07E; }
+        .border-accent-2 { border-color: #E0A07E; }
+        .text-accent-2 { color: #E0A07E; }
+        .bg-accent-3 { background-color: #AD8B73; }
+        .text-accent-3 { color: #AD8B73; }
+        .bg-card { background-color: #FAF6F0; }
+        .chart-container { position: relative; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; height: 300px; max-height: 350px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; max-height: 400px;} }
+        .tab-button { padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; transition: background-color 0.3s; }
+        .tab-button.active { background-color: #E0A07E; color: white; }
+        .tab-button:not(.active) { background-color: #FAF6F0; color: #7A7067; border: 1px solid #E0A07E; }
+        .details-panel { display: none; }
+        .details-panel.active { display: block; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+    </style>
+</head>
+<body class="antialiased leading-relaxed">
+
+    <header class="bg-accent-2 text-white py-8 shadow-lg">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold">Finanzas en Pareja en Las Vegas</h1>
+            <p class="mt-4 text-lg md:text-xl">¡Su Guía Interactiva para un Futuro Financiero Sólido!</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="mapa-financiero" class="mb-16">
+            <h2 class="text-3xl font-semibold text-accent-1 mb-2 text-center">El Mapa Financiero Ideal</h2>
+            <p class="text-center text-lg text-main mb-10 max-w-3xl mx-auto">Para una gestión óptima, recomendamos una estructura de 4 cuentas bancarias. Esta organización les brindará claridad, control sobre sus gastos personales y compartidos, y les ayudará a maximizar sus ahorros de manera eficiente.</p>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="account-card bg-card p-6 rounded-xl shadow-lg cursor-pointer hover:shadow-2xl transition-shadow duration-300" data-account="conjunta">
+                    <h3 class="text-xl font-semibold text-accent-2 mb-3">💰 Cuenta Corriente Conjunta</h3>
+                    <p class="text-sm text-main">Para gastos del hogar y pagos compartidos.</p>
+                </div>
+                <div class="account-card bg-card p-6 rounded-xl shadow-lg cursor-pointer hover:shadow-2xl transition-shadow duration-300" data-account="individuales">
+                    <h3 class="text-xl font-semibold text-accent-2 mb-3">👤 Cuentas Corrientes Individuales (x2)</h3>
+                    <p class="text-sm text-main">Para gastos personales y mantener independencia.</p>
+                </div>
+                <div class="account-card bg-card p-6 rounded-xl shadow-lg cursor-pointer hover:shadow-2xl transition-shadow duration-300" data-account="ahorros">
+                    <h3 class="text-xl font-semibold text-accent-2 mb-3">🏦 Cuenta de Ahorros Conjunta</h3>
+                    <p class="text-sm text-main">Para fondo de emergencia y metas grandes.</p>
+                </div>
+                 <div class="account-card bg-card p-6 rounded-xl shadow-lg cursor-pointer hover:shadow-2xl transition-shadow duration-300" data-account="total">
+                    <h3 class="text-xl font-semibold text-accent-2 mb-3">📊 Total: 4 Cuentas Clave</h3>
+                    <p class="text-sm text-main">Esta estructura simplifica y optimiza.</p>
+                </div>
+            </div>
+
+            <div id="account-details-panel" class="mt-8 p-6 bg-white rounded-xl shadow-xl border border-accent-2" style="display: none;">
+                <h4 id="details-title" class="text-2xl font-semibold text-accent-2 mb-3"></h4>
+                <p id="details-purpose" class="text-main mb-2"></p>
+                <p id="details-advantages" class="text-main"></p>
+            </div>
+        </section>
+
+        <section id="presupuesto" class="mb-16">
+            <h2 class="text-3xl font-semibold text-accent-1 mb-2 text-center">Dominando el Presupuesto Juntos</h2>
+            <p class="text-center text-lg text-main mb-10 max-w-3xl mx-auto">Una vez establecidas las cuentas, es fundamental crear un presupuesto. Esto implica conocer sus ingresos, clasificar gastos y definir cómo contribuirán a sus metas compartidas. La comunicación y revisiones periódicas son esenciales.</p>
+            
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <div class="bg-card p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold text-accent-2 mb-4">Regla 50/30/20 (Punto de Partida)</h3>
+                    <p class="text-main mb-4">Una guía popular para distribuir sus ingresos netos. Pueden adaptarla a su realidad en Las Vegas.</p>
+                    <div class="chart-container">
+                        <canvas id="budgetPieChart"></canvas>
+                    </div>
+                     <p class="text-xs text-gray-500 mt-2 text-center">Hagan clic en las secciones del gráfico para más detalles.</p>
+                </div>
+                <div class="bg-card p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold text-accent-2 mb-4">Pasos Clave para su Presupuesto:</h3>
+                    <ul id="budget-steps" class="space-y-3">
+                        <li class="budget-step p-4 border border-accent-3 rounded-lg hover:bg-accent-3 hover:text-white transition-colors cursor-pointer" data-step-info="Sumen todos sus ingresos después de impuestos para saber con cuánto cuentan realmente cada mes.">1. Conozcan sus Ingresos Netos Combinados</li>
+                        <li class="budget-step p-4 border border-accent-3 rounded-lg hover:bg-accent-3 hover:text-white transition-colors cursor-pointer" data-step-info="Dividan sus gastos en Fijos (alquiler, seguros) y Variables (comida, entretenimiento). Esto ayuda a ver dónde se va el dinero.">2. Identifiquen y Clasifiquen Gastos</li>
+                        <li class="budget-step p-4 border border-accent-3 rounded-lg hover:bg-accent-3 hover:text-white transition-colors cursor-pointer" data-step-info="Asignen un monto máximo para cada categoría de gasto variable. Sean realistas pero también busquen áreas de ahorro.">3. Establezcan Límites de Gasto</li>
+                        <li class="budget-step p-4 border border-accent-3 rounded-lg hover:bg-accent-3 hover:text-white transition-colors cursor-pointer" data-step-info="Decidan si aportarán un porcentaje de sus ingresos (proporcional) o una cantidad igual (50/50) a la cuenta conjunta. ¡Lo importante es que sea justo para ambos!">4. Definan Contribuciones a la Cuenta Conjunta</li>
+                        <li class="budget-step p-4 border border-accent-3 rounded-lg hover:bg-accent-3 hover:text-white transition-colors cursor-pointer" data-step-info="Configuren pagos automáticos para facturas desde la cuenta conjunta. Así evitan olvidos y cargos por mora.">5. Automaticen Pagos</li>
+                        <li class="budget-step p-4 border border-accent-3 rounded-lg hover:bg-accent-3 hover:text-white transition-colors cursor-pointer" data-step-info="Designen un día al mes para revisar su presupuesto, ver cómo van con sus metas y hacer los ajustes necesarios. La comunicación abierta es vital.">6. Hagan Revisiones Mensuales</li>
+                    </ul>
+                     <div id="step-info-panel" class="mt-4 p-4 bg-white rounded-lg border border-accent-2 text-main" style="display: none;"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="bilt-mastercard" class="mb-16">
+            <h2 class="text-3xl font-semibold text-accent-1 mb-2 text-center">¡Sáquenle Jugo a la Renta! La Bilt Mastercard</h2>
+            <p class="text-center text-lg text-main mb-10 max-w-3xl mx-auto">La Bilt Mastercard es una herramienta financiera innovadora, especialmente para quienes pagan alquiler. Permite ganar puntos de recompensa en la renta sin las típicas comisiones, además de ofrecer excelentes beneficios en otras categorías de gasto.</p>
+
+            <div class="bg-card p-6 rounded-xl shadow-lg mb-8">
+                 <div class="text-center mb-6">
+                    <button id="bilt-requirements-toggle" class="bg-accent-2 text-white px-6 py-3 rounded-lg font-semibold hover:bg-opacity-80 transition-colors">Ver/Ocultar Requisitos para Obtenerla ▼</button>
+                </div>
+                <div id="bilt-requirements-content" class="accordion-content px-4">
+                    <h4 class="text-lg font-semibold text-accent-2 mb-2">Requisitos Generales:</h4>
+                    <ul class="list-disc list-inside text-main space-y-1">
+                        <li>Ser mayor de 18 años y residente de EE. UU.</li>
+                        <li>Tener un buen historial crediticio.</li>
+                        <li>Demostrar ingresos suficientes.</li>
+                        <li>Solicitar a través de Bilt Rewards o Wells Fargo.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="bg-card p-6 rounded-xl shadow-lg">
+                <h3 class="text-xl font-semibold text-accent-2 mb-6 text-center">Beneficios Clave y Acumulación de Puntos</h3>
+                <div class="flex flex-wrap justify-center gap-2 mb-6">
+                    <button class="tab-button active" data-tab="renta">Puntos en Renta</button>
+                    <button class="tab-button" data-tab="categorias">Otras Categorías</button>
+                    <button class="tab-button" data-tab="rentday">"Rent Day"</button>
+                    <button class="tab-button" data-tab="valor">Valor de Puntos</button>
+                    <button class="tab-button" data-tab="worldelite">Beneficios Adicionales</button>
+                </div>
+
+                <div id="bilt-details-container" class="p-4 border border-accent-3 rounded-lg bg-white min-h-[200px]">
+                    <div id="tab-content-renta" class="details-panel active">
+                        <h4 class="text-lg font-semibold text-accent-2 mb-2">1. Puntos en Renta (¡Sin Tarifas!)</h4>
+                        <p class="text-main">Gana **1 punto por cada $1 de renta** (hasta 100,000 puntos/año). Lo crucial es que **no hay tarifas de procesamiento** al pagar a través de la app de Bilt. Para que estos puntos se apliquen, debes hacer al menos 5 transacciones adicionales con la tarjeta cada mes.</p>
+                    </div>
+                    <div id="tab-content-categorias" class="details-panel">
+                        <h4 class="text-lg font-semibold text-accent-2 mb-2">2. Puntos en Otras Categorías</h4>
+                        <ul class="list-disc list-inside text-main space-y-1">
+                            <li>**3x puntos** en restaurantes.</li>
+                            <li>**2x puntos** en viajes (reservados directamente).</li>
+                            <li>**1x punto** en todas las demás compras.</li>
+                            <li>**5x puntos** en viajes de Lyft (al vincular cuentas).</li>
+                        </ul>
+                    </div>
+                    <div id="tab-content-rentday" class="details-panel">
+                        <h4 class="text-lg font-semibold text-accent-2 mb-2">3. "Rent Day" (El primer día de cada mes)</h4>
+                        <p class="text-main">¡Puntos dobles en todas las compras (excepto renta) durante 24 horas! Esto se traduce en: **6x puntos** en restaurantes, **4x puntos** en viajes, y **2x puntos** en otras compras (hasta 1,000 puntos de bonificación por "Rent Day" al mes).</p>
+                    </div>
+                    <div id="tab-content-valor" class="details-panel">
+                        <h4 class="text-lg font-semibold text-accent-2 mb-2">4. Valor y Flexibilidad de los Puntos</h4>
+                        <p class="text-main mb-2">Los puntos Bilt Rewards son muy versátiles:</p>
+                        <ul class="list-disc list-inside text-main space-y-1">
+                            <li>**Transferencia 1:1** a excelentes socios de aerolíneas (American Airlines, United, Hyatt, etc.) y hoteles.</li>
+                            <li>Canje por **enganche para una casa** (valor de 1.5 centavos por punto).</li>
+                            <li>Reserva de viajes a través del portal de Bilt (valor de 1.25 centavos por punto).</li>
+                            <li>Otras opciones como clases de fitness o productos seleccionados.</li>
+                        </ul>
+                    </div>
+                     <div id="tab-content-worldelite" class="details-panel">
+                        <h4 class="text-lg font-semibold text-accent-2 mb-2">5. Beneficios Adicionales (World Elite Mastercard)</h4>
+                         <p class="text-main mb-2">Al ser una World Elite Mastercard, incluye protecciones valiosas sin cuota anual:</p>
+                        <ul class="list-disc list-inside text-main space-y-1">
+                            <li>Seguro de Protección de Teléfono Celular.</li>
+                            <li>Seguro Primario de Colisión para Alquiler de Autos.</li>
+                            <li>Protecciones de viaje (cancelación, interrupción, retraso).</li>
+                            <li>Sin comisiones por transacciones en el extranjero.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <h4 class="text-lg font-semibold text-accent-2 mb-4 text-center">Comparativa de Acumulación de Puntos Bilt</h4>
+                    <div class="chart-container">
+                        <canvas id="biltPointsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="proximo-paso" class="text-center py-12 bg-accent-3 text-white rounded-xl shadow-lg">
+            <h2 class="text-3xl font-semibold mb-4">¡Construyan su Futuro Financiero Juntos!</h2>
+            <p class="text-lg mb-8 max-w-2xl mx-auto">Organizar sus finanzas es un paso fundamental hacia la estabilidad y la consecución de sus sueños. Con estas herramientas y una comunicación abierta y constante, estarán bien equipados para manejar sus gastos, ahorrar eficazmente y construir el futuro que desean en Las Vegas.</p>
+            <p class="font-semibold">¡Empiecen a planificar hoy mismo!</p>
+        </section>
+    </main>
+
+    <footer class="text-center py-8 mt-12 border-t border-accent-1">
+        <p class="text-sm text-main">&copy; <span id="currentYear"></span> Infografía Financiera Interactiva. Todos los derechos reservados.</p>
+    </footer>
+
+<script>
+    // Funciones auxiliares para Chart.js
+    function wrapText(text, maxWidthChars) {
+        if (typeof text !== 'string') return text;
+        if (text.length <= maxWidthChars) return text;
+
+        const words = text.split(' ');
+        const lines = [];
+        let currentLine = words[0];
+
+        for (let i = 1; i < words.length; i++) {
+            if (currentLine.length + words[i].length + 1 <= maxWidthChars) {
+                currentLine += ' ' + words[i];
+            } else {
+                lines.push(currentLine);
+                currentLine = words[i];
+            }
+        }
+        lines.push(currentLine);
+        return lines;
+    }
+
+    const tooltipTitleCallback = (tooltipItems) => {
+        const item = tooltipItems[0];
+        let label = item.chart.data.labels[item.dataIndex];
+        if (Array.isArray(label)) {
+            return label.join(' ');
+        }
+        return label;
+    };
+
+    // Datos y configuración de cuentas
+    const accountData = {
+        conjunta: {
+            title: "Cuenta Corriente Conjunta (Ej: Chase Bank)",
+            purpose: "Propósito: Centralizar todos los gastos compartidos del hogar como alquiler/hipoteca, servicios (luz, agua, internet), supermercado, pagos de coche y seguros.",
+            advantages: "Ventajas: Facilita la gestión de finanzas comunes, ofrece transparencia total para ambos y simplifica el pago de facturas. Bancos como Chase ofrecen amplia red de sucursales/cajeros y robustas plataformas digitales."
+        },
+        individuales: {
+            title: "Cuentas Corrientes Individuales (Ej: Capital One 360)",
+            purpose: "Propósito: Cada miembro de la pareja tiene su propia cuenta para gastos personales discrecionales (hobbies, salidas con amigos, ropa, regalos personales, etc.).",
+            advantages: "Ventajas: Promueve la independencia financiera, evita discusiones sobre gastos personales y permite a cada uno manejar una parte de su dinero con autonomía. Bancos en línea como Capital One 360 suelen tener menos comisiones."
+        },
+        ahorros: {
+            title: "Cuenta de Ahorros Conjunta de Alto Rendimiento (Ej: Ally Bank o Discover Bank)",
+            purpose: "Propósito: Acumular el fondo de emergencia (idealmente 3-6 meses de gastos) y ahorrar para metas financieras grandes a mediano/largo plazo (enganche de casa, coche nuevo, vacaciones importantes).",
+            advantages: "Ventajas: Ofrecen tasas de interés (APY) significativamente más altas que los bancos tradicionales, lo que permite que su dinero crezca más rápido. Son ideales para dinero que no se necesita con acceso inmediato."
+        },
+        total: {
+            title: "Total: 4 Cuentas Clave para el Éxito",
+            purpose: "Propósito: Esta estructura de cuatro cuentas (una conjunta de gastos, dos individuales y una conjunta de ahorros) proporciona un sistema equilibrado.",
+            advantages: "Ventajas: Combina la colaboración en gastos comunes con la independencia personal y una estrategia de ahorro potente, fomentando la armonía y el progreso financiero de la pareja."
+        }
+    };
+
+    const accountCards = document.querySelectorAll('.account-card');
+    const detailsPanel = document.getElementById('account-details-panel');
+    const detailsTitle = document.getElementById('details-title');
+    const detailsPurpose = document.getElementById('details-purpose');
+    const detailsAdvantages = document.getElementById('details-advantages');
+
+    accountCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const accountType = card.dataset.account;
+            const data = accountData[accountType];
+            
+            detailsTitle.textContent = data.title;
+            detailsPurpose.textContent = data.purpose;
+            detailsAdvantages.textContent = data.advantages;
+            detailsPanel.style.display = 'block';
+        });
+    });
+
+    // Gráfico de Presupuesto (Pie Chart)
+    const budgetCtx = document.getElementById('budgetPieChart').getContext('2d');
+    new Chart(budgetCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['50% Necesidades (Vivienda, Comida, etc.)', '30% Deseos (Entretenimiento, Hobbies)', '20% Ahorros y Pago de Deudas'],
+            datasets: [{
+                label: 'Distribución de Presupuesto (Ejemplo)',
+                data: [50, 30, 20],
+                backgroundColor: ['#AD8B73', '#E0A07E', '#7A7067'],
+                borderColor: ['#FAF6F0', '#FAF6F0', '#FAF6F0'],
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: { size: 12 },
+                        color: '#3C3633',
+                        padding: 15,
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map(function(label, i) {
+                                    const meta = chart.getDatasetMeta(0);
+                                    const style = meta.controller.getStyle(i);
+                                    return {
+                                        text: wrapText(label, 25).join('\\n'), // Wrap label text
+                                        fillStyle: style.backgroundColor,
+                                        strokeStyle: style.borderColor,
+                                        lineWidth: style.borderWidth,
+                                        hidden: isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#3C3633',
+                    titleColor: '#FDFBF6',
+                    bodyColor: '#FDFBF6',
+                    callbacks: {
+                         title: tooltipTitleCallback
+                    }
+                }
+            }
+        }
+    });
+
+    // Pasos del presupuesto interactivos
+    const budgetSteps = document.querySelectorAll('.budget-step');
+    const stepInfoPanel = document.getElementById('step-info-panel');
+    budgetSteps.forEach(step => {
+        step.addEventListener('click', () => {
+            const info = step.dataset.stepInfo;
+            stepInfoPanel.textContent = info;
+            stepInfoPanel.style.display = 'block';
+            budgetSteps.forEach(s => s.classList.remove('bg-accent-2', 'text-white'));
+            step.classList.add('bg-accent-2', 'text-white');
+        });
+    });
+    
+    // Bilt Mastercard - Acordeón de Requisitos
+    const biltRequirementsToggle = document.getElementById('bilt-requirements-toggle');
+    const biltRequirementsContent = document.getElementById('bilt-requirements-content');
+    biltRequirementsToggle.addEventListener('click', () => {
+        if (biltRequirementsContent.style.maxHeight && biltRequirementsContent.style.maxHeight !== "0px") {
+            biltRequirementsContent.style.maxHeight = "0px";
+            biltRequirementsToggle.textContent = "Ver/Ocultar Requisitos para Obtenerla ▼";
+        } else {
+            biltRequirementsContent.style.maxHeight = biltRequirementsContent.scrollHeight + "px";
+            biltRequirementsToggle.textContent = "Ver/Ocultar Requisitos para Obtenerla ▲";
+        }
+    });
+
+    // Bilt Mastercard - Pestañas
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const detailsPanels = document.querySelectorAll('.details-panel');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabId = button.dataset.tab;
+
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            detailsPanels.forEach(panel => {
+                if (panel.id === `tab-content-${tabId}`) {
+                    panel.classList.add('active');
+                } else {
+                    panel.classList.remove('active');
+                }
+            });
+        });
+    });
+    
+    // Gráfico de Puntos Bilt (Bar Chart)
+    const biltCtx = document.getElementById('biltPointsChart').getContext('2d');
+    const biltLabels = [
+        wrapText('Renta (1x)', 16), 
+        wrapText('Restaurantes (3x)', 16), 
+        wrapText('Viajes (2x)', 16), 
+        wrapText('Lyft (5x)', 16), 
+        wrapText('Restaurantes Rent Day (6x)', 16), 
+        wrapText('Viajes Rent Day (4x)', 16)
+    ];
+
+    new Chart(biltCtx, {
+        type: 'bar',
+        data: {
+            labels: biltLabels,
+            datasets: [{
+                label: 'Puntos por $1 Gastado',
+                data: [1, 3, 2, 5, 6, 4],
+                backgroundColor: ['#AD8B73', '#E0A07E', '#7A7067', '#A0937D', '#D4A5A5', '#BF8B67'],
+                borderColor: '#FAF6F0',
+                borderWidth: 2,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(122, 112, 103, 0.2)' },
+                    ticks: { color: '#3C3633', font: { size: 12 } }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { color: '#3C3633', font: { size: 12 } }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: '#3C3633',
+                    titleColor: '#FDFBF6',
+                    bodyColor: '#FDFBF6',
+                    callbacks: {
+                        title: tooltipTitleCallback // Usar el callback personalizado
+                    }
+                }
+            }
+        }
+    });
+    
+    // Año actual en el footer
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+</script>
+</body>
+</html>
