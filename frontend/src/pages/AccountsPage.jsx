@@ -30,7 +30,7 @@ const AccountsPage = ({ token }) => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      const res = await axios.get("https://mi-dinero-hoy.onrender.com/api/accounts");
+      const res = await axios.get("${process.env.REACT_APP_BACKEND_URL}/api/accounts");
       setAccounts(res.data);
     } catch (err) {
       console.error(
@@ -50,7 +50,7 @@ const AccountsPage = ({ token }) => {
   const handleAddAccount = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("https://mi-dinero-hoy.onrender.com/api/accounts", {
+      await axios.post("${process.env.REACT_APP_BACKEND_URL}/api/accounts", {
         name: newAccountName,
         type: newAccountType,
         balance: newAccountBalance,
@@ -83,7 +83,7 @@ const AccountsPage = ({ token }) => {
 
     try {
       await axios.put(
-        `https://mi-dinero-hoy.onrender.com/api/accounts/${editingAccount._id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/accounts/${editingAccount._id}`,
         {
           name: editingAccount.name,
           type: editingAccount.type,
@@ -108,7 +108,7 @@ const AccountsPage = ({ token }) => {
       )
     ) {
       try {
-        await axios.delete(`https://mi-dinero-hoy.onrender.com/api/accounts/${id}`);
+        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/accounts/${id}`);
         fetchAccounts();
         toast.success("Cuenta eliminada exitosamente!");
       } catch (err) {
