@@ -1,6 +1,7 @@
 // backend/controllers/transactionController.js
 const Transaction = require("../models/Transaction");
 const Account = require("../models/Account");
+const mongoose = require("mongoose");
 
 // @route   GET api/transactions
 // @desc    Obtener todas las transacciones del usuario actual, con filtros y búsqueda
@@ -267,20 +268,24 @@ exports.deleteTransaction = async (req, res) => {
   }
 };
 
-// @route   GET api/transactions/summary
+/// @route   GET api/transactions/summary
 // @desc    Obtener un resumen de gastos/ingresos por categoría para un período
 // @access  Private
 exports.getTransactionsSummary = async (req, res) => {
   const { startDate, endDate, type } = req.query;
 
+  // Importante: Asegurar que las fechas representen el inicio y fin del día en UTC
   let startOfDay = new Date(startDate);
-  startOfDay.setUTCHours(0, 0, 0, 0);
+  startOfDay.setUTCHours(0, 0, 0, 0); // 00:00:00.000 UTC
 
   let endOfDay = new Date(endDate);
-  endOfDay.setUTCHours(23, 59, 59, 999);
+  endOfDay.setUTCHours(23, 59, 59, 999); // 23:59:59.999 UTC (final del día)
+
+  // Asegurarse de que el user ID sea un ObjectId para la comparación en el pipeline
+  const userId = new mongoose.Types.ObjectId(req.user.id); // <-- ¡CAMBIO CRÍTICO AQUÍ!
 
   let matchConditions = {
-    user: req.user.id,
+    user: userId, // <-- ¡USAR EL OBJECTID CONVERTIDO!
     date: {
       $gte: startOfDay,
       $lte: endOfDay,
@@ -293,8 +298,13 @@ exports.getTransactionsSummary = async (req, res) => {
     matchConditions.type = { $in: ["Ingreso", "Gasto"] };
   }
 
+  // --- Debugging en la terminal del Backend (Render.com) ---
   console.log("\n--- Backend Debugging Reporte Sumario ---");
   console.log("Usuario que realiza la petición (ID del Token):", req.user.id);
+  console.log(
+    "Usuario que se usará en el match (ObjectId):",
+    userId.toString()
+  ); // Convertir a string para el log
   console.log(
     "Rango de Fechas Solicitado por Frontend (ISO):",
     startDate,
@@ -308,7 +318,7 @@ exports.getTransactionsSummary = async (req, res) => {
   console.log(
     JSON.stringify(
       {
-        user: req.user.id,
+        user: userId.toString(), // Para mostrar en el log, usamos el string
         date: {
           $gte: startOfDay.toISOString(),
           $lte: endOfDay.toISOString(),
@@ -320,11 +330,12 @@ exports.getTransactionsSummary = async (req, res) => {
     )
   );
   console.log("-------------------------------------------\n");
+  // --- Fin Debugging ---
 
   try {
     const summary = await Transaction.aggregate([
       {
-        $match: matchConditions,
+        $match: matchConditions, // Filtrar por usuario (ObjectId), rango de fechas y tipo
       },
       {
         $group: {
@@ -340,7 +351,7 @@ exports.getTransactionsSummary = async (req, res) => {
     const totalByType = await Transaction.aggregate([
       {
         $match: {
-          user: req.user.id,
+          user: userId, // <-- ¡USAR EL OBJECTID CONVERTIDO AQUÍ TAMBIÉN!
           date: {
             $gte: startOfDay,
             $lte: endOfDay,
