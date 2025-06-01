@@ -40,7 +40,7 @@ const TransactionsPage = ({ token }) => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      const res = await axios.get("http://localhost:5000/api/accounts");
+      const res = await axios.get("${process.env.REACT_APP_BACKEND_URL}/api/accounts");
       setAccounts(res.data);
       if (res.data.length > 0 && !selectedAccountId && !editingTransaction) {
         setSelectedAccountId(res.data[0]._id);
@@ -66,7 +66,7 @@ const TransactionsPage = ({ token }) => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      const res = await axios.get("http://localhost:5000/api/transactions");
+      const res = await axios.get("${process.env.REACT_APP_BACKEND_URL}/api/transactions");
       setTransactions(res.data);
     } catch (err) {
       console.error(
@@ -89,7 +89,7 @@ const TransactionsPage = ({ token }) => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      const res = await axios.get("http://localhost:5000/api/categories");
+      const res = await axios.get("${process.env.REACT_APP_BACKEND_URL}/api/categories");
       setCategories(res.data);
     } catch (err) {
       console.error(
@@ -127,7 +127,7 @@ const TransactionsPage = ({ token }) => {
       }
 
       await axios.post(
-        "http://localhost:5000/api/transactions",
+        "${process.env.REACT_APP_BACKEND_URL}/api/transactions",
         transactionData
       );
       toast.success("Transacción registrada exitosamente!");
@@ -194,7 +194,7 @@ const TransactionsPage = ({ token }) => {
       };
 
       await axios.put(
-        `http://localhost:5000/api/transactions/${editingTransaction._id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/transactions/${editingTransaction._id}`,
         updatedTransactionData
       );
       toast.success("Transacción actualizada exitosamente!");
@@ -215,7 +215,7 @@ const TransactionsPage = ({ token }) => {
       window.confirm("¿Estás seguro de que quieres eliminar esta transacción?")
     ) {
       try {
-        await axios.delete(`http://localhost:5000/api/transactions/${id}`);
+        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/transactions/${id}`);
         toast.success("Transacción eliminada y saldos actualizados!");
         fetchAccounts();
         fetchTransactions();
