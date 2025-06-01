@@ -24,4 +24,9 @@ router.put("/:id", auth, transactionController.updateTransaction);
 // @access  Private
 router.delete("/:id", auth, transactionController.deleteTransaction);
 
+// @route   GET api/transactions/summary
+// @desc    Obtener un resumen de transacciones para reportes
+// @access  Private
+router.get("/summary", auth, transactionController.getTransactionsSummary);
+
 module.exports = router;

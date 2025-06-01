@@ -1,6 +1,6 @@
-// frontend/src/components/Layout.jsx
 import React from "react";
 import { Link } from "react-router-dom";
+// Asegúrate de importar FaChartPie aquí junto con los otros íconos
 import {
   FaHome,
   FaWallet,
@@ -9,7 +9,8 @@ import {
   FaBullseye,
   FaCog,
   FaSignOutAlt,
-} from "react-icons/fa"; // <-- NUEVA LÍNEA: Importar íconos
+  FaChartPie,
+} from "react-icons/fa";
 
 const Layout = ({ onLogout, children }) => {
   return (
@@ -20,7 +21,6 @@ const Layout = ({ onLogout, children }) => {
         backgroundColor: "#f4f7f6",
       }}
     >
-      {/* Barra Lateral de Navegación */}
       <aside
         style={{
           width: "250px",
@@ -30,7 +30,7 @@ const Layout = ({ onLogout, children }) => {
           boxShadow: "2px 0 5px rgba(0,0,0,0.1)",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between", // Para empujar el botón de cerrar sesión hacia abajo
+          justifyContent: "space-between",
         }}
       >
         <div>
@@ -64,8 +64,7 @@ const Layout = ({ onLogout, children }) => {
                     (e.target.style.backgroundColor = "transparent")
                   }
                 >
-                  <FaHome style={{ marginRight: "10px" }} /> Dashboard{" "}
-                  {/* <-- ÍCONO */}
+                  <FaHome style={{ marginRight: "10px" }} /> Dashboard
                 </Link>
               </li>
               <li style={{ marginBottom: "15px" }}>
@@ -87,8 +86,7 @@ const Layout = ({ onLogout, children }) => {
                     (e.target.style.backgroundColor = "transparent")
                   }
                 >
-                  <FaWallet style={{ marginRight: "10px" }} /> Cuentas{" "}
-                  {/* <-- ÍCONO */}
+                  <FaWallet style={{ marginRight: "10px" }} /> Cuentas
                 </Link>
               </li>
               <li style={{ marginBottom: "15px" }}>
@@ -111,7 +109,7 @@ const Layout = ({ onLogout, children }) => {
                   }
                 >
                   <FaExchangeAlt style={{ marginRight: "10px" }} />{" "}
-                  Transacciones {/* <-- ÍCONO */}
+                  Transacciones
                 </Link>
               </li>
               <li style={{ marginBottom: "15px" }}>
@@ -133,8 +131,7 @@ const Layout = ({ onLogout, children }) => {
                     (e.target.style.backgroundColor = "transparent")
                   }
                 >
-                  <FaTags style={{ marginRight: "10px" }} /> Categorías{" "}
-                  {/* <-- ÍCONO */}
+                  <FaTags style={{ marginRight: "10px" }} /> Categorías
                 </Link>
               </li>
               <li style={{ marginBottom: "15px" }}>
@@ -156,11 +153,31 @@ const Layout = ({ onLogout, children }) => {
                     (e.target.style.backgroundColor = "transparent")
                   }
                 >
-                  <FaBullseye style={{ marginRight: "10px" }} /> Metas de Ahorro{" "}
-                  {/* <-- ÍCONO */}
+                  <FaBullseye style={{ marginRight: "10px" }} /> Metas de Ahorro
                 </Link>
               </li>
-              {/* Si decides reintegrar Reportes, aquí iría FaChartPie o similar */}
+              <li style={{ marginBottom: "15px" }}>
+                <Link
+                  to="/reports"
+                  style={{
+                    textDecoration: "none",
+                    color: "#ecf0f1",
+                    fontSize: "1.1em",
+                    padding: "10px 15px",
+                    display: "block",
+                    borderRadius: "5px",
+                    transition: "background-color 0.3s",
+                  }}
+                  onMouseOver={(e) =>
+                    (e.target.style.backgroundColor = "#34495e")
+                  }
+                  onMouseOut={(e) =>
+                    (e.target.style.backgroundColor = "transparent")
+                  }
+                >
+                  <FaChartPie style={{ marginRight: "10px" }} /> Reportes
+                </Link>
+              </li>
               <li style={{ marginBottom: "15px" }}>
                 <Link
                   to="/settings"
@@ -180,8 +197,7 @@ const Layout = ({ onLogout, children }) => {
                     (e.target.style.backgroundColor = "transparent")
                   }
                 >
-                  <FaCog style={{ marginRight: "10px" }} /> Configuración{" "}
-                  {/* <-- ÍCONO */}
+                  <FaCog style={{ marginRight: "10px" }} /> Configuración
                 </Link>
               </li>
             </ul>
@@ -202,12 +218,10 @@ const Layout = ({ onLogout, children }) => {
           onMouseOver={(e) => (e.target.style.backgroundColor = "#c0392b")}
           onMouseOut={(e) => (e.target.style.backgroundColor = "#e74c3c")}
         >
-          <FaSignOutAlt style={{ marginRight: "8px" }} /> Cerrar Sesión{" "}
-          {/* <-- ÍCONO */}
+          <FaSignOutAlt style={{ marginRight: "8px" }} /> Cerrar Sesión
         </button>
       </aside>
 
-      {/* Contenido Principal (donde se renderizarán las rutas hijas) */}
       <main
         style={{ flexGrow: 1, padding: "20px", backgroundColor: "#f4f7f6" }}
       >

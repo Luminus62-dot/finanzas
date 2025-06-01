@@ -15,9 +15,9 @@ import Layout from "./components/Layout";
 import DashboardPage from "./pages/DashboardPage";
 import AccountsPage from "./pages/AccountsPage";
 import TransactionsPage from "./pages/TransactionsPage";
-import CategoriesPage from "./pages/CategoriesPage";
+import CategoriesPage from "./pages/CategoriessPage";
 import SavingGoalsPage from "./pages/SavingGoalsPage";
-// import ReportsPage from './pages/ReportsPage';
+import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
 
 function App() {
@@ -209,7 +209,12 @@ function App() {
                 path="/saving-goals"
                 render={(props) => <SavingGoalsPage {...props} token={token} />}
               />
-              {/* <Route path="/reports" render={(props) => <ReportsPage {...props} token={token} />} /> */}
+              {
+                <Route
+                  path="/reports"
+                  render={(props) => <ReportsPage {...props} token={token} />}
+                />
+              }
               <Route
                 path="/settings"
                 render={(props) => <SettingsPage {...props} token={token} />}
