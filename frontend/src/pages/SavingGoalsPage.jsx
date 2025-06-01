@@ -34,7 +34,7 @@ const SavingGoalsPage = ({ token }) => {
         return;
       }
       axios.defaults.headers.common["x-auth-token"] = token;
-      const res = await axios.get("http://localhost:5000/api/savinggoals");
+      const res = await axios.get("${process.env.REACT_APP_BACKEND_URL}/api/savinggoals");
       setGoals(res.data);
       // setMessage(''); // <-- ELIMINADO
     } catch (err) {
@@ -64,7 +64,7 @@ const SavingGoalsPage = ({ token }) => {
         dueDate: newGoalDueDate || undefined,
         description: newGoalDescription,
       };
-      await axios.post("http://localhost:5000/api/savinggoals", goalData);
+      await axios.post("${process.env.REACT_APP_BACKEND_URL}/api/savinggoals", goalData);
       toast.success("Meta de ahorro creada exitosamente!"); // <-- USANDO TOAST
       setNewGoalName("");
       setNewGoalTargetAmount("");
@@ -110,7 +110,7 @@ const SavingGoalsPage = ({ token }) => {
         isCompleted: editingGoal.isCompleted,
       };
       await axios.put(
-        `http://localhost:5000/api/savinggoals/${editingGoal._id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/savinggoals/${editingGoal._id}`,
         updatedGoalData
       );
       toast.success("Meta de ahorro actualizada exitosamente!"); // <-- USANDO TOAST
@@ -136,7 +136,7 @@ const SavingGoalsPage = ({ token }) => {
       if (!goalToUpdate) return;
 
       const newCurrentAmount = currentAmount + parseFloat(addAmount);
-      await axios.put(`http://localhost:5000/api/savinggoals/${goalId}`, {
+      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/savinggoals/${goalId}`, {
         currentAmount: newCurrentAmount,
         isCompleted: newCurrentAmount >= goalToUpdate.targetAmount,
       });
@@ -160,7 +160,7 @@ const SavingGoalsPage = ({ token }) => {
       )
     ) {
       try {
-        await axios.delete(`http://localhost:5000/api/savinggoals/${id}`);
+        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/savinggoals/${id}`);
         toast.success("Meta de ahorro eliminada exitosamente!"); // <-- USANDO TOAST
         fetchSavingGoals();
       } catch (err) {
