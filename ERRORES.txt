@@ -1,0 +1,118 @@
+--- INICIO DEL DOCUMENTO DE ERRORES Y SOLUCIONES ---
+
+# Historial de Errores y Soluciones: "Mi Dinero Hoy" (Versión Concisa para Referencia)
+
+Este documento resume los errores clave encontrados durante el desarrollo y despliegue de la aplicación "Mi Dinero Hoy", junto con sus causas y soluciones aplicadas.
+
+---
+
+## 1. Errores de Entorno y `npm`
+
+### 1.1. `npm` o `node` no reconocidos
+
+* **Error(es):** `npm : El término 'npm' no se reconoce...`, `"npm" no se reconoce como un comando interno o externo...`
+* **Causa:** `PATH` del sistema no configurado para Node.js/npm, o terminal no actualizada.
+* **Solución:** Reiniciar terminal. Asegurar "Add to PATH" en instalación de Node.js. Usar CMD en VS Code terminal si PowerSshell daba problemas.
+
+### 1.2. `npm install` por `package.json` Faltante
+
+* **Error:** `npm error enoent Could not read package.json: Error: ENOENT: no such file or directory...`
+* **Causa:** `package.json` no existe en el directorio.
+* **Solución:** Ejecutar **`npm init -y`** en el directorio, luego **`npm install`**.
+
+---
+
+## 2. Errores de Compilación y Módulos de Frontend
+
+### 2.1. `digital envelope routines::unsupported` (`ERR_OSSL_EVP_UNSUPPORTED`)
+
+* **Error:** `Error: error:0308010C:digital envelope routines::unsupported`
+* **Causa:** Incompatibilidad de OpenSSL entre Node.js (v17+) y `webpack` (de `react-scripts`).
+* **Solución:** Iniciar frontend con **`set NODE_OPTIONS=--openssl-legacy-provider && npm start`**.
+
+### 2.2. `Can't reexport the namespace object from non EcmaScript module`
+
+* **Error:** `Can't reexport the namespace object from non EcmaScript module (only default export is available)`
+* **Causa:** `react-scripts` (Webpack 4) en conflicto con módulos ES (`.mjs`) de librerías modernas (`react-router-dom` v6, `react-toastify`).
+* **Solución:**
+    1.  Degradar **`react-router-dom` a la v5.3.0** (`npm install react-router-dom@5.3.0 history@4.10.1`).
+    2.  Ajustar sintaxis del router a v5.
+    3.  Realizar **reinstalación limpia de dependencias**.
+
+### 2.3. `Element type is invalid`
+
+* **Error:** `Uncaught Error: Element type is invalid: expected a string... but got: object.`
+* **Causa:** Componente React importado incorrectamente (ej., `import { Componente }` cuando era `export default Componente;`), o error de copiado/pegado.
+* **Solución:** Asegurar que **importaciones y exportaciones coincidan**. Reemplazar código de archivo meticulosamente.
+
+### 2.4. `SyntaxError: Identifier 'DashboardPage' has already been declared.`
+
+* **Error:** `SyntaxError: ...Identifier 'DashboardPage' has already been declared.`
+* **Causa:** Componente `DashboardPage` importado Y definido localmente en `App.js`.
+* **Solución:** Eliminar la **definición local** de `DashboardPage` en `App.js`, dejando solo la línea `import DashboardPage from './pages/DashboardPage';`.
+
+### 2.5. `TypeError: r.map is not a function`
+
+* **Error:** `TypeError: r.map is not a function`
+* **Causa:** Intentar llamar `.map()` en una variable que no era un array (ej., `accounts` era `null` o `undefined`). Generalmente por respuesta backend inesperada o estado no inicializado como `[]`.
+* **Solución:**
+    1.  Inicializar estados de listas como **arrays vacíos (`useState([])`)**.
+    2.  Añadir validación **`if (Array.isArray(res.data))`** al procesar respuestas del backend, estableciendo `setMiLista([])` si no es un array.
+    3.  Asegurar que el backend siempre devuelva un array vacío (`[]`) si no hay resultados.
+
+### 2.6. `Module not found: Error: Can't resolve 'web-vitals'`
+
+* **Error:** `Module not found: Error: Can't resolve 'web-vitals'...`
+* **Causa:** La librería `web-vitals` (usada por `reportWebVitals.js`) no estaba instalada o se eliminó.
+* **Solución:** Instalar **`npm install web-vitals`**, seguido de una reinstalación limpia de dependencias.
+
+---
+
+## 3. Errores de Backend y Conectividad (Despliegue)
+
+### 3.1. `ERR_CONNECTION_REFUSED` (Desde Frontend Local)
+
+* **Error:** `net::ERR_CONNECTION_REFUSED`
+* **Causa:** El servidor backend (`node server.js`) no estaba corriendo o no era accesible en `localhost:5000`.
+* **Solución:** Asegurar que el backend esté iniciado (`node server.js` o `npm run dev`) y muestre "Servidor corriendo en el puerto 5000".
+
+### 3.2. `404 Not Found` para `/undefined/api/...` (Desde Frontend Local)
+
+* **Error:** `POST http://localhost:3000/undefined/api/auth/login 404 (Not Found)`
+* **Causa:** `process.env.REACT_APP_BACKEND_URL` era `undefined` porque `frontend/.env` faltaba, estaba mal escrito o el frontend no se reinició.
+* **Solución:** Crear/corregir `frontend/.env` con `REACT_APP_BACKEND_URL=http://localhost:5000` y reiniciar el frontend.
+
+### 3.3. `404 Not Found` o `Cannot GET /api/auth` (Desde Backend)
+
+* **Error:** `GET http://localhost:5000/api/auth 404 (Not Found)`, `Cannot GET /api/auth`
+* **Causa:** El backend no había cargado la ruta o el controlador, o no se reinició correctamente.
+* **Solución:**
+    1.  Asegurar que las definiciones de rutas y controladores sean correctas.
+    2.  **Reiniciar el backend de forma rigurosa** (`Ctrl+C` múltiples veces y verificar procesos `node.exe`).
+    3.  Considerar reinstalación limpia de `node_modules` en el backend.
+
+### 3.4. `MongooseError: The `uri` parameter... must be a string, got "undefined"`
+
+* **Error:** `Error de conexión a MongoDB: MongooseError: The `uri` parameter... must be a string, got "undefined".`
+* **Causa:** `MONGO_URI` en `backend/.env` (o en Render) no existía o estaba mal escrita.
+* **Solución:** Crear/corregir `backend/.env` con `MONGO_URI=mongodb://localhost:27017/midinerohoy` (o URL de Atlas). Asegurar `require('dotenv').config();` en `server.js`.
+
+### 3.5. `MongoServerError: bad auth : authentication failed` (En Render.com)
+
+* **Error:** `MongoServerError: bad auth : authentication failed`
+* **Causa:** Usuario/contraseña incorrectos en `MONGO_URI` de Atlas en Render, o contraseña con caracteres especiales NO codificados en URL, o símbolos `< >` en la contraseña.
+* **Solución:**
+    1.  Verificar credenciales en MongoDB Atlas.
+    2.  **Codificar en URL la contraseña** si tiene caracteres especiales.
+    3.  **Eliminar los símbolos `<` y `>`** de la contraseña en la cadena `MONGO_URI` en Render.
+    4.  Asegurar permisos y Network Access `0.0.0.0/0` en Atlas.
+
+### 3.6. `404 (Not Found)` con doble barra `//` en URL (Desplegado)
+
+* **Error:** `POST https://mi-dinero-hoy.onrender.com//api/auth/register 404 (Not Found)`
+* **Causa:** `REACT_APP_BACKEND_URL` (en Vercel/`frontend/.env`) terminaba con una barra `/`, causando una doble barra en la URL final.
+* **Solución:** Asegurar que `REACT_APP_BACKEND_URL` (en Vercel y `frontend/.env`) **NO termine con una barra inclinada `/`**. Disparar nuevo despliegue en Vercel.
+
+---
+
+--- FIN DEL DOCUMENTO DE ERRORES Y SOLUCIONES ---
