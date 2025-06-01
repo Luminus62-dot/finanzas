@@ -30,7 +30,7 @@ const AccountsPage = ({ token }) => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      const res = await axios.get("http://localhost:5000/api/accounts");
+      const res = await axios.get("https://mi-dinero-hoy.onrender.com/api/accounts");
       setAccounts(res.data);
     } catch (err) {
       console.error(
