@@ -1,19 +1,16 @@
 // frontend/src/App.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-// Importar de react-router-dom v5
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
 } from "react-router-dom";
-// Importar componentes de React-Bootstrap
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
-// Importar ToastContainer y toast de react-toastify
 import { ToastContainer, toast } from "react-toastify";
 
-// Importar los componentes de página (ahora en la carpeta pages)
+// Importar los componentes de página
 import Layout from "./components/Layout";
 import DashboardPage from "./pages/DashboardPage";
 import AccountsPage from "./pages/AccountsPage";
@@ -24,7 +21,7 @@ import SavingGoalsPage from "./pages/SavingGoalsPage";
 import SettingsPage from "./pages/SettingsPage";
 
 function App() {
-  // Campos de registro y login (manejados directamente en App.js)
+  // Campos de registro y login
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -41,6 +38,9 @@ function App() {
   // Estados para errores de validación de formularios
   const [registerErrors, setRegisterErrors] = useState({});
   const [loginErrors, setLoginErrors] = useState({});
+
+  // NUEVO ESTADO: Controla si se muestra el formulario de registro (false = muestra login por defecto)
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
 
   // Efecto para verificar el token al cargar la aplicación y configurarlo en Axios
   useEffect(() => {
@@ -107,11 +107,10 @@ function App() {
           dateOfBirth,
         }
       );
-      toast.success("Registro exitoso. ¡Bienvenido!");
-      localStorage.setItem("token", res.data.token); // Autologin después de registro
-      setToken(res.data.token);
-      setIsAuthenticated(true);
+      toast.success("Registro exitoso. ¡Bienvenido! Por favor, inicia sesión.");
+      setShowRegisterForm(false); // Volver al formulario de login
 
+      // Limpiar formulario y errores
       setRegisterEmail("");
       setRegisterPassword("");
       setFirstName("");
@@ -143,6 +142,7 @@ function App() {
       setToken(res.data.token);
       setIsAuthenticated(true);
 
+      // Limpiar formulario y errores
       setLoginEmail("");
       setLoginPassword("");
       setLoginErrors({});
@@ -214,24 +214,25 @@ function App() {
                 path="/settings"
                 render={(props) => <SettingsPage {...props} token={token} />}
               />
-              {/* ¡La ruta de verificación se ha eliminado de aquí! */}
-              {/* <Route path="/verify-email" render={(props) => <VerificationPage {...props} />} /> */}
               <Route path="*" render={() => <Redirect to="/dashboard" />} />
             </Switch>
           </Layout>
         ) : (
-          // Si no está autenticado, muestra los formularios de login/registro con Bootstrap
+          // Si no está autenticado, muestra el formulario de login o registro
           <Container
             className="d-flex justify-content-center align-items-center"
             style={{ minHeight: "100vh", backgroundColor: "#f8f9fa" }}
           >
             <Row className="w-100">
-              <Col md={{ span: 8, offset: 2 }} lg={{ span: 6, offset: 3 }}>
+              <Col md={{ span: 6, offset: 3 }} lg={{ span: 4, offset: 4 }}>
+                {" "}
+                {/* Columna única centrada */}
                 <h1 className="text-center mb-4">Mi Dinero Hoy</h1>
-                <Row>
-                  <Col md={6} className="mb-4 mb-md-0">
-                    <Card className="shadow-sm">
-                      <Card.Body>
+                <Card className="shadow-sm">
+                  <Card.Body>
+                    {showRegisterForm ? (
+                      // FORMULARIO DE REGISTRO
+                      <>
                         <h2 className="text-center mb-3">Registrarse</h2>
                         <Form onSubmit={handleRegister}>
                           <Form.Group
@@ -332,12 +333,19 @@ function App() {
                             </Button>
                           </div>
                         </Form>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                  <Col md={6}>
-                    <Card className="shadow-sm">
-                      <Card.Body>
+                        <p className="text-center mt-3">
+                          ¿Ya tienes una cuenta?{" "}
+                          <Button
+                            variant="link"
+                            onClick={() => setShowRegisterForm(false)}
+                          >
+                            Inicia Sesión
+                          </Button>
+                        </p>
+                      </>
+                    ) : (
+                      // FORMULARIO DE LOGIN (DEFAULT)
+                      <>
                         <h2 className="text-center mb-3">Iniciar Sesión</h2>
                         <Form onSubmit={handleLogin}>
                           <Form.Group
@@ -384,10 +392,19 @@ function App() {
                             </Button>
                           </div>
                         </Form>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
+                        <p className="text-center mt-3">
+                          ¿No tienes una cuenta?{" "}
+                          <Button
+                            variant="link"
+                            onClick={() => setShowRegisterForm(true)}
+                          >
+                            Regístrate aquí
+                          </Button>
+                        </p>
+                      </>
+                    )}
+                  </Card.Body>
+                </Card>
               </Col>
             </Row>
           </Container>
