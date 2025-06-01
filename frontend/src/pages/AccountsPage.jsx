@@ -50,7 +50,7 @@ const AccountsPage = ({ token }) => {
   const handleAddAccount = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/accounts", {
+      await axios.post("https://mi-dinero-hoy.onrender.com/api/accounts", {
         name: newAccountName,
         type: newAccountType,
         balance: newAccountBalance,
@@ -83,7 +83,7 @@ const AccountsPage = ({ token }) => {
 
     try {
       await axios.put(
-        `http://localhost:5000/api/accounts/${editingAccount._id}`,
+        `https://mi-dinero-hoy.onrender.com/api/accounts/${editingAccount._id}`,
         {
           name: editingAccount.name,
           type: editingAccount.type,
@@ -108,7 +108,7 @@ const AccountsPage = ({ token }) => {
       )
     ) {
       try {
-        await axios.delete(`http://localhost:5000/api/accounts/${id}`);
+        await axios.delete(`https://mi-dinero-hoy.onrender.com/api/accounts/${id}`);
         fetchAccounts();
         toast.success("Cuenta eliminada exitosamente!");
       } catch (err) {
