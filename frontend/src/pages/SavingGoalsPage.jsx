@@ -1,106 +1,87 @@
 // frontend/src/pages/SavingGoalsPage.jsx
-import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  Card,
-  ListGroup,
-  Alert,
-  ProgressBar,
-} from "react-bootstrap";
-import { FaEdit, FaTrashAlt } from "react-icons/fa"; // <-- NUEVA LÍNEA: Importar íconos
-import { toast } from "react-toastify"; // <-- NUEVA LÍNEA: Importar toast
+import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import { Container, Row, Col, Form, Button, Card, ListGroup, ProgressBar } from 'react-bootstrap';
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 const SavingGoalsPage = ({ token }) => {
-  // <-- ELIMINADO 'message' y 'setMessage' de props
   const [goals, setGoals] = useState([]);
-  const [newGoalName, setNewGoalName] = useState("");
-  const [newGoalTargetAmount, setNewGoalTargetAmount] = useState("");
-  const [newGoalDueDate, setNewGoalDueDate] = useState("");
-  const [newGoalDescription, setNewGoalDescription] = useState("");
+  const [newGoalName, setNewGoalName] = useState('');
+  const [newGoalTargetAmount, setNewGoalTargetAmount] = useState('');
+  const [newGoalDueDate, setNewGoalDueDate] = useState('');
+  const [newGoalDescription, setNewGoalDescription] = useState('');
   const [editingGoal, setEditingGoal] = useState(null);
-  const [addAmount, setAddAmount] = useState("");
-  // const [message, setMessage] = useState(''); // <-- ELIMINADO
+  const [addAmount, setAddAmount] = useState('');
 
-  // Fetch saving goals from backend
   const fetchSavingGoals = useCallback(async () => {
     try {
       if (!token) {
-        toast.error("Token no encontrado. Por favor, inicia sesión de nuevo."); // <-- USANDO TOAST
+        toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
-      axios.defaults.headers.common["x-auth-token"] = token;
-      const res = await axios.get("http://localhost:5000/api/savinggoals");
-      setGoals(res.data);
-      // setMessage(''); // <-- ELIMINADO
+      axios.defaults.headers.common['x-auth-token'] = token;
+      console.log('DEBUG: SavingGoalsPage - Enviando GET a /api/savinggoals...'); // Debug
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/savinggoals`);
+      console.log('DEBUG: SavingGoalsPage - Respuesta de /api/savinggoals:', res.data); // Debug
+      if (Array.isArray(res.data)) {
+        setGoals(res.data);
+      } else {
+        console.error('DEBUG: SavingGoalsPage - La respuesta de /api/savinggoals NO es un array:', res.data);
+        setGoals([]);
+        toast.error('Formato de datos de metas de ahorro inesperado.');
+      }
     } catch (err) {
-      console.error(
-        "Error fetching saving goals:",
-        err.response?.data?.msg || err.message
-      );
-      toast.error(
-        `Error al cargar metas de ahorro: ${
-          err.response?.data?.msg || "Error de red"
-        }`
-      ); // <-- USANDO TOAST
+      console.error('DEBUG: SavingGoalsPage - Error al cargar metas de ahorro:', err.response?.data || err.message); // Debug
+      toast.error(`Error al cargar metas de ahorro: ${err.response?.data?.msg || 'Error de red'}`);
     }
-  }, [token]); // <-- Eliminado 'setMessage' de dependencias
+  }, [token]);
 
   useEffect(() => {
+    console.log('DEBUG: SavingGoalsPage - Iniciando carga inicial de datos...'); // Debug
     fetchSavingGoals();
   }, [fetchSavingGoals]);
 
-  // Handle adding a new saving goal
   const handleAddGoal = async (e) => {
     e.preventDefault();
     try {
+      console.log('DEBUG: SavingGoalsPage - Enviando POST a /api/savinggoals...'); // Debug
       const goalData = {
         name: newGoalName,
         targetAmount: parseFloat(newGoalTargetAmount),
         dueDate: newGoalDueDate || undefined,
         description: newGoalDescription,
       };
-      await axios.post("http://localhost:5000/api/savinggoals", goalData);
-      toast.success("Meta de ahorro creada exitosamente!"); // <-- USANDO TOAST
-      setNewGoalName("");
-      setNewGoalTargetAmount("");
-      setNewGoalDueDate("");
-      setNewGoalDescription("");
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/savinggoals`, goalData);
+      toast.success('Meta de ahorro creada exitosamente!');
+      setNewGoalName('');
+      setNewGoalTargetAmount('');
+      setNewGoalDueDate('');
+      setNewGoalDescription('');
       fetchSavingGoals();
     } catch (err) {
-      toast.error(
-        `Error al crear meta de ahorro: ${
-          err.response?.data?.msg || err.message
-        }`
-      ); // <-- USANDO TOAST
+      console.error('DEBUG: SavingGoalsPage - Error al crear meta de ahorro:', err.response?.data || err.message); // Debug
+      toast.error(`Error al crear meta de ahorro: ${err.response?.data?.msg || err.message}`);
     }
   };
 
-  // Start editing an existing goal
   const startEditGoal = (goal) => {
     setEditingGoal({
       ...goal,
-      dueDate: goal.dueDate
-        ? new Date(goal.dueDate).toISOString().slice(0, 10)
-        : "",
+      dueDate: goal.dueDate ? new Date(goal.dueDate).toISOString().slice(0, 10) : '',
     });
   };
 
-  // Cancel editing
   const cancelEditGoal = () => {
     setEditingGoal(null);
   };
 
-  // Handle updating an existing goal
   const handleUpdateGoal = async (e) => {
     e.preventDefault();
     if (!editingGoal) return;
 
     try {
+      console.log('DEBUG: SavingGoalsPage - Enviando PUT a /api/savinggoals/:id...'); // Debug
       const updatedGoalData = {
         name: editingGoal.name,
         targetAmount: parseFloat(editingGoal.targetAmount),
@@ -109,66 +90,50 @@ const SavingGoalsPage = ({ token }) => {
         description: editingGoal.description,
         isCompleted: editingGoal.isCompleted,
       };
-      await axios.put(
-        `http://localhost:5000/api/savinggoals/${editingGoal._id}`,
-        updatedGoalData
-      );
-      toast.success("Meta de ahorro actualizada exitosamente!"); // <-- USANDO TOAST
-      setEditingGoal(null); // Exit edit mode
-      fetchSavingGoals(); // Refresh goals list
+      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/savinggoals/${editingGoal._id}`, updatedGoalData);
+      toast.success('Meta de ahorro actualizada exitosamente!');
+      setEditingGoal(null);
+      fetchSavingGoals();
     } catch (err) {
-      toast.error(
-        `Error al actualizar meta de ahorro: ${
-          err.response?.data?.msg || err.message
-        }`
-      ); // <-- USANDO TOAST
+      console.error('DEBUG: SavingGoalsPage - Error al actualizar meta de ahorro:', err.response?.data || err.message); // Debug
+      toast.error(`Error al actualizar meta de ahorro: ${err.response?.data?.msg || err.message}`);
     }
   };
 
-  // Handle adding amount to a goal
   const handleAddAmountToGoal = async (goalId, currentAmount) => {
     if (!addAmount || parseFloat(addAmount) <= 0) {
-      toast.error("Por favor, ingresa un monto válido para añadir."); // <-- USANDO TOAST
+      toast.error('Por favor, ingresa un monto válido para añadir.');
       return;
     }
     try {
-      const goalToUpdate = goals.find((g) => g._id === goalId);
+      console.log('DEBUG: SavingGoalsPage - Añadiendo monto a meta...'); // Debug
+      const goalToUpdate = goals.find(g => g._id === goalId);
       if (!goalToUpdate) return;
 
       const newCurrentAmount = currentAmount + parseFloat(addAmount);
-      await axios.put(`http://localhost:5000/api/savinggoals/${goalId}`, {
+      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/savinggoals/${goalId}`, {
         currentAmount: newCurrentAmount,
         isCompleted: newCurrentAmount >= goalToUpdate.targetAmount,
       });
-      toast.success(
-        `Monto de ${parseFloat(addAmount).toFixed(2)} añadido a la meta!`
-      ); // <-- USANDO TOAST
-      setAddAmount(""); // Clear add amount input
-      fetchSavingGoals(); // Refresh goals list
+      toast.success(`Monto de ${parseFloat(addAmount).toFixed(2)} añadido a la meta!`);
+      setAddAmount('');
+      fetchSavingGoals();
     } catch (err) {
-      toast.error(
-        `Error al añadir monto: ${err.response?.data?.msg || err.message}`
-      ); // <-- USANDO TOAST
+      console.error('DEBUG: SavingGoalsPage - Error al añadir monto a meta:', err.response?.data || err.message); // Debug
+      toast.error(`Error al añadir monto: ${err.response?.data?.msg || err.message}`);
     }
   };
 
-  // Handle deleting a goal
   const handleDeleteGoal = async (id) => {
-    if (
-      window.confirm(
-        "¿Estás seguro de que quieres eliminar esta meta de ahorro?"
-      )
-    ) {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta meta de ahorro?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/savinggoals/${id}`);
-        toast.success("Meta de ahorro eliminada exitosamente!"); // <-- USANDO TOAST
+        console.log('DEBUG: SavingGoalsPage - Enviando DELETE a /api/savinggoals/:id...'); // Debug
+        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/savinggoals/${id}`);
+        toast.success('Meta de ahorro eliminada exitosamente!');
         fetchSavingGoals();
       } catch (err) {
-        toast.error(
-          `Error al eliminar meta de ahorro: ${
-            err.response?.data?.msg || err.message
-          }`
-        ); // <-- USANDO TOAST
+        console.error('DEBUG: SavingGoalsPage - Error al eliminar meta de ahorro:', err.response?.data || err.message); // Debug
+        toast.error(`Error al eliminar meta de ahorro: ${err.response?.data?.msg || err.message}`);
       }
     }
   };
@@ -177,18 +142,10 @@ const SavingGoalsPage = ({ token }) => {
     <Container className="py-4">
       <h2 className="mb-4 text-center">Mis Metas de Ahorro</h2>
 
-      {/* Mensajes de éxito/error - ELIMINADO EL COMPONENTE ALERT */}
-      {/* {message && (
-        <Alert variant={message.includes('Error') ? 'danger' : 'success'} className="mb-4">
-          {message}
-        </Alert>
-      )} */}
-
-      {/* Formulario para Añadir/Editar Meta de Ahorro */}
       <Card className="mb-4 shadow-sm">
         <Card.Body>
           <Card.Title className="text-center mb-3">
-            {editingGoal ? "Editar Meta de Ahorro" : "Crear Nueva Meta"}
+            {editingGoal ? 'Editar Meta de Ahorro' : 'Crear Nueva Meta'}
           </Card.Title>
           <Form onSubmit={editingGoal ? handleUpdateGoal : handleAddGoal}>
             <Row className="mb-3 g-3">
@@ -198,14 +155,7 @@ const SavingGoalsPage = ({ token }) => {
                   <Form.Control
                     type="text"
                     value={editingGoal ? editingGoal.name : newGoalName}
-                    onChange={(e) =>
-                      editingGoal
-                        ? setEditingGoal({
-                            ...editingGoal,
-                            name: e.target.value,
-                          })
-                        : setNewGoalName(e.target.value)
-                    }
+                    onChange={(e) => editingGoal ? setEditingGoal({ ...editingGoal, name: e.target.value }) : setNewGoalName(e.target.value)}
                     required
                   />
                 </Form.Group>
@@ -215,19 +165,8 @@ const SavingGoalsPage = ({ token }) => {
                   <Form.Label>Monto Objetivo:</Form.Label>
                   <Form.Control
                     type="number"
-                    value={
-                      editingGoal
-                        ? editingGoal.targetAmount
-                        : newGoalTargetAmount
-                    }
-                    onChange={(e) =>
-                      editingGoal
-                        ? setEditingGoal({
-                            ...editingGoal,
-                            targetAmount: e.target.value,
-                          })
-                        : setNewGoalTargetAmount(e.target.value)
-                    }
+                    value={editingGoal ? editingGoal.targetAmount : newGoalTargetAmount}
+                    onChange={(e) => editingGoal ? setEditingGoal({ ...editingGoal, targetAmount: e.target.value }) : setNewGoalTargetAmount(e.target.value)}
                     required
                     step="0.01"
                     min="0.01"
@@ -243,12 +182,7 @@ const SavingGoalsPage = ({ token }) => {
                     <Form.Control
                       type="number"
                       value={editingGoal.currentAmount}
-                      onChange={(e) =>
-                        setEditingGoal({
-                          ...editingGoal,
-                          currentAmount: e.target.value,
-                        })
-                      }
+                      onChange={(e) => setEditingGoal({ ...editingGoal, currentAmount: e.target.value })}
                       step="0.01"
                       min="0"
                     />
@@ -261,14 +195,7 @@ const SavingGoalsPage = ({ token }) => {
                   <Form.Control
                     type="date"
                     value={editingGoal ? editingGoal.dueDate : newGoalDueDate}
-                    onChange={(e) =>
-                      editingGoal
-                        ? setEditingGoal({
-                            ...editingGoal,
-                            dueDate: e.target.value,
-                          })
-                        : setNewGoalDueDate(e.target.value)
-                    }
+                    onChange={(e) => editingGoal ? setEditingGoal({ ...editingGoal, dueDate: e.target.value }) : setNewGoalDueDate(e.target.value)}
                   />
                 </Form.Group>
               </Col>
@@ -278,25 +205,13 @@ const SavingGoalsPage = ({ token }) => {
               <Form.Control
                 as="textarea"
                 rows={2}
-                value={
-                  editingGoal ? editingGoal.description : newGoalDescription
-                }
-                onChange={(e) =>
-                  editingGoal
-                    ? setEditingGoal({
-                        ...editingGoal,
-                        description: e.target.value,
-                      })
-                    : setNewGoalDescription(e.target.value)
-                }
+                value={editingGoal ? editingGoal.description : newGoalDescription}
+                onChange={(e) => editingGoal ? setEditingGoal({ ...editingGoal, description: e.target.value }) : setNewGoalDescription(e.target.value)}
               />
             </Form.Group>
             <div className="d-grid gap-2">
-              <Button
-                variant={editingGoal ? "warning" : "success"}
-                type="submit"
-              >
-                {editingGoal ? "Guardar Cambios" : "Crear Meta"}
+              <Button variant={editingGoal ? 'warning' : 'success'} type="submit">
+                {editingGoal ? 'Guardar Cambios' : 'Crear Meta'}
               </Button>
               {editingGoal && (
                 <Button variant="secondary" onClick={cancelEditGoal}>
@@ -308,70 +223,43 @@ const SavingGoalsPage = ({ token }) => {
         </Card.Body>
       </Card>
 
-      {/* Listado de Metas de Ahorro */}
       <Card className="shadow-sm">
         <Card.Body>
           <Card.Title className="text-center mb-3">Tus Metas</Card.Title>
+          {console.log('DEBUG: SavingGoalsPage - Estado de goals ANTES del map:', goals)}
           {goals.length === 0 ? (
-            <p className="text-center">
-              No tienes metas de ahorro. ¡Crea una para empezar a ahorrar!
-            </p>
+            <p className="text-center">No tienes metas de ahorro. ¡Crea una para empezar a ahorrar!</p>
           ) : (
             <ListGroup variant="flush">
-              {goals.map((goal) => {
+              {goals.map(goal => {
                 const progress = (goal.currentAmount / goal.targetAmount) * 100;
-                const isOverdue =
-                  goal.dueDate &&
-                  new Date(goal.dueDate) < new Date() &&
-                  !goal.isCompleted;
+                const isOverdue = goal.dueDate && new Date(goal.dueDate) < new Date() && !goal.isCompleted;
 
                 return (
-                  <ListGroup.Item
-                    key={goal._id}
-                    className="mb-3 p-3 position-relative"
-                  >
+                  <ListGroup.Item key={goal._id} className="mb-3 p-3 position-relative">
                     {goal.isCompleted && (
-                      <span className="badge bg-success position-absolute top-0 end-0 mt-2 me-2">
-                        ¡Completada!
-                      </span>
+                      <span className="badge bg-success position-absolute top-0 end-0 mt-2 me-2">¡Completada!</span>
                     )}
                     <h4 className="mb-2">{goal.name}</h4>
                     <p className="mb-1">
-                      Objetivo:{" "}
-                      <strong>{goal.targetAmount.toFixed(2)} USD</strong> |
-                      Actual:{" "}
-                      <strong>{goal.currentAmount.toFixed(2)} USD</strong>
+                      Objetivo: <strong>{goal.targetAmount.toFixed(2)} USD</strong> | Actual: <strong>{goal.currentAmount.toFixed(2)} USD</strong>
                     </p>
                     <ProgressBar
                       now={Math.min(100, progress)}
-                      variant={goal.isCompleted ? "success" : "primary"}
+                      variant={goal.isCompleted ? 'success' : 'primary'}
                       className="mb-2"
-                      style={{ height: "15px" }}
+                      style={{ height: '15px' }}
                     />
-                    <p
-                      className="mb-1 text-muted"
-                      style={{ fontSize: "0.9em" }}
-                    >
+                    <p className="mb-1 text-muted" style={{ fontSize: '0.9em' }}>
                       Progreso: {progress.toFixed(2)}%
                       {goal.dueDate && (
-                        <span
-                          className={`ms-3 ${isOverdue ? "text-danger" : ""}`}
-                        >
-                          Fecha Límite:{" "}
-                          {new Date(goal.dueDate).toLocaleDateString()}
+                        <span className={`ms-3 ${isOverdue ? 'text-danger' : ''}`}>
+                          Fecha Límite: {new Date(goal.dueDate).toLocaleDateString()}
                         </span>
                       )}
                     </p>
-                    {goal.description && (
-                      <p
-                        className="text-muted fst-italic mb-2"
-                        style={{ fontSize: "0.85em" }}
-                      >
-                        {goal.description}
-                      </p>
-                    )}
+                    {goal.description && <p className="text-muted fst-italic mb-2" style={{ fontSize: '0.85em' }}>{goal.description}</p>}
 
-                    {/* Add amount input and buttons */}
                     <div className="d-flex align-items-center mt-3">
                       <Form.Control
                         type="number"
@@ -382,29 +270,14 @@ const SavingGoalsPage = ({ token }) => {
                         min="0.01"
                         className="w-auto me-2"
                       />
-                      <Button
-                        variant="info"
-                        className="me-auto"
-                        onClick={() =>
-                          handleAddAmountToGoal(goal._id, goal.currentAmount)
-                        }
-                      >
+                      <Button variant="info" className="me-auto" onClick={() => handleAddAmountToGoal(goal._id, goal.currentAmount)}>
                         Añadir
                       </Button>
-                      <Button
-                        variant="warning"
-                        size="sm"
-                        className="me-2"
-                        onClick={() => startEditGoal(goal)}
-                      >
-                        <FaEdit /> Editar {/* <-- ÍCONO */}
+                      <Button variant="warning" size="sm" className="me-2" onClick={() => startEditGoal(goal)}>
+                        <FaEdit /> Editar
                       </Button>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleDeleteGoal(goal._id)}
-                      >
-                        <FaTrashAlt /> Eliminar {/* <-- ÍCONO */}
+                      <Button variant="danger" size="sm" onClick={() => handleDeleteGoal(goal._id)}>
+                        <FaTrashAlt /> Eliminar
                       </Button>
                     </div>
                   </ListGroup.Item>

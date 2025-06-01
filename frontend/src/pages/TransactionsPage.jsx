@@ -1,180 +1,159 @@
 // frontend/src/pages/TransactionsPage.jsx
-import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  Card,
-  ListGroup,
-  Alert,
-} from "react-bootstrap";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
-import { toast } from "react-toastify";
+import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import { Container, Row, Col, Form, Button, Card, ListGroup } from 'react-bootstrap';
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 const TransactionsPage = ({ token }) => {
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  // Estados para el formulario de AÑADIR/EDITAR TRANSACCIÓN
-  const [transactionType, setTransactionType] = useState("Gasto");
-  const [transactionAmount, setTransactionAmount] = useState("");
-  const [transactionCategory, setTransactionCategory] = useState("");
-  const [transactionDescription, setTransactionDescription] = useState("");
-  const [transactionDate, setTransactionDate] = useState(
-    new Date().toISOString().slice(0, 10)
-  );
-  const [selectedAccountId, setSelectedAccountId] = useState("");
-  const [toAccountId, setToAccountId] = useState("");
+  const [transactionType, setTransactionType] = useState('Gasto');
+  const [transactionAmount, setTransactionAmount] = useState('');
+  const [transactionCategory, setTransactionCategory] = useState('');
+  const [transactionDescription, setTransactionDescription] = useState('');
+  const [transactionDate, setTransactionDate] = useState(new Date().toISOString().slice(0, 10));
+  const [selectedAccountId, setSelectedAccountId] = useState('');
+  const [toAccountId, setToAccountId] = useState('');
   const [editingTransaction, setEditingTransaction] = useState(null);
 
-  // Funciones de Carga de Datos (Cuentas, Transacciones, Categorías)
   const fetchAccounts = useCallback(async () => {
     try {
       if (token) {
-        axios.defaults.headers.common["x-auth-token"] = token;
+        axios.defaults.headers.common['x-auth-token'] = token;
       } else {
-        toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
+        toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
-      const res = await axios.get("http://localhost:5000/api/accounts");
-      setAccounts(res.data);
-      if (res.data.length > 0 && !selectedAccountId && !editingTransaction) {
-        setSelectedAccountId(res.data[0]._id);
-      } else if (res.data.length === 0) {
-        setSelectedAccountId("");
+      console.log('DEBUG: TransactionsPage - Enviando GET a /api/accounts...'); // Debug
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/accounts`);
+      console.log('DEBUG: TransactionsPage - Respuesta de /api/accounts:', res.data); // Debug
+      if (Array.isArray(res.data)) {
+        setAccounts(res.data);
+        if (res.data.length > 0 && !selectedAccountId && !editingTransaction) {
+          setSelectedAccountId(res.data[0]._id);
+        } else if (res.data.length === 0) {
+          setSelectedAccountId('');
+        }
+      } else {
+        console.error('DEBUG: TransactionsPage - La respuesta de /api/accounts NO es un array:', res.data);
+        setAccounts([]);
+        toast.error('Formato de datos de cuentas inesperado.');
       }
     } catch (err) {
-      console.error(
-        "Error al cargar cuentas:",
-        err.response?.data?.msg || err.message
-      );
-      toast.error(
-        `Error al cargar cuentas: ${err.response?.data?.msg || "Error de red"}`
-      );
+      console.error('DEBUG: TransactionsPage - Error al cargar cuentas:', err.response?.data || err.message); // Debug
+      toast.error(`Error al cargar cuentas: ${err.response?.data?.msg || 'Error de red'}`);
     }
   }, [token, selectedAccountId, editingTransaction]);
 
   const fetchTransactions = useCallback(async () => {
     try {
       if (token) {
-        axios.defaults.headers.common["x-auth-token"] = token;
+        axios.defaults.headers.common['x-auth-token'] = token;
       } else {
-        toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
+        toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
-      const res = await axios.get("http://localhost:5000/api/transactions");
-      setTransactions(res.data);
+      console.log('DEBUG: TransactionsPage - Enviando GET a /api/transactions...'); // Debug
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/transactions`);
+      console.log('DEBUG: TransactionsPage - Respuesta de /api/transactions:', res.data); // Debug
+      if (Array.isArray(res.data)) {
+        setTransactions(res.data);
+      } else {
+        console.error('DEBUG: TransactionsPage - La respuesta de /api/transactions NO es un array:', res.data);
+        setTransactions([]);
+        toast.error('Formato de datos de transacciones inesperado.');
+      }
     } catch (err) {
-      console.error(
-        "Error al cargar transacciones:",
-        err.response?.data?.msg || err.message
-      );
-      toast.error(
-        `Error al cargar transacciones: ${
-          err.response?.data?.msg || "Error de red"
-        }`
-      );
+      console.error('DEBUG: TransactionsPage - Error al cargar transacciones:', err.response?.data || err.message); // Debug
+      toast.error(`Error al cargar transacciones: ${err.response?.data?.msg || 'Error de red'}`);
     }
   }, [token]);
 
   const fetchCategories = useCallback(async () => {
     try {
       if (token) {
-        axios.defaults.headers.common["x-auth-token"] = token;
+        axios.defaults.headers.common['x-auth-token'] = token;
       } else {
-        toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
+        toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
-      const res = await axios.get("http://localhost:5000/api/categories");
-      setCategories(res.data);
+      console.log('DEBUG: TransactionsPage - Enviando GET a /api/categories...'); // Debug
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/categories`);
+      console.log('DEBUG: TransactionsPage - Respuesta de /api/categories:', res.data); // Debug
+      if (Array.isArray(res.data)) {
+        setCategories(res.data);
+      } else {
+        console.error('DEBUG: TransactionsPage - La respuesta de /api/categories NO es un array:', res.data);
+        setCategories([]);
+        toast.error('Formato de datos de categorías inesperado.');
+      }
     } catch (err) {
-      console.error(
-        "Error al cargar categorías:",
-        err.response?.data?.msg || err.message
-      );
-      toast.error(
-        `Error al cargar categorías: ${
-          err.response?.data?.msg || "Error de red"
-        }`
-      );
+      console.error('DEBUG: TransactionsPage - Error al cargar categorías:', err.response?.data || err.message); // Debug
+      toast.error(`Error al cargar categorías: ${err.response?.data?.msg || 'Error de red'}`);
     }
   }, [token]);
 
   useEffect(() => {
+    console.log('DEBUG: TransactionsPage - Iniciando carga inicial de datos...'); // Debug
     fetchAccounts();
     fetchTransactions();
     fetchCategories();
   }, [fetchAccounts, fetchTransactions, fetchCategories]);
 
-  // Funciones para TRANSACCIONES
   const handleAddTransaction = async (e) => {
     e.preventDefault();
     try {
+      console.log('DEBUG: TransactionsPage - Enviando POST a /api/transactions...'); // Debug
       const transactionData = {
         account: selectedAccountId,
         type: transactionType,
         category: transactionCategory,
         description: transactionDescription,
         amount: parseFloat(transactionAmount),
-        date: transactionDate,
+        date: transactionDate
       };
-      if (transactionType === "Transferencia") {
+      if (transactionType === 'Transferencia') {
         transactionData.toAccount = toAccountId;
       }
 
-      await axios.post(
-        "http://localhost:5000/api/transactions",
-        transactionData
-      );
-      toast.success("Transacción registrada exitosamente!");
-      fetchAccounts(); // Recargar cuentas para actualizar saldos
-      fetchTransactions(); // Recargar transacciones para ver la nueva
-      // Limpiar formulario de transacción
-      setTransactionAmount("");
-      setTransactionCategory("");
-      setTransactionDescription("");
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/transactions`, transactionData);
+      toast.success('Transacción registrada exitosamente!');
+      fetchAccounts();
+      fetchTransactions();
+      setTransactionAmount('');
+      setTransactionCategory('');
+      setTransactionDescription('');
       setTransactionDate(new Date().toISOString().slice(0, 10));
-      setTransactionType("Gasto");
-      setToAccountId("");
+      setTransactionType('Gasto');
+      setToAccountId('');
     } catch (err) {
-      toast.error(
-        `Error al registrar transacción: ${
-          err.response?.data?.msg || err.message
-        }`
-      );
+      console.error('DEBUG: TransactionsPage - Error al añadir transacción:', err.response?.data || err.message); // Debug
+      toast.error(`Error al registrar transacción: ${err.response?.data?.msg || err.message}`);
     }
   };
 
   const startEditTransaction = (transaction) => {
-    setEditingTransaction({
-      ...transaction,
-      date: new Date(transaction.date).toISOString().slice(0, 10),
-    });
+    setEditingTransaction({ ...transaction, date: new Date(transaction.date).toISOString().slice(0, 10) });
     setTransactionType(transaction.type);
     setTransactionAmount(transaction.amount);
-    setTransactionCategory(transaction.category || "");
-    setTransactionDescription(transaction.description || "");
+    setTransactionCategory(transaction.category || '');
+    setTransactionDescription(transaction.description || '');
     setTransactionDate(new Date(transaction.date).toISOString().slice(0, 10));
     setSelectedAccountId(transaction.account?._id);
-    setToAccountId(
-      transaction.type === "Transferencia" && transaction.toAccount
-        ? transaction.toAccount._id
-        : ""
-    );
+    setToAccountId(transaction.type === 'Transferencia' && transaction.toAccount ? transaction.toAccount._id : '');
   };
 
   const cancelEditTransaction = () => {
     setEditingTransaction(null);
-    setTransactionAmount("");
-    setTransactionCategory("");
-    setTransactionDescription("");
+    setTransactionAmount('');
+    setTransactionCategory('');
+    setTransactionDescription('');
     setTransactionDate(new Date().toISOString().slice(0, 10));
-    setTransactionType("Gasto");
-    setToAccountId("");
+    setTransactionType('Gasto');
+    setToAccountId('');
   };
 
   const handleUpdateTransaction = async (e) => {
@@ -182,6 +161,7 @@ const TransactionsPage = ({ token }) => {
     if (!editingTransaction) return;
 
     try {
+      console.log('DEBUG: TransactionsPage - Enviando PUT a /api/transactions/:id...'); // Debug
       const updatedTransactionData = {
         account: selectedAccountId,
         type: transactionType,
@@ -189,86 +169,58 @@ const TransactionsPage = ({ token }) => {
         description: transactionDescription,
         amount: parseFloat(transactionAmount),
         date: transactionDate,
-        toAccount:
-          transactionType === "Transferencia" ? toAccountId : undefined,
+        toAccount: transactionType === 'Transferencia' ? toAccountId : undefined,
       };
 
-      await axios.put(
-        `http://localhost:5000/api/transactions/${editingTransaction._id}`,
-        updatedTransactionData
-      );
-      toast.success("Transacción actualizada exitosamente!");
+      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/transactions/${editingTransaction._id}`, updatedTransactionData);
+      toast.success('Transacción actualizada exitosamente!');
       fetchAccounts();
       fetchTransactions();
       cancelEditTransaction();
     } catch (err) {
-      toast.error(
-        `Error al actualizar transacción: ${
-          err.response?.data?.msg || err.message
-        }`
-      );
+      console.error('DEBUG: TransactionsPage - Error al actualizar transacción:', err.response?.data || err.message); // Debug
+      toast.error(`Error al actualizar transacción: ${err.response?.data?.msg || err.message}`);
     }
   };
 
   const handleDeleteTransaction = async (id) => {
-    if (
-      window.confirm("¿Estás seguro de que quieres eliminar esta transacción?")
-    ) {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta transacción?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/transactions/${id}`);
-        toast.success("Transacción eliminada y saldos actualizados!");
+        console.log('DEBUG: TransactionsPage - Enviando DELETE a /api/transactions/:id...'); // Debug
+        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/transactions/${id}`);
+        toast.success('Transacción eliminada y saldos actualizados!');
         fetchAccounts();
         fetchTransactions();
       } catch (err) {
-        toast.error(
-          `Error al eliminar transacción: ${
-            err.response?.data?.msg || err.message
-          }`
-        );
+        console.error('DEBUG: TransactionsPage - Error al eliminar transacción:', err.response?.data || err.message); // Debug
+        toast.error(`Error al eliminar transacción: ${err.response?.data?.msg || err.message}`);
       }
     }
   };
 
-  const filteredCategories = categories.filter(
-    (cat) => cat.type === transactionType
-  );
+  const filteredCategories = categories.filter(cat => cat.type === transactionType);
 
   return (
     <Container className="py-4">
       <h2 className="mb-4 text-center">Gestión de Transacciones</h2>
 
-      {/* Formulario para Añadir/Editar Transacción */}
       <Card className="mb-4 shadow-sm">
         <Card.Body>
           <Card.Title className="text-center mb-3">
-            {editingTransaction
-              ? "Editar Transacción"
-              : "Añadir Nueva Transacción"}
+            {editingTransaction ? 'Editar Transacción' : 'Añadir Nueva Transacción'}
           </Card.Title>
-          <Form
-            onSubmit={
-              editingTransaction
-                ? handleUpdateTransaction
-                : handleAddTransaction
-            }
-          >
+          <Form onSubmit={editingTransaction ? handleUpdateTransaction : handleAddTransaction}>
             <Row className="mb-3 g-3">
               <Col xs={12} md={4}>
-                {" "}
-                {/* xs={12} para ocupar todo el ancho en móviles */}
-                <Form.Group
-                  controlId="transactionType"
-                  className="mb-3 mb-md-0"
-                >
+                <Form.Group controlId="transactionType" className="mb-3 mb-md-0">
                   <Form.Label>Tipo:</Form.Label>
                   <Form.Control
                     as="select"
                     value={transactionType}
                     onChange={(e) => {
                       setTransactionType(e.target.value);
-                      setTransactionCategory("");
-                      if (e.target.value !== "Transferencia")
-                        setToAccountId("");
+                      setTransactionCategory('');
+                      if (e.target.value !== 'Transferencia') setToAccountId('');
                     }}
                   >
                     <option value="Gasto">Gasto</option>
@@ -278,10 +230,7 @@ const TransactionsPage = ({ token }) => {
                 </Form.Group>
               </Col>
               <Col xs={12} md={4}>
-                <Form.Group
-                  controlId="selectedAccountId"
-                  className="mb-3 mb-md-0"
-                >
+                <Form.Group controlId="selectedAccountId" className="mb-3 mb-md-0">
                   <Form.Label>Cuenta:</Form.Label>
                   <Form.Control
                     as="select"
@@ -291,16 +240,15 @@ const TransactionsPage = ({ token }) => {
                     disabled={accounts.length === 0}
                   >
                     <option value="">Selecciona una cuenta</option>
-                    {accounts.map((account) => (
+                    {accounts.map(account => (
                       <option key={account._id} value={account._id}>
-                        {account.name} ({account.balance.toFixed(2)}{" "}
-                        {account.currency})
+                        {account.name} ({account.balance.toFixed(2)} {account.currency})
                       </option>
                     ))}
                   </Form.Control>
                 </Form.Group>
               </Col>
-              {transactionType === "Transferencia" && (
+              {transactionType === 'Transferencia' && (
                 <Col xs={12} md={4}>
                   <Form.Group controlId="toAccountId" className="mb-3 mb-md-0">
                     <Form.Label>Cuenta Destino:</Form.Label>
@@ -309,18 +257,14 @@ const TransactionsPage = ({ token }) => {
                       value={toAccountId}
                       onChange={(e) => setToAccountId(e.target.value)}
                       required
-                      disabled={
-                        accounts.length === 0 || selectedAccountId === ""
-                      }
+                      disabled={accounts.length === 0 || selectedAccountId === ''}
                     >
                       <option value="">Selecciona cuenta destino</option>
-                      {accounts
-                        .filter((acc) => acc._id !== selectedAccountId)
-                        .map((account) => (
-                          <option key={account._id} value={account._id}>
-                            {account.name}
-                          </option>
-                        ))}
+                      {accounts.filter(acc => acc._id !== selectedAccountId).map(account => (
+                        <option key={account._id} value={account._id}>
+                          {account.name}
+                        </option>
+                      ))}
                     </Form.Control>
                   </Form.Group>
                 </Col>
@@ -328,10 +272,7 @@ const TransactionsPage = ({ token }) => {
             </Row>
             <Row className="mb-3 g-3">
               <Col xs={12} md={4}>
-                <Form.Group
-                  controlId="transactionAmount"
-                  className="mb-3 mb-md-0"
-                >
+                <Form.Group controlId="transactionAmount" className="mb-3 mb-md-0">
                   <Form.Label>Monto:</Form.Label>
                   <Form.Control
                     type="number"
@@ -343,34 +284,26 @@ const TransactionsPage = ({ token }) => {
                   />
                 </Form.Group>
               </Col>
-              {transactionType !== "Transferencia" && (
+              {transactionType !== 'Transferencia' && (
                 <Col xs={12} md={4}>
-                  <Form.Group
-                    controlId="transactionCategory"
-                    className="mb-3 mb-md-0"
-                  >
+                  <Form.Group controlId="transactionCategory" className="mb-3 mb-md-0">
                     <Form.Label>Categoría:</Form.Label>
                     <Form.Control
                       as="select"
                       value={transactionCategory}
                       onChange={(e) => setTransactionCategory(e.target.value)}
-                      required={transactionType !== "Transferencia"}
+                      required={transactionType !== 'Transferencia'}
                     >
                       <option value="">Selecciona una categoría</option>
-                      {filteredCategories.map((cat) => (
-                        <option key={cat._id} value={cat.name}>
-                          {cat.name}
-                        </option>
+                      {filteredCategories.map(cat => (
+                        <option key={cat._id} value={cat.name}>{cat.name}</option>
                       ))}
                     </Form.Control>
                   </Form.Group>
                 </Col>
               )}
               <Col xs={12} md={4}>
-                <Form.Group
-                  controlId="transactionDate"
-                  className="mb-3 mb-md-0"
-                >
+                <Form.Group controlId="transactionDate" className="mb-3 mb-md-0">
                   <Form.Label>Fecha:</Form.Label>
                   <Form.Control
                     type="date"
@@ -391,11 +324,8 @@ const TransactionsPage = ({ token }) => {
               />
             </Form.Group>
             <div className="d-grid gap-2">
-              <Button
-                variant={editingTransaction ? "warning" : "primary"}
-                type="submit"
-              >
-                {editingTransaction ? "Guardar Cambios" : "Añadir Transacción"}
+              <Button variant={editingTransaction ? 'warning' : 'primary'} type="submit">
+                {editingTransaction ? 'Guardar Cambios' : 'Añadir Transacción'}
               </Button>
               {editingTransaction && (
                 <Button variant="secondary" onClick={cancelEditTransaction}>
@@ -407,58 +337,30 @@ const TransactionsPage = ({ token }) => {
         </Card.Body>
       </Card>
 
-      {/* Listado de Transacciones */}
       <Card className="shadow-sm">
         <Card.Body>
-          <Card.Title className="text-center mb-3">
-            Historial de Transacciones
-          </Card.Title>
+          <Card.Title className="text-center mb-3">Historial de Transacciones</Card.Title>
+          {console.log('DEBUG: TransactionsPage - Estado de transactions ANTES del map:', transactions)}
           {transactions.length === 0 ? (
-            <p className="text-center">
-              No tienes transacciones registradas. ¡Añade una para empezar!
-            </p>
+            <p className="text-center">No tienes transacciones registradas. ¡Añade una para empezar!</p>
           ) : (
             <ListGroup variant="flush">
-              {transactions.map((trans) => (
-                <ListGroup.Item
-                  key={trans._id}
-                  className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2"
-                >
+              {transactions.map(trans => (
+                <ListGroup.Item key={trans._id} className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2">
                   <div className="mb-2 mb-md-0">
-                    <strong
-                      className={
-                        trans.type === "Ingreso"
-                          ? "text-success"
-                          : trans.type === "Gasto"
-                          ? "text-danger"
-                          : "text-primary"
-                      }
-                    >
-                      {trans.type}: {trans.amount.toFixed(2)}{" "}
-                      {trans.account?.currency || "USD"}
+                    <strong className={trans.type === 'Ingreso' ? 'text-success' : trans.type === 'Gasto' ? 'text-danger' : 'text-primary'}>
+                      {trans.type}: {trans.amount.toFixed(2)} {trans.account?.currency || 'USD'}
                     </strong>
-                    <div className="text-muted" style={{ fontSize: "0.85em" }}>
-                      {trans.description || trans.category || "Sin descripción"}
+                    <div className="text-muted" style={{ fontSize: '0.85em' }}>
+                      {trans.description || trans.category || 'Sin descripción'}
                     </div>
                   </div>
-                  <small className="text-muted">
-                    {new Date(trans.date).toLocaleDateString()}
-                  </small>
+                  <small className="text-muted">{new Date(trans.date).toLocaleDateString()}</small>
                   <div className="d-flex gap-2 mt-2 mt-md-0">
-                    {" "}
-                    {/* mt-2 para móvil, mt-md-0 para med+ */}
-                    <Button
-                      variant="info"
-                      size="sm"
-                      onClick={() => startEditTransaction(trans)}
-                    >
+                    <Button variant="info" size="sm" onClick={() => startEditTransaction(trans)}>
                       <FaEdit /> Editar
                     </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => handleDeleteTransaction(trans._id)}
-                    >
+                    <Button variant="danger" size="sm" onClick={() => handleDeleteTransaction(trans._id)}>
                       <FaTrashAlt /> Eliminar
                     </Button>
                   </div>
