@@ -30,7 +30,7 @@ const CategoriesPage = ({ token }) => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo."); // <-- USANDO TOAST
         return;
       }
-      const res = await axios.get("REACT_APP_BACKEND_URL=https://mi-dinero-hoy.onrender.com/api/categories");
+      const res = await axios.get("${process.env.REACT_APP_BACKEND_URL}/api/categories");
       setCategories(res.data);
       // setMessage(''); // <-- ELIMINADO
     } catch (err) {
@@ -54,7 +54,7 @@ const CategoriesPage = ({ token }) => {
   const handleAddCategory = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("REACT_APP_BACKEND_URL=https://mi-dinero-hoy.onrender.com/api/categories", {
+      await axios.post("${process.env.REACT_APP_BACKEND_URL}/api/categories", {
         name: newCategoryName,
         type: newCategoryType,
       });
@@ -86,7 +86,7 @@ const CategoriesPage = ({ token }) => {
 
     try {
       await axios.put(
-        `REACT_APP_BACKEND_URL=https://mi-dinero-hoy.onrender.com/api/categories/${editingCategory._id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/categories/${editingCategory._id}`,
         {
           name: editingCategory.name,
           type: editingCategory.type,
@@ -106,7 +106,7 @@ const CategoriesPage = ({ token }) => {
   const handleDeleteCategory = async (id) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
       try {
-        await axios.delete(`REACT_APP_BACKEND_URL=https://mi-dinero-hoy.onrender.com/api/categories/${id}`);
+        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/categories/${id}`);
         toast.success("Category deleted successfully!"); // <-- USANDO TOAST
         fetchCategories(); // Refresh categories list
       } catch (err) {
