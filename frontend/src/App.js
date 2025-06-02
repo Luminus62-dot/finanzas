@@ -19,6 +19,7 @@ import CategoriesPage from "./pages/CategoriesPage";
 import SavingGoalsPage from "./pages/SavingGoalsPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
+import BudgetCalculatorPage from "./pages/BudgetCalculatorPage";
 
 function App() {
   // Campos de registro y login
@@ -220,6 +221,11 @@ function App() {
                 render={(props) => <SettingsPage {...props} token={token} />}
               />
               <Route path="*" render={() => <Redirect to="/dashboard" />} />
+
+              <Route
+                path="/budget-calculator"
+                render={(props) => <BudgetCalculatorPage {...props} />}
+              />
             </Switch>
           </Layout>
         ) : (

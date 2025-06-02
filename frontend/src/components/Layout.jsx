@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-// Asegúrate de importar FaChartPie aquí junto con los otros íconos
+// Asegúrate de importar FaCalculator aquí junto con los otros íconos
 import {
   FaHome,
   FaWallet,
@@ -10,6 +10,7 @@ import {
   FaCog,
   FaSignOutAlt,
   FaChartPie,
+  FaCalculator,
 } from "react-icons/fa";
 
 const Layout = ({ onLogout, children }) => {
@@ -154,6 +155,29 @@ const Layout = ({ onLogout, children }) => {
                   }
                 >
                   <FaBullseye style={{ marginRight: "10px" }} /> Metas de Ahorro
+                </Link>
+              </li>
+              <li style={{ marginBottom: "15px" }}>
+                <Link
+                  to="/budget-calculator"
+                  style={{
+                    textDecoration: "none",
+                    color: "#ecf0f1",
+                    fontSize: "1.1em",
+                    padding: "10px 15px",
+                    display: "block",
+                    borderRadius: "5px",
+                    transition: "background-color 0.3s",
+                  }}
+                  onMouseOver={(e) =>
+                    (e.target.style.backgroundColor = "#34495e")
+                  }
+                  onMouseOut={(e) =>
+                    (e.target.style.backgroundColor = "transparent")
+                  }
+                >
+                  <FaCalculator style={{ marginRight: "10px" }} /> Calculadora
+                  Presupuesto
                 </Link>
               </li>
               <li style={{ marginBottom: "15px" }}>
