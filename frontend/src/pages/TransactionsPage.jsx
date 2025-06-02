@@ -10,6 +10,7 @@ const TransactionsPage = ({ token }) => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
 
+  // Estados para el formulario de AÑADIR/EDITAR TRANSACCIÓN
   const [transactionType, setTransactionType] = useState('Gasto');
   const [transactionAmount, setTransactionAmount] = useState('');
   const [transactionCategory, setTransactionCategory] = useState('');
@@ -19,6 +20,10 @@ const TransactionsPage = ({ token }) => {
   const [toAccountId, setToAccountId] = useState('');
   const [editingTransaction, setEditingTransaction] = useState(null);
 
+  // NUEVO ESTADO para errores del formulario de transacciones
+  const [transactionFormErrors, setTransactionFormErrors] = useState({});
+
+  // Funciones de Carga de Datos (Cuentas, Transacciones, Categorías)
   const fetchAccounts = useCallback(async () => {
     try {
       if (token) {
@@ -27,11 +32,12 @@ const TransactionsPage = ({ token }) => {
         toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
-      console.log('DEBUG: TransactionsPage - Enviando GET a /api/accounts...'); // Debug
+      console.log('DEBUG: TransactionsPage - Enviando GET a /api/accounts...');
       const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/accounts`);
-      console.log('DEBUG: TransactionsPage - Respuesta de /api/accounts:', res.data); // Debug
+      console.log('DEBUG: TransactionsPage - Respuesta de /api/accounts:', res.data);
       if (Array.isArray(res.data)) {
         setAccounts(res.data);
+        // Seleccionar la primera cuenta por defecto si no hay ninguna seleccionada
         if (res.data.length > 0 && !selectedAccountId && !editingTransaction) {
           setSelectedAccountId(res.data[0]._id);
         } else if (res.data.length === 0) {
@@ -43,7 +49,7 @@ const TransactionsPage = ({ token }) => {
         toast.error('Formato de datos de cuentas inesperado.');
       }
     } catch (err) {
-      console.error('DEBUG: TransactionsPage - Error al cargar cuentas:', err.response?.data || err.message); // Debug
+      console.error('DEBUG: TransactionsPage - Error al cargar cuentas:', err.response?.data || err.message);
       toast.error(`Error al cargar cuentas: ${err.response?.data?.msg || 'Error de red'}`);
     }
   }, [token, selectedAccountId, editingTransaction]);
@@ -56,9 +62,9 @@ const TransactionsPage = ({ token }) => {
         toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
-      console.log('DEBUG: TransactionsPage - Enviando GET a /api/transactions...'); // Debug
+      console.log('DEBUG: TransactionsPage - Enviando GET a /api/transactions...');
       const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/transactions`);
-      console.log('DEBUG: TransactionsPage - Respuesta de /api/transactions:', res.data); // Debug
+      console.log('DEBUG: TransactionsPage - Respuesta de /api/transactions:', res.data);
       if (Array.isArray(res.data)) {
         setTransactions(res.data);
       } else {
@@ -67,7 +73,7 @@ const TransactionsPage = ({ token }) => {
         toast.error('Formato de datos de transacciones inesperado.');
       }
     } catch (err) {
-      console.error('DEBUG: TransactionsPage - Error al cargar transacciones:', err.response?.data || err.message); // Debug
+      console.error('DEBUG: TransactionsPage - Error al cargar transacciones:', err.response?.data || err.message);
       toast.error(`Error al cargar transacciones: ${err.response?.data?.msg || 'Error de red'}`);
     }
   }, [token]);
@@ -80,37 +86,73 @@ const TransactionsPage = ({ token }) => {
         toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
-      console.log('DEBUG: TransactionsPage - Enviando GET a /api/categories...'); // Debug
+      console.log('DEBUG: TransactionsPage - Enviando GET a /api/categories...');
       const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/categories`);
-      console.log('DEBUG: TransactionsPage - Respuesta de /api/categories:', res.data); // Debug
+      console.log('DEBUG: CategoriesPage - Respuesta de /api/categories:', res.data);
       if (Array.isArray(res.data)) {
         setCategories(res.data);
       } else {
-        console.error('DEBUG: TransactionsPage - La respuesta de /api/categories NO es un array:', res.data);
+        console.error('DEBUG: CategoriesPage - La respuesta de /api/categories NO es un array:', res.data);
         setCategories([]);
         toast.error('Formato de datos de categorías inesperado.');
       }
     } catch (err) {
-      console.error('DEBUG: TransactionsPage - Error al cargar categorías:', err.response?.data || err.message); // Debug
+      console.error('DEBUG: CategoriesPage - Error al cargar categorías:', err.response?.data || err.message);
       toast.error(`Error al cargar categorías: ${err.response?.data?.msg || 'Error de red'}`);
     }
   }, [token]);
 
   useEffect(() => {
-    console.log('DEBUG: TransactionsPage - Iniciando carga inicial de datos...'); // Debug
+    console.log('DEBUG: TransactionsPage - Iniciando carga inicial de datos...');
     fetchAccounts();
     fetchTransactions();
     fetchCategories();
   }, [fetchAccounts, fetchTransactions, fetchCategories]);
 
+
+  // NUEVA FUNCIÓN DE VALIDACIÓN PARA EL FORMULARIO DE TRANSACCIONES
+  const validateTransactionForm = () => {
+    const errors = {};
+
+    if (!selectedAccountId) {
+      errors.selectedAccount = 'Debes seleccionar una cuenta.';
+    }
+    if (isNaN(parseFloat(transactionAmount)) || parseFloat(transactionAmount) <= 0) {
+      errors.amount = 'El monto debe ser un número positivo.';
+    }
+    if (!transactionDate) {
+      errors.date = 'La fecha es requerida.';
+    }
+
+    if (transactionType === 'Transferencia') {
+      if (!toAccountId) {
+        errors.toAccount = 'La cuenta de destino es requerida para transferencias.';
+      }
+      if (selectedAccountId === toAccountId && selectedAccountId) { // Asegura que no sea la misma cuenta
+        errors.toAccount = 'La cuenta de origen y destino no pueden ser la misma.';
+      }
+    } else { // Ingreso o Gasto
+      if (!transactionCategory) {
+        errors.category = 'La categoría es requerida para ingresos/gastos.';
+      }
+    }
+
+    setTransactionFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+
   const handleAddTransaction = async (e) => {
     e.preventDefault();
+    if (!validateTransactionForm()) { // Validar antes de enviar
+      return;
+    }
     try {
-      console.log('DEBUG: TransactionsPage - Enviando POST a /api/transactions...'); // Debug
+      console.log('DEBUG: TransactionsPage - Enviando POST a /api/transactions...');
       const transactionData = {
         account: selectedAccountId,
         type: transactionType,
-        category: transactionCategory,
+        category: transactionType !== 'Transferencia' ? transactionCategory : undefined, // No enviar categoría para transferencias
         description: transactionDescription,
         amount: parseFloat(transactionAmount),
         date: transactionDate
@@ -123,14 +165,16 @@ const TransactionsPage = ({ token }) => {
       toast.success('Transacción registrada exitosamente!');
       fetchAccounts();
       fetchTransactions();
+      // Limpiar formulario y errores
       setTransactionAmount('');
       setTransactionCategory('');
       setTransactionDescription('');
       setTransactionDate(new Date().toISOString().slice(0, 10));
       setTransactionType('Gasto');
+      setSelectedAccountId(accounts.length > 0 ? accounts[0]._id : ''); // Vuelve a la primera cuenta
       setToAccountId('');
+      setTransactionFormErrors({}); // Limpiar errores después del éxito
     } catch (err) {
-      console.error('DEBUG: TransactionsPage - Error al añadir transacción:', err.response?.data || err.message); // Debug
       toast.error(`Error al registrar transacción: ${err.response?.data?.msg || err.message}`);
     }
   };
@@ -144,6 +188,7 @@ const TransactionsPage = ({ token }) => {
     setTransactionDate(new Date(transaction.date).toISOString().slice(0, 10));
     setSelectedAccountId(transaction.account?._id);
     setToAccountId(transaction.type === 'Transferencia' && transaction.toAccount ? transaction.toAccount._id : '');
+    setTransactionFormErrors({}); // Limpiar errores al iniciar edición
   };
 
   const cancelEditTransaction = () => {
@@ -153,19 +198,24 @@ const TransactionsPage = ({ token }) => {
     setTransactionDescription('');
     setTransactionDate(new Date().toISOString().slice(0, 10));
     setTransactionType('Gasto');
+    setSelectedAccountId(accounts.length > 0 ? accounts[0]._id : ''); // Vuelve a la primera cuenta
     setToAccountId('');
+    setTransactionFormErrors({}); // Limpiar errores al cancelar
   };
 
   const handleUpdateTransaction = async (e) => {
     e.preventDefault();
     if (!editingTransaction) return;
+    if (!validateTransactionForm()) { // Validar antes de enviar
+        return;
+    }
 
     try {
-      console.log('DEBUG: TransactionsPage - Enviando PUT a /api/transactions/:id...'); // Debug
+      console.log('DEBUG: TransactionsPage - Enviando PUT a /api/transactions/:id...');
       const updatedTransactionData = {
         account: selectedAccountId,
         type: transactionType,
-        category: transactionCategory,
+        category: transactionType !== 'Transferencia' ? transactionCategory : undefined,
         description: transactionDescription,
         amount: parseFloat(transactionAmount),
         date: transactionDate,
@@ -177,8 +227,8 @@ const TransactionsPage = ({ token }) => {
       fetchAccounts();
       fetchTransactions();
       cancelEditTransaction();
+      setTransactionFormErrors({}); // Limpiar errores después del éxito
     } catch (err) {
-      console.error('DEBUG: TransactionsPage - Error al actualizar transacción:', err.response?.data || err.message); // Debug
       toast.error(`Error al actualizar transacción: ${err.response?.data?.msg || err.message}`);
     }
   };
@@ -186,13 +236,12 @@ const TransactionsPage = ({ token }) => {
   const handleDeleteTransaction = async (id) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta transacción?')) {
       try {
-        console.log('DEBUG: TransactionsPage - Enviando DELETE a /api/transactions/:id...'); // Debug
+        console.log('DEBUG: TransactionsPage - Enviando DELETE a /api/transactions/:id...');
         await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/transactions/${id}`);
         toast.success('Transacción eliminada y saldos actualizados!');
         fetchAccounts();
         fetchTransactions();
       } catch (err) {
-        console.error('DEBUG: TransactionsPage - Error al eliminar transacción:', err.response?.data || err.message); // Debug
         toast.error(`Error al eliminar transacción: ${err.response?.data?.msg || err.message}`);
       }
     }
@@ -204,6 +253,7 @@ const TransactionsPage = ({ token }) => {
     <Container className="py-4">
       <h2 className="mb-4 text-center">Gestión de Transacciones</h2>
 
+      {/* Formulario para Añadir/Editar Transacción */}
       <Card className="mb-4 shadow-sm">
         <Card.Body>
           <Card.Title className="text-center mb-3">
@@ -212,7 +262,7 @@ const TransactionsPage = ({ token }) => {
           <Form onSubmit={editingTransaction ? handleUpdateTransaction : handleAddTransaction}>
             <Row className="mb-3 g-3">
               <Col xs={12} md={4}>
-                <Form.Group controlId="transactionType" className="mb-3 mb-md-0">
+                <Form.Group controlId="transactionType">
                   <Form.Label>Tipo:</Form.Label>
                   <Form.Control
                     as="select"
@@ -221,6 +271,7 @@ const TransactionsPage = ({ token }) => {
                       setTransactionType(e.target.value);
                       setTransactionCategory('');
                       if (e.target.value !== 'Transferencia') setToAccountId('');
+                      setTransactionFormErrors({}); // Limpiar errores al cambiar tipo
                     }}
                   >
                     <option value="Gasto">Gasto</option>
@@ -230,12 +281,16 @@ const TransactionsPage = ({ token }) => {
                 </Form.Group>
               </Col>
               <Col xs={12} md={4}>
-                <Form.Group controlId="selectedAccountId" className="mb-3 mb-md-0">
+                <Form.Group controlId="selectedAccountId">
                   <Form.Label>Cuenta:</Form.Label>
                   <Form.Control
                     as="select"
                     value={selectedAccountId}
-                    onChange={(e) => setSelectedAccountId(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedAccountId(e.target.value);
+                      setTransactionFormErrors({ ...transactionFormErrors, selectedAccount: '' }); // Limpiar error
+                    }}
+                    isInvalid={!!transactionFormErrors.selectedAccount} // Marcar inválido
                     required
                     disabled={accounts.length === 0}
                   >
@@ -246,16 +301,23 @@ const TransactionsPage = ({ token }) => {
                       </option>
                     ))}
                   </Form.Control>
+                  <Form.Control.Feedback type="invalid">
+                    {transactionFormErrors.selectedAccount}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
               {transactionType === 'Transferencia' && (
                 <Col xs={12} md={4}>
-                  <Form.Group controlId="toAccountId" className="mb-3 mb-md-0">
+                  <Form.Group controlId="toAccountId">
                     <Form.Label>Cuenta Destino:</Form.Label>
                     <Form.Control
                       as="select"
                       value={toAccountId}
-                      onChange={(e) => setToAccountId(e.target.value)}
+                      onChange={(e) => {
+                        setToAccountId(e.target.value);
+                        setTransactionFormErrors({ ...transactionFormErrors, toAccount: '' }); // Limpiar error
+                      }}
+                      isInvalid={!!transactionFormErrors.toAccount} // Marcar inválido
                       required
                       disabled={accounts.length === 0 || selectedAccountId === ''}
                     >
@@ -266,32 +328,46 @@ const TransactionsPage = ({ token }) => {
                         </option>
                       ))}
                     </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                        {transactionFormErrors.toAccount}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
               )}
             </Row>
             <Row className="mb-3 g-3">
               <Col xs={12} md={4}>
-                <Form.Group controlId="transactionAmount" className="mb-3 mb-md-0">
+                <Form.Group controlId="transactionAmount">
                   <Form.Label>Monto:</Form.Label>
                   <Form.Control
                     type="number"
                     value={transactionAmount}
-                    onChange={(e) => setTransactionAmount(e.target.value)}
+                    onChange={(e) => {
+                      setTransactionAmount(e.target.value);
+                      setTransactionFormErrors({ ...transactionFormErrors, amount: '' }); // Limpiar error
+                    }}
+                    isInvalid={!!transactionFormErrors.amount} // Marcar inválido
                     required
                     min="0.01"
                     step="0.01"
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {transactionFormErrors.amount}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
               {transactionType !== 'Transferencia' && (
                 <Col xs={12} md={4}>
-                  <Form.Group controlId="transactionCategory" className="mb-3 mb-md-0">
+                  <Form.Group controlId="transactionCategory">
                     <Form.Label>Categoría:</Form.Label>
                     <Form.Control
                       as="select"
                       value={transactionCategory}
-                      onChange={(e) => setTransactionCategory(e.target.value)}
+                      onChange={(e) => {
+                        setTransactionCategory(e.target.value);
+                        setTransactionFormErrors({ ...transactionFormErrors, category: '' }); // Limpiar error
+                      }}
+                      isInvalid={!!transactionFormErrors.category} // Marcar inválido
                       required={transactionType !== 'Transferencia'}
                     >
                       <option value="">Selecciona una categoría</option>
@@ -299,18 +375,28 @@ const TransactionsPage = ({ token }) => {
                         <option key={cat._id} value={cat.name}>{cat.name}</option>
                       ))}
                     </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                        {transactionFormErrors.category}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
               )}
               <Col xs={12} md={4}>
-                <Form.Group controlId="transactionDate" className="mb-3 mb-md-0">
+                <Form.Group controlId="transactionDate">
                   <Form.Label>Fecha:</Form.Label>
                   <Form.Control
                     type="date"
                     value={transactionDate}
-                    onChange={(e) => setTransactionDate(e.target.value)}
+                    onChange={(e) => {
+                      setTransactionDate(e.target.value);
+                      setTransactionFormErrors({ ...transactionFormErrors, date: '' }); // Limpiar error
+                    }}
+                    isInvalid={!!transactionFormErrors.date} // Marcar inválido
                     required
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {transactionFormErrors.date}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
             </Row>
