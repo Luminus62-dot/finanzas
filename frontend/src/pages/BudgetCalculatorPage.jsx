@@ -8,9 +8,9 @@ import {
   Col,
   Button,
   InputGroup,
-  Alert,
   ListGroup,
-} from "react-bootstrap";
+  Alert,
+} from "react-bootstrap"; // Asegúrate de ListGroup y Alert
 import { toast } from "react-toastify";
 import {
   FaCalculator,
@@ -18,9 +18,10 @@ import {
   FaMoneyBillWave,
   FaGift,
   FaPiggyBank,
-} from "react-icons/fa"; // Íconos para la calculadora
+} from "react-icons/fa";
 
 const BudgetCalculatorPage = () => {
+  // No necesita 'token' ni 'setMessage'
   const [monthlyIncome, setMonthlyIncome] = useState("");
   const [needsPercentage, setNeedsPercentage] = useState(50); // 50%
   const [wantsPercentage, setWantsPercentage] = useState(30); // 30%
@@ -66,12 +67,13 @@ const BudgetCalculatorPage = () => {
 
   const handlePercentageChange = (setter, value) => {
     const numValue = parseInt(value);
-    if (!isNaN(numValue) && numValue >= 0 && numValue <= 100) {
+    // Permite que el campo esté vacío temporalmente o sea 0-100
+    if (
+      value === "" ||
+      (!isNaN(numValue) && numValue >= 0 && numValue <= 100)
+    ) {
       setter(numValue);
       setFormError(""); // Limpiar errores al cambiar porcentajes
-    } else if (value === "") {
-      setter(""); // Permitir que el campo esté temporalmente vacío
-      setFormError("");
     } else {
       setFormError("Los porcentajes deben ser números entre 0 y 100.");
     }
@@ -102,12 +104,20 @@ const BudgetCalculatorPage = () => {
                   value={monthlyIncome}
                   onChange={(e) => {
                     setMonthlyIncome(e.target.value);
-                    setFormError(""); // Limpiar error al escribir
+                    setFormError("");
                   }}
                   required
                   step="0.01"
                   min="0"
+                  isInvalid={
+                    formError &&
+                    (isNaN(parseFloat(monthlyIncome)) ||
+                      parseFloat(monthlyIncome) <= 0)
+                  } // Validación visual
                 />
+                <Form.Control.Feedback type="invalid">
+                  {formError}
+                </Form.Control.Feedback>
               </InputGroup>
               <Form.Text className="text-muted">
                 Ingresa tu ingreso neto mensual.
@@ -135,8 +145,17 @@ const BudgetCalculatorPage = () => {
                       min="0"
                       max="100"
                       required
+                      isInvalid={
+                        formError &&
+                        (isNaN(needsPercentage) ||
+                          needsPercentage < 0 ||
+                          needsPercentage > 100)
+                      } // Validación visual
                     />
                     <InputGroup.Text>%</InputGroup.Text>
+                    <Form.Control.Feedback type="invalid">
+                      {formError}
+                    </Form.Control.Feedback>
                   </InputGroup>
                 </Form.Group>
               </Col>
@@ -158,8 +177,17 @@ const BudgetCalculatorPage = () => {
                       min="0"
                       max="100"
                       required
+                      isInvalid={
+                        formError &&
+                        (isNaN(wantsPercentage) ||
+                          wantsPercentage < 0 ||
+                          wantsPercentage > 100)
+                      }
                     />
                     <InputGroup.Text>%</InputGroup.Text>
+                    <Form.Control.Feedback type="invalid">
+                      {formError}
+                    </Form.Control.Feedback>
                   </InputGroup>
                 </Form.Group>
               </Col>
@@ -181,8 +209,17 @@ const BudgetCalculatorPage = () => {
                       min="0"
                       max="100"
                       required
+                      isInvalid={
+                        formError &&
+                        (isNaN(savingsDebtsPercentage) ||
+                          savingsDebtsPercentage < 0 ||
+                          savingsDebtsPercentage > 100)
+                      }
                     />
                     <InputGroup.Text>%</InputGroup.Text>
+                    <Form.Control.Feedback type="invalid">
+                      {formError}
+                    </Form.Control.Feedback>
                   </InputGroup>
                 </Form.Group>
               </Col>
