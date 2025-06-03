@@ -14,28 +14,30 @@ import {
   FaSignInAlt,
   FaUserPlus,
   FaQuestionCircle,
-  FaBookOpen, // Icono para Educación Financiera
-} from "react-icons/fa"; // FaQuestionCircle para Ayuda/FAQ
-import { useAuth } from "../context/AuthContext"; // Asegúrate que la ruta sea correcta
+  FaBookOpen,
+} from "react-icons/fa";
 
-const Layout = ({ children }) => {
+// Ya no importamos useAuth de AuthContext
+
+// El componente Layout ahora recibe props de App.js
+const Layout = ({ children, isAuthenticated, user, onLogout }) => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
-  const { isAuthenticated, logout, user } = useAuth(); // user para mostrar nombre/rol
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-    setShowOffcanvas(false); // Cerrar offcanvas al desloguear
+  const handleLogoutInternal = () => {
+    if (onLogout) {
+      onLogout(); // Llama a la función handleLogout de App.js
+    }
+    // No es necesario navegar aquí si App.js ya lo hace o controla la redirección
+    setShowOffcanvas(false);
   };
 
   const handleSelect = (path) => {
     navigate(path);
-    setShowOffcanvas(false); // Cerrar offcanvas al seleccionar una opción
+    setShowOffcanvas(false);
   };
 
-  // Cerrar offcanvas si la ruta cambia (navegación por botones del navegador)
   useEffect(() => {
     setShowOffcanvas(false);
   }, [location]);
@@ -44,14 +46,13 @@ const Layout = ({ children }) => {
     { name: "Dashboard", path: "/dashboard", icon: <FaTachometerAlt /> },
     { name: "Cuentas", path: "/accounts", icon: <FaCreditCard /> },
     { name: "Transacciones", path: "/transactions", icon: <FaListAlt /> },
-    { name: "Categorías", path: "/categories", icon: <FaListAlt /> }, // Podría ser FaShapes o similar
+    { name: "Categorías", path: "/categories", icon: <FaListAlt /> },
     { name: "Reportes", path: "/reports", icon: <FaChartBar /> },
-    // ESTA ES LA LÍNEA CON EL TEXTO ORIGINAL
     {
-      name: "Calculadora de Presupuesto",
+      name: "Presupuestos",
       path: "/budget-calculator",
       icon: <FaCalculator />,
-    },
+    }, // Usamos la versión corta que preferiste
     { name: "Metas de Ahorro", path: "/saving-goals", icon: <FaBullseye /> },
     { name: "Educación Financiera", path: "/educate", icon: <FaBookOpen /> },
     { name: "Configuración", path: "/settings", icon: <FaCog /> },
@@ -59,11 +60,10 @@ const Layout = ({ children }) => {
   ];
 
   const guestLinks = [
-    { name: "Iniciar Sesión", path: "/login", icon: <FaSignInAlt /> },
-    { name: "Registrarse", path: "/register", icon: <FaUserPlus /> },
-    // ESTA ES LA LÍNEA CON EL TEXTO ORIGINAL
+    { name: "Iniciar Sesión", path: "/login", icon: <FaSignInAlt /> }, // App.js maneja la vista de login
+    { name: "Registrarse", path: "/register", icon: <FaUserPlus /> }, // App.js maneja la vista de registro
     {
-      name: "Calculadora de Presupuesto",
+      name: "Presupuestos",
       path: "/budget-calculator",
       icon: <FaCalculator />,
     },
@@ -71,7 +71,11 @@ const Layout = ({ children }) => {
     { name: "Ayuda y FAQ", path: "/help", icon: <FaQuestionCircle /> },
   ];
 
-  const activeLinks = isAuthenticated ? navLinks : guestLinks;
+  // App.js decide si mostrar el Layout o los formularios de login/registro.
+  // Aquí, si Layout se renderiza, asumimos que isAuthenticated es true (según la lógica de App.js)
+  // pero igual lo usamos para el saludo y el botón de logout.
+  // esta lógica interna puede simplificarse si Layout
+  // solo se usa cuando isAuthenticated es true.
 
   return (
     <>
@@ -84,20 +88,24 @@ const Layout = ({ children }) => {
           <Navbar.Brand as={Link} to={isAuthenticated ? "/dashboard" : "/"}>
             Gestor de Finanzas
           </Navbar.Brand>
-          {isAuthenticated && user && (
-            <Navbar.Text className="ms-auto me-3 text-light d-none d-sm-block">
-              Hola, {user.username}
-            </Navbar.Text>
-          )}
+          {isAuthenticated &&
+            user && ( // Asumimos que 'user' es un objeto con 'username' o similar
+              <Navbar.Text className="ms-auto me-3 text-light d-none d-sm-block">
+                {/* Necesitarás asegurarte de que App.js pase un objeto 'user' con la info */}
+                Hola, {user.firstName || user.email || "Usuario"}
+              </Navbar.Text>
+            )}
           {isAuthenticated ? (
             <Button
               variant="outline-danger"
-              onClick={handleLogout}
+              onClick={handleLogoutInternal}
               className="d-none d-sm-block"
             >
               <FaSignOutAlt /> Salir
             </Button>
           ) : (
+            // Esta parte del Navbar no se mostraría si App.js ya redirige a login
+            // Pero la dejamos por si acaso la lógica de App.js cambia.
             <Nav className="ms-auto d-none d-sm-flex flex-row">
               <Nav.Link as={Link} to="/login" className="text-light">
                 <FaSignInAlt /> Iniciar Sesión
@@ -125,19 +133,21 @@ const Layout = ({ children }) => {
         <Offcanvas.Body>
           {isAuthenticated && user && (
             <div className="mb-3 border-bottom pb-3">
-              <p className="h5">Hola, {user.username}</p>
-              {/* <p className="small text-muted">{user.role || 'Usuario'}</p> */}
+              <p className="h5">
+                Hola, {user.firstName || user.email || "Usuario"}
+              </p>
             </div>
           )}
           <Nav className="flex-column">
-            {activeLinks.map((link) => (
+            {/* Si Layout solo se muestra cuando está autenticado, guestLinks no se usaría aquí */}
+            {(isAuthenticated ? navLinks : guestLinks).map((link) => (
               <Nav.Item key={link.name} className="mb-1">
                 <Nav.Link
                   onClick={() => handleSelect(link.path)}
                   className={`text-white d-flex align-items-center sidebar-link ${
                     location.pathname === link.path ? "active" : ""
                   }`}
-                  style={{ cursor: "pointer" }} // Añadido para mejor UX
+                  style={{ cursor: "pointer" }}
                 >
                   <span className="me-3 icon-container">{link.icon}</span>
                   {link.name}
@@ -146,10 +156,8 @@ const Layout = ({ children }) => {
             ))}
             {isAuthenticated && (
               <Nav.Item className="mt-auto pt-3 border-top d-sm-none">
-                {" "}
-                {/* Visible solo en S y XS */}
                 <Nav.Link
-                  onClick={handleLogout}
+                  onClick={handleLogoutInternal}
                   className="text-danger d-flex align-items-center sidebar-link"
                 >
                   <FaSignOutAlt className="me-3 icon-container" />
@@ -157,6 +165,9 @@ const Layout = ({ children }) => {
                 </Nav.Link>
               </Nav.Item>
             )}
+            {/* Los botones de login/register en el offcanvas para móviles si no está autenticado
+                no serían necesarios si App.js maneja esto a nivel superior.
+                Considera si esta lógica es necesaria aquí. */}
             {!isAuthenticated && (
               <>
                 <Nav.Item className="mt-auto pt-3 border-top d-sm-none">
@@ -193,11 +204,6 @@ const Layout = ({ children }) => {
             &copy; {new Date().getFullYear()} Gestor de Finanzas. Todos los
             derechos reservados.
           </p>
-          {/* <Nav className="justify-content-center">
-            <Nav.Link as={Link} to="/about" className="text-white">Sobre Nosotros</Nav.Link>
-            <Nav.Link as={Link} to="/contact" className="text-white">Contacto</Nav.Link>
-            <Nav.Link as={Link} to="/privacy" className="text-white">Privacidad</Nav.Link>
-          </Nav> */}
         </Container>
       </footer>
     </>
