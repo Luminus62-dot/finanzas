@@ -1,6 +1,7 @@
 // frontend/src/components/Layout.jsx
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+// Cambiado: Se importa useHistory en lugar de useNavigate
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { Navbar, Nav, Container, Offcanvas, Button } from "react-bootstrap";
 import {
   FaTachometerAlt,
@@ -17,24 +18,22 @@ import {
   FaBookOpen,
 } from "react-icons/fa";
 
-// Ya no importamos useAuth de AuthContext
-
-// El componente Layout ahora recibe props de App.js
 const Layout = ({ children, isAuthenticated, user, onLogout }) => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
-  const navigate = useNavigate();
+  const history = useHistory(); // Cambiado: Se usa useHistory
   const location = useLocation();
 
   const handleLogoutInternal = () => {
     if (onLogout) {
-      onLogout(); // Llama a la función handleLogout de App.js
+      onLogout();
     }
-    // No es necesario navegar aquí si App.js ya lo hace o controla la redirección
+    // No es necesario history.push('/login') aquí si App.js ya controla la redirección
+    // basada en isAuthenticated.
     setShowOffcanvas(false);
   };
 
   const handleSelect = (path) => {
-    navigate(path);
+    history.push(path); // Cambiado: Se usa history.push()
     setShowOffcanvas(false);
   };
 
@@ -52,7 +51,7 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
       name: "Presupuestos",
       path: "/budget-calculator",
       icon: <FaCalculator />,
-    }, // Usamos la versión corta que preferiste
+    },
     { name: "Metas de Ahorro", path: "/saving-goals", icon: <FaBullseye /> },
     { name: "Educación Financiera", path: "/educate", icon: <FaBookOpen /> },
     { name: "Configuración", path: "/settings", icon: <FaCog /> },
@@ -60,8 +59,11 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
   ];
 
   const guestLinks = [
-    { name: "Iniciar Sesión", path: "/login", icon: <FaSignInAlt /> }, // App.js maneja la vista de login
-    { name: "Registrarse", path: "/register", icon: <FaUserPlus /> }, // App.js maneja la vista de registro
+    // Si App.js maneja el renderizado de LoginPage/RegisterPage, estos enlaces podrían no ser necesarios
+    // o deberían navegar a rutas que App.js luego redirige o maneja.
+    // Por ahora, los dejamos para la navegación dentro del Offcanvas si es visible.
+    { name: "Iniciar Sesión", path: "/login", icon: <FaSignInAlt /> },
+    { name: "Registrarse", path: "/register", icon: <FaUserPlus /> },
     {
       name: "Presupuestos",
       path: "/budget-calculator",
@@ -71,11 +73,7 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
     { name: "Ayuda y FAQ", path: "/help", icon: <FaQuestionCircle /> },
   ];
 
-  // App.js decide si mostrar el Layout o los formularios de login/registro.
-  // Aquí, si Layout se renderiza, asumimos que isAuthenticated es true (según la lógica de App.js)
-  // pero igual lo usamos para el saludo y el botón de logout.
-  // esta lógica interna puede simplificarse si Layout
-  // solo se usa cuando isAuthenticated es true.
+  const activeLinks = isAuthenticated ? navLinks : guestLinks;
 
   return (
     <>
@@ -88,13 +86,11 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
           <Navbar.Brand as={Link} to={isAuthenticated ? "/dashboard" : "/"}>
             Gestor de Finanzas
           </Navbar.Brand>
-          {isAuthenticated &&
-            user && ( // Asumimos que 'user' es un objeto con 'username' o similar
-              <Navbar.Text className="ms-auto me-3 text-light d-none d-sm-block">
-                {/* Necesitarás asegurarte de que App.js pase un objeto 'user' con la info */}
-                Hola, {user.firstName || user.email || "Usuario"}
-              </Navbar.Text>
-            )}
+          {isAuthenticated && user && (
+            <Navbar.Text className="ms-auto me-3 text-light d-none d-sm-block">
+              Hola, {user.firstName || user.email || "Usuario"}
+            </Navbar.Text>
+          )}
           {isAuthenticated ? (
             <Button
               variant="outline-danger"
@@ -104,15 +100,21 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
               <FaSignOutAlt /> Salir
             </Button>
           ) : (
-            // Esta parte del Navbar no se mostraría si App.js ya redirige a login
-            // Pero la dejamos por si acaso la lógica de App.js cambia.
+            // En la versión de App.js que me mostraste, esta sección no se mostraría
+            // porque el componente Layout solo se renderiza si isAuthenticated es true.
+            // La mantengo por si la lógica de renderizado de App.js cambia.
             <Nav className="ms-auto d-none d-sm-flex flex-row">
-              <Nav.Link as={Link} to="/login" className="text-light">
+              {/* Estos enlaces podrían redirigir a la vista de login/register que maneja App.js */}
+              <Button
+                variant="outline-light"
+                onClick={() => history.push("/login")}
+                className="me-2"
+              >
                 <FaSignInAlt /> Iniciar Sesión
-              </Nav.Link>
-              <Nav.Link as={Link} to="/register" className="text-light">
+              </Button>
+              <Button variant="light" onClick={() => history.push("/register")}>
                 <FaUserPlus /> Registrarse
-              </Nav.Link>
+              </Button>
             </Nav>
           )}
         </Container>
@@ -139,8 +141,7 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
             </div>
           )}
           <Nav className="flex-column">
-            {/* Si Layout solo se muestra cuando está autenticado, guestLinks no se usaría aquí */}
-            {(isAuthenticated ? navLinks : guestLinks).map((link) => (
+            {activeLinks.map((link) => (
               <Nav.Item key={link.name} className="mb-1">
                 <Nav.Link
                   onClick={() => handleSelect(link.path)}
@@ -165,10 +166,7 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
                 </Nav.Link>
               </Nav.Item>
             )}
-            {/* Los botones de login/register en el offcanvas para móviles si no está autenticado
-                no serían necesarios si App.js maneja esto a nivel superior.
-                Considera si esta lógica es necesaria aquí. */}
-            {!isAuthenticated && (
+            {!isAuthenticated && ( // Estos solo se verían si el Offcanvas se muestra cuando no está autenticado
               <>
                 <Nav.Item className="mt-auto pt-3 border-top d-sm-none">
                   <Nav.Link
@@ -194,13 +192,17 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
         </Offcanvas.Body>
       </Offcanvas>
 
-      <Container fluid className="pt-5 mt-4">
+      <Container fluid className="pt-5 mt-4" style={{ flexGrow: 1 }}>
+        {" "}
+        {/* Añadido flexGrow para el footer */}
         <main>{children}</main>
       </Container>
 
-      <footer className="bg-dark text-white text-center py-3 mt-auto">
+      <footer className="bg-dark text-white text-center py-3">
+        {" "}
+        {/* Quitado mt-auto, App.js maneja el flex */}
         <Container>
-          <p>
+          <p className="mb-0">
             &copy; {new Date().getFullYear()} Gestor de Finanzas. Todos los
             derechos reservados.
           </p>
