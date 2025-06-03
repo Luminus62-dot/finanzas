@@ -46,9 +46,9 @@ const Layout = ({ children }) => {
     { name: "Transacciones", path: "/transactions", icon: <FaListAlt /> },
     { name: "Categorías", path: "/categories", icon: <FaListAlt /> }, // Podría ser FaShapes o similar
     { name: "Reportes", path: "/reports", icon: <FaChartBar /> },
-    // MODIFICADO: Texto acortado para mayor consistencia
+    // ESTA ES LA LÍNEA CON EL TEXTO ORIGINAL
     {
-      name: "Presupuestos",
+      name: "Calculadora de Presupuesto",
       path: "/budget-calculator",
       icon: <FaCalculator />,
     },
@@ -61,9 +61,9 @@ const Layout = ({ children }) => {
   const guestLinks = [
     { name: "Iniciar Sesión", path: "/login", icon: <FaSignInAlt /> },
     { name: "Registrarse", path: "/register", icon: <FaUserPlus /> },
-    // MODIFICADO: Texto acortado para mayor consistencia
+    // ESTA ES LA LÍNEA CON EL TEXTO ORIGINAL
     {
-      name: "Presupuestos",
+      name: "Calculadora de Presupuesto",
       path: "/budget-calculator",
       icon: <FaCalculator />,
     },
