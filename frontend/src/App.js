@@ -17,12 +17,12 @@ import AccountsPage from "./pages/AccountsPage";
 import TransactionsPage from "./pages/TransactionsPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import SavingGoalsPage from "./pages/SavingGoalsPage";
-import ReportsPage from "./pages/ReportsPage";
+import BudgetCalculatorPage from "./pages/BudgetCalculatorPage"; // <--- VERIFICAR ESTA LÍNEA
+// import ReportsPage from './pages/ReportsPage';
 import SettingsPage from "./pages/SettingsPage";
-import BudgetCalculatorPage from "./pages/BudgetCalculatorPage";
 
 function App() {
-  // Campos de registro y login
+  // Campos de registro y login (manejados directamente en App.js)
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -40,7 +40,7 @@ function App() {
   const [registerErrors, setRegisterErrors] = useState({});
   const [loginErrors, setLoginErrors] = useState({});
 
-  // NUEVO ESTADO: Controla si se muestra el formulario de registro (false = muestra login por defecto)
+  // Controla si se muestra el formulario de registro (false = muestra login por defecto)
   const [showRegisterForm, setShowRegisterForm] = useState(false);
 
   // Efecto para verificar el token al cargar la aplicación y configurarlo en Axios
@@ -210,22 +210,17 @@ function App() {
                 path="/saving-goals"
                 render={(props) => <SavingGoalsPage {...props} token={token} />}
               />
-              {
-                <Route
-                  path="/reports"
-                  render={(props) => <ReportsPage {...props} token={token} />}
-                />
-              }
+              <Route
+                path="/budget-calculator"
+                render={(props) => <BudgetCalculatorPage {...props} />}
+              />{" "}
+              {/* <--- VERIFICAR ESTA LÍNEA */}
+              {/* <Route path="/reports" render={(props) => <ReportsPage {...props} token={token} />} /> */}
               <Route
                 path="/settings"
                 render={(props) => <SettingsPage {...props} token={token} />}
               />
               <Route path="*" render={() => <Redirect to="/dashboard" />} />
-
-              <Route
-                path="/budget-calculator"
-                render={(props) => <BudgetCalculatorPage {...props} />}
-              />
             </Switch>
           </Layout>
         ) : (
@@ -236,8 +231,6 @@ function App() {
           >
             <Row className="w-100">
               <Col md={{ span: 6, offset: 3 }} lg={{ span: 4, offset: 4 }}>
-                {" "}
-                {/* Columna única centrada */}
                 <h1 className="text-center mb-4">Mi Dinero Hoy</h1>
                 <Card className="shadow-sm">
                   <Card.Body>

@@ -1,6 +1,6 @@
+// frontend/src/components/Layout.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-// Asegúrate de importar FaCalculator aquí junto con los otros íconos
 import {
   FaHome,
   FaWallet,
@@ -11,7 +11,7 @@ import {
   FaSignOutAlt,
   FaChartPie,
   FaCalculator,
-} from "react-icons/fa";
+} from "react-icons/fa"; // <--- VERIFICAR ESTA LÍNEA
 
 const Layout = ({ onLogout, children }) => {
   return (

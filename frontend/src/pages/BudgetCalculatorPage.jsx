@@ -10,7 +10,7 @@ import {
   InputGroup,
   ListGroup,
   Alert,
-} from "react-bootstrap"; // Asegúrate de ListGroup y Alert
+} from "react-bootstrap";
 import { toast } from "react-toastify";
 import {
   FaCalculator,
@@ -21,7 +21,6 @@ import {
 } from "react-icons/fa";
 
 const BudgetCalculatorPage = () => {
-  // No necesita 'token' ni 'setMessage'
   const [monthlyIncome, setMonthlyIncome] = useState("");
   const [needsPercentage, setNeedsPercentage] = useState(50); // 50%
   const [wantsPercentage, setWantsPercentage] = useState(30); // 30%
@@ -67,7 +66,6 @@ const BudgetCalculatorPage = () => {
 
   const handlePercentageChange = (setter, value) => {
     const numValue = parseInt(value);
-    // Permite que el campo esté vacío temporalmente o sea 0-100
     if (
       value === "" ||
       (!isNaN(numValue) && numValue >= 0 && numValue <= 100)
@@ -113,7 +111,7 @@ const BudgetCalculatorPage = () => {
                     formError &&
                     (isNaN(parseFloat(monthlyIncome)) ||
                       parseFloat(monthlyIncome) <= 0)
-                  } // Validación visual
+                  }
                 />
                 <Form.Control.Feedback type="invalid">
                   {formError}
@@ -150,7 +148,7 @@ const BudgetCalculatorPage = () => {
                         (isNaN(needsPercentage) ||
                           needsPercentage < 0 ||
                           needsPercentage > 100)
-                      } // Validación visual
+                      }
                     />
                     <InputGroup.Text>%</InputGroup.Text>
                     <Form.Control.Feedback type="invalid">
