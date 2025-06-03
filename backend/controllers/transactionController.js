@@ -1,7 +1,7 @@
 // backend/controllers/transactionController.js
 const Transaction = require("../models/Transaction");
 const Account = require("../models/Account");
-const mongoose = require("mongoose");
+const mongoose = require("mongoose"); // <-- ¡Asegúrate de que mongoose esté importado aquí!
 
 // @route   GET api/transactions
 // @desc    Obtener todas las transacciones del usuario actual, con filtros y búsqueda
@@ -60,9 +60,11 @@ exports.createTransaction = async (req, res) => {
       user: req.user.id,
     });
     if (!fromAccount) {
-      return res.status(404).json({
-        msg: "Cuenta de origen no encontrada o no pertenece al usuario",
-      });
+      return res
+        .status(404)
+        .json({
+          msg: "Cuenta de origen no encontrada o no pertenece al usuario",
+        });
     }
 
     const newTransaction = new Transaction({
@@ -81,23 +83,29 @@ exports.createTransaction = async (req, res) => {
       fromAccount.balance -= newTransaction.amount;
     } else if (type === "Transferencia") {
       if (!toAccount) {
-        return res.status(400).json({
-          msg: "Se requiere una cuenta de destino para transferencias",
-        });
+        return res
+          .status(400)
+          .json({
+            msg: "Se requiere una cuenta de destino para transferencias",
+          });
       }
       const destinationAccount = await Account.findOne({
         _id: toAccount,
         user: req.user.id,
       });
       if (!destinationAccount) {
-        return res.status(404).json({
-          msg: "Cuenta de destino no encontrada o no pertenece al usuario",
-        });
+        return res
+          .status(404)
+          .json({
+            msg: "Cuenta de destino no encontrada o no pertenece al usuario",
+          });
       }
       if (fromAccount._id.toString() === destinationAccount._id.toString()) {
-        return res.status(400).json({
-          msg: "La cuenta de origen y destino no pueden ser la misma para una transferencia",
-        });
+        return res
+          .status(400)
+          .json({
+            msg: "La cuenta de origen y destino no pueden ser la misma para una transferencia",
+          });
       }
 
       fromAccount.balance -= newTransaction.amount;
@@ -139,9 +147,11 @@ exports.updateTransaction = async (req, res) => {
         "Cuenta de origen antigua no encontrada para transacción:",
         transaction._id
       );
-      return res.status(500).json({
-        msg: "Error interno: Cuenta de origen antigua no encontrada.",
-      });
+      return res
+        .status(500)
+        .json({
+          msg: "Error interno: Cuenta de origen antigua no encontrada.",
+        });
     }
 
     if (transaction.type === "Ingreso") {
@@ -155,9 +165,11 @@ exports.updateTransaction = async (req, res) => {
           "Cuenta de destino antigua no encontrada para transacción:",
           transaction._id
         );
-        return res.status(500).json({
-          msg: "Error interno: Cuenta de destino antigua no encontrada.",
-        });
+        return res
+          .status(500)
+          .json({
+            msg: "Error interno: Cuenta de destino antigua no encontrada.",
+          });
       }
       oldFromAccount.balance += transaction.amount;
       oldToAccount.balance -= transaction.amount;
@@ -199,13 +211,17 @@ exports.updateTransaction = async (req, res) => {
         user: req.user.id,
       });
       if (!newToAccount)
-        return res.status(404).json({
-          msg: "Nueva cuenta de destino no encontrada o no pertenece al usuario",
-        });
+        return res
+          .status(404)
+          .json({
+            msg: "Nueva cuenta de destino no encontrada o no pertenece al usuario",
+          });
       if (newFromAccount._id.toString() === newToAccount._id.toString()) {
-        return res.status(400).json({
-          msg: "La cuenta de origen y destino no pueden ser la misma para una transferencia",
-        });
+        return res
+          .status(400)
+          .json({
+            msg: "La cuenta de origen y destino no pueden ser la misma para una transferencia",
+          });
       }
 
       newFromAccount.balance -= transaction.amount;
@@ -213,9 +229,11 @@ exports.updateTransaction = async (req, res) => {
       transaction.toAccount = toAccount;
       await newToAccount.save();
     } else {
-      return res.status(400).json({
-        msg: "Tipo de transacción inválido después de la actualización",
-      });
+      return res
+        .status(400)
+        .json({
+          msg: "Tipo de transacción inválido después de la actualización",
+        });
     }
 
     await newFromAccount.save();
@@ -268,7 +286,7 @@ exports.deleteTransaction = async (req, res) => {
   }
 };
 
-/// @route   GET api/transactions/summary
+// @route   GET api/transactions/summary
 // @desc    Obtener un resumen de gastos/ingresos por categoría para un período
 // @access  Private
 exports.getTransactionsSummary = async (req, res) => {
@@ -276,16 +294,16 @@ exports.getTransactionsSummary = async (req, res) => {
 
   // Importante: Asegurar que las fechas representen el inicio y fin del día en UTC
   let startOfDay = new Date(startDate);
-  startOfDay.setUTCHours(0, 0, 0, 0); // 00:00:00.000 UTC
+  startOfDay.setUTCHours(0, 0, 0, 0);
 
   let endOfDay = new Date(endDate);
-  endOfDay.setUTCHours(23, 59, 59, 999); // 23:59:59.999 UTC (final del día)
+  endOfDay.setUTCHours(23, 59, 59, 999);
 
   // Asegurarse de que el user ID sea un ObjectId para la comparación en el pipeline
   const userId = new mongoose.Types.ObjectId(req.user.id); // <-- ¡CAMBIO CRÍTICO AQUÍ!
 
   let matchConditions = {
-    user: userId, // <-- ¡USAR EL OBJECTID CONVERTIDO!
+    user: userId, // ¡USAR EL OBJECTID CONVERTIDO!
     date: {
       $gte: startOfDay,
       $lte: endOfDay,
@@ -304,7 +322,7 @@ exports.getTransactionsSummary = async (req, res) => {
   console.log(
     "Usuario que se usará en el match (ObjectId):",
     userId.toString()
-  ); // Convertir a string para el log
+  );
   console.log(
     "Rango de Fechas Solicitado por Frontend (ISO):",
     startDate,
@@ -318,7 +336,7 @@ exports.getTransactionsSummary = async (req, res) => {
   console.log(
     JSON.stringify(
       {
-        user: userId.toString(), // Para mostrar en el log, usamos el string
+        user: userId.toString(),
         date: {
           $gte: startOfDay.toISOString(),
           $lte: endOfDay.toISOString(),
@@ -330,12 +348,11 @@ exports.getTransactionsSummary = async (req, res) => {
     )
   );
   console.log("-------------------------------------------\n");
-  // --- Fin Debugging ---
 
   try {
     const summary = await Transaction.aggregate([
       {
-        $match: matchConditions, // Filtrar por usuario (ObjectId), rango de fechas y tipo
+        $match: matchConditions,
       },
       {
         $group: {
@@ -351,7 +368,7 @@ exports.getTransactionsSummary = async (req, res) => {
     const totalByType = await Transaction.aggregate([
       {
         $match: {
-          user: userId, // <-- ¡USAR EL OBJECTID CONVERTIDO AQUÍ TAMBIÉN!
+          user: userId,
           date: {
             $gte: startOfDay,
             $lte: endOfDay,

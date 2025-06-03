@@ -1,6 +1,7 @@
 // frontend/src/components/Layout.jsx
 import React from "react";
 import { Link } from "react-router-dom";
+// Asegúrate de importar FaChartPie aquí junto con los otros íconos
 import {
   FaHome,
   FaWallet,
@@ -11,7 +12,7 @@ import {
   FaSignOutAlt,
   FaChartPie,
   FaCalculator,
-} from "react-icons/fa"; // <--- VERIFICAR ESTA LÍNEA
+} from "react-icons/fa";
 
 const Layout = ({ onLogout, children }) => {
   return (

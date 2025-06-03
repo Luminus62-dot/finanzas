@@ -36,18 +36,18 @@ const ReportsPage = ({ token }) => {
   const [reportType, setReportType] = useState("monthly");
   const [selectedMonth, setSelectedMonth] = useState(
     new Date().toISOString().slice(0, 7)
-  );
+  ); // YYYY-MM
   const [selectedYear, setSelectedYear] = useState(
     new Date().getFullYear().toString()
-  );
-  const [summaryData, setSummaryData] = useState(null); // Sigue siendo null inicialmente
-  const [loading, setLoading] = useState(false); // Inicia como false
+  ); // YYYY
+  const [summaryData, setSummaryData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchReportData = useCallback(async () => {
-    console.log("\n--- Frontend Debugging Reporte (fetchReportData) ---"); // Debug 1
+    console.log("\n--- Frontend Debugging Reporte (fetchReportData) ---");
     console.log("Token en ReportsPage:", token);
 
-    setLoading(true); // Debug: Establece loading a true al inicio de la petición
+    setLoading(true);
     let startMoment, endMoment;
 
     if (reportType === "monthly") {
@@ -81,7 +81,7 @@ const ReportsPage = ({ token }) => {
       }
       axios.defaults.headers.common["x-auth-token"] = token;
 
-      console.log("DEBUG: ReportsPage - Realizando peticiones Axios..."); // Debug 2
+      console.log("DEBUG: ReportsPage - Realizando peticiones Axios...");
 
       const [expenseRes, incomeRes, netFlowRes] = await Promise.all([
         axios.get(
@@ -112,12 +112,11 @@ const ReportsPage = ({ token }) => {
         ),
       ]);
 
-      console.log("DEBUG: ReportsPage - Respuestas recibidas:"); // Debug 3
+      console.log("DEBUG: ReportsPage - Respuestas recibidas:");
       console.log("  expenseRes.data:", expenseRes.data);
       console.log("  incomeRes.data:", incomeRes.data);
       console.log("  netFlowRes.data:", netFlowRes.data);
 
-      // Procesar y validar respuestas
       const processedSummaryData = {
         expenseSummary: Array.isArray(expenseRes.data.categorySummary)
           ? expenseRes.data.categorySummary.map((item) => ({
@@ -136,33 +135,33 @@ const ReportsPage = ({ token }) => {
         netFlow: netFlowRes.data.netFlow || 0,
       };
 
-      setSummaryData(processedSummaryData); // Actualiza el estado con los datos procesados
-      toast.success("Reporte generado exitosamente!"); // Éxito aquí
+      setSummaryData(processedSummaryData);
+      toast.success("Reporte generado exitosamente!");
       console.log(
         "DEBUG: ReportsPage - summaryData establecido:",
         processedSummaryData
-      ); // Debug 4
+      );
     } catch (err) {
       console.error(
         "DEBUG: ReportsPage - Error CATCH en fetchReportData:",
         err.response?.data || err.message
-      ); // Debug 5
+      );
       toast.error(
         `Error al cargar los reportes: ${
           err.response?.data?.msg || "Error de red"
         }`
       );
-      setSummaryData(null); // Asegura que los datos no sean corruptos
+      setSummaryData(null);
     } finally {
-      setLoading(false); // Debug: Establece loading a false al final de la petición
+      setLoading(false);
       console.log(
         "DEBUG: ReportsPage - fetchReportData finalizado. Loading a false."
-      ); // Debug 6
+      );
     }
   }, [token, selectedMonth, selectedYear, reportType]);
 
   useEffect(() => {
-    fetchReportData(); // Cargar datos al montar el componente o si cambia el tipo de reporte/mes/año
+    fetchReportData();
   }, [fetchReportData]);
 
   const renderCustomizedLabel = ({
@@ -198,7 +197,7 @@ const ReportsPage = ({ token }) => {
     summaryData,
     "Current loading:",
     loading
-  ); // Debug 7: Antes del return
+  );
 
   return (
     <Container className="py-4">
@@ -257,10 +256,9 @@ const ReportsPage = ({ token }) => {
         </Card.Body>
       </Card>
 
-      {/* Condición de renderizado: Mostrar cargando o datos si summaryData no es null */}
       {loading ? (
         <p className="text-center">Cargando datos del reporte...</p>
-      ) : summaryData ? ( // Si summaryData ya tiene datos, renderiza los gráficos
+      ) : summaryData ? (
         <Row className="g-4">
           {/* Resumen General */}
           <Col xs={12}>
@@ -372,7 +370,6 @@ const ReportsPage = ({ token }) => {
           </Col>
         </Row>
       ) : (
-        // Si no está cargando y summaryData es null, muestra el mensaje inicial
         <p className="text-center text-muted">
           Selecciona un período y genera un reporte.
         </p>

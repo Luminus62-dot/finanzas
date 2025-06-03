@@ -17,8 +17,8 @@ import AccountsPage from "./pages/AccountsPage";
 import TransactionsPage from "./pages/TransactionsPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import SavingGoalsPage from "./pages/SavingGoalsPage";
-import BudgetCalculatorPage from "./pages/BudgetCalculatorPage"; // <--- VERIFICAR ESTA LÍNEA
-// import ReportsPage from './pages/ReportsPage';
+import BudgetCalculatorPage from "./pages/BudgetCalculatorPage";
+import ReportsPage from "./pages/ReportsPage"; // <-- ¡VERIFICAR ESTA LÍNEA!
 import SettingsPage from "./pages/SettingsPage";
 
 function App() {
@@ -109,9 +109,8 @@ function App() {
         }
       );
       toast.success("Registro exitoso. ¡Bienvenido! Por favor, inicia sesión.");
-      setShowRegisterForm(false); // Volver al formulario de login
+      setShowRegisterForm(false);
 
-      // Limpiar formulario y errores
       setRegisterEmail("");
       setRegisterPassword("");
       setFirstName("");
@@ -143,7 +142,6 @@ function App() {
       setToken(res.data.token);
       setIsAuthenticated(true);
 
-      // Limpiar formulario y errores
       setLoginEmail("");
       setLoginPassword("");
       setLoginErrors({});
@@ -213,9 +211,12 @@ function App() {
               <Route
                 path="/budget-calculator"
                 render={(props) => <BudgetCalculatorPage {...props} />}
+              />
+              <Route
+                path="/reports"
+                render={(props) => <ReportsPage {...props} token={token} />}
               />{" "}
-              {/* <--- VERIFICAR ESTA LÍNEA */}
-              {/* <Route path="/reports" render={(props) => <ReportsPage {...props} token={token} />} /> */}
+              {/* <-- ¡VERIFICAR ESTA LÍNEA! */}
               <Route
                 path="/settings"
                 render={(props) => <SettingsPage {...props} token={token} />}
