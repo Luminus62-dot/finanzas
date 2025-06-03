@@ -1,15 +1,13 @@
 // frontend/src/services/api.js
 import axios from "axios";
 
-// La URL base para las llamadas API provendrá de la variable de entorno
-const API_BASE_URL =
-  process.env.REACT_APP_RENDER_BACKEND_URL || "http://localhost:5001"; // Fallback para desarrollo local
+const API_BASE_URL = process.env.REACT_APP_RENDER_BACKEND_URL; // Sin fallback a localhost para producción
+console.log("API Base URL for Vercel:", API_BASE_URL); // Para depuración
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`, // Añadimos /api aquí si todas tus rutas de backend lo usan
+  baseURL: `${API_BASE_URL}/api`,
 });
 
-// Interceptor para añadir el token de autorización a las peticiones
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -24,3 +22,4 @@ api.interceptors.request.use(
 );
 
 export default api;
+// Este archivo configura Axios para que use la URL base de la API y maneje el token de autenticación automáticamente.
