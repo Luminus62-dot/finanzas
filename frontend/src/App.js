@@ -98,7 +98,7 @@ function App() {
       return;
     }
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/auth/register`,
         {
           email: registerEmail,
