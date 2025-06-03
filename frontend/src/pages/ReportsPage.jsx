@@ -30,24 +30,24 @@ const COLORS = [
   "#DE3163",
   "#5DADE2",
   "#2ECC71",
-]; // Más colores
+];
 
 const ReportsPage = ({ token }) => {
-  const [reportType, setReportType] = useState("monthly"); // 'monthly' o 'yearly'
+  const [reportType, setReportType] = useState("monthly");
   const [selectedMonth, setSelectedMonth] = useState(
     new Date().toISOString().slice(0, 7)
-  ); // Formato YYYY-MM
+  );
   const [selectedYear, setSelectedYear] = useState(
     new Date().getFullYear().toString()
-  ); // Formato YYYY
-  const [summaryData, setSummaryData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  );
+  const [summaryData, setSummaryData] = useState(null); // Sigue siendo null inicialmente
+  const [loading, setLoading] = useState(false); // Inicia como false
 
   const fetchReportData = useCallback(async () => {
-    console.log("\n--- Frontend Debugging Reporte ---"); // Log de depuración
+    console.log("\n--- Frontend Debugging Reporte (fetchReportData) ---"); // Debug 1
     console.log("Token en ReportsPage:", token);
 
-    setLoading(true);
+    setLoading(true); // Debug: Establece loading a true al inicio de la petición
     let startMoment, endMoment;
 
     if (reportType === "monthly") {
@@ -81,6 +81,8 @@ const ReportsPage = ({ token }) => {
       }
       axios.defaults.headers.common["x-auth-token"] = token;
 
+      console.log("DEBUG: ReportsPage - Realizando peticiones Axios..."); // Debug 2
+
       const [expenseRes, incomeRes, netFlowRes] = await Promise.all([
         axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/api/transactions/summary`,
@@ -105,12 +107,18 @@ const ReportsPage = ({ token }) => {
         axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/api/transactions/summary`,
           {
-            params: { startDate: startDateISO, endDate: endDateISO }, // Para totales de ingresos/gastos
+            params: { startDate: startDateISO, endDate: endDateISO },
           }
         ),
       ]);
 
-      setSummaryData({
+      console.log("DEBUG: ReportsPage - Respuestas recibidas:"); // Debug 3
+      console.log("  expenseRes.data:", expenseRes.data);
+      console.log("  incomeRes.data:", incomeRes.data);
+      console.log("  netFlowRes.data:", netFlowRes.data);
+
+      // Procesar y validar respuestas
+      const processedSummaryData = {
         expenseSummary: Array.isArray(expenseRes.data.categorySummary)
           ? expenseRes.data.categorySummary.map((item) => ({
               name: item._id,
@@ -126,26 +134,35 @@ const ReportsPage = ({ token }) => {
         incomeTotal: netFlowRes.data.incomeTotal || 0,
         expenseTotal: netFlowRes.data.expenseTotal || 0,
         netFlow: netFlowRes.data.netFlow || 0,
-      });
+      };
 
-      toast.success("Reporte generado exitosamente!");
+      setSummaryData(processedSummaryData); // Actualiza el estado con los datos procesados
+      toast.success("Reporte generado exitosamente!"); // Éxito aquí
+      console.log(
+        "DEBUG: ReportsPage - summaryData establecido:",
+        processedSummaryData
+      ); // Debug 4
     } catch (err) {
       console.error(
-        "Error fetching report data:",
+        "DEBUG: ReportsPage - Error CATCH en fetchReportData:",
         err.response?.data || err.message
-      );
+      ); // Debug 5
       toast.error(
         `Error al cargar los reportes: ${
           err.response?.data?.msg || "Error de red"
         }`
       );
+      setSummaryData(null); // Asegura que los datos no sean corruptos
     } finally {
-      setLoading(false);
+      setLoading(false); // Debug: Establece loading a false al final de la petición
+      console.log(
+        "DEBUG: ReportsPage - fetchReportData finalizado. Loading a false."
+      ); // Debug 6
     }
   }, [token, selectedMonth, selectedYear, reportType]);
 
   useEffect(() => {
-    fetchReportData();
+    fetchReportData(); // Cargar datos al montar el componente o si cambia el tipo de reporte/mes/año
   }, [fetchReportData]);
 
   const renderCustomizedLabel = ({
@@ -175,6 +192,13 @@ const ReportsPage = ({ token }) => {
       </text>
     );
   };
+
+  console.log(
+    "DEBUG: ReportsPage - Render JSX. Current summaryData:",
+    summaryData,
+    "Current loading:",
+    loading
+  ); // Debug 7: Antes del return
 
   return (
     <Container className="py-4">
@@ -233,9 +257,10 @@ const ReportsPage = ({ token }) => {
         </Card.Body>
       </Card>
 
+      {/* Condición de renderizado: Mostrar cargando o datos si summaryData no es null */}
       {loading ? (
         <p className="text-center">Cargando datos del reporte...</p>
-      ) : summaryData ? (
+      ) : summaryData ? ( // Si summaryData ya tiene datos, renderiza los gráficos
         <Row className="g-4">
           {/* Resumen General */}
           <Col xs={12}>
@@ -347,6 +372,7 @@ const ReportsPage = ({ token }) => {
           </Col>
         </Row>
       ) : (
+        // Si no está cargando y summaryData es null, muestra el mensaje inicial
         <p className="text-center text-muted">
           Selecciona un período y genera un reporte.
         </p>
