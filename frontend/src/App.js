@@ -1,6 +1,8 @@
 // frontend/src/App.js
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// Ya no importamos axios directamente aquí para las llamadas, usaremos el servicio api
+// import axios from 'axios';
+import api from "./services/api"; // Importar la instancia de api configurada
 import {
   BrowserRouter as Router,
   Switch,
@@ -20,9 +22,6 @@ import SavingGoalsPage from "./pages/SavingGoalsPage";
 import BudgetCalculatorPage from "./pages/BudgetCalculatorPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
-// Si tienes estas páginas, descomenta o añade sus imports:
-// import HelpPage from './pages/HelpPage';
-// import EducatePage from './pages/EducatePage';
 
 function App() {
   const [registerEmail, setRegisterEmail] = useState("");
@@ -35,10 +34,10 @@ function App() {
   const [loginPassword, setLoginPassword] = useState("");
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [token, setToken] = useState(null); // Inicializar en null, useEffect lo cargará
-  const [user, setUser] = useState(null); // Inicializar en null
+  // const [token, setToken] = useState(null); // Ya no es necesario gestionar token directamente en App si api.js lo usa de localStorage
+  const [user, setUser] = useState(null);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Para estado de carga inicial
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   const [registerErrors, setRegisterErrors] = useState({});
   const [loginErrors, setLoginErrors] = useState({});
@@ -47,38 +46,27 @@ function App() {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
     if (storedToken && storedUser) {
-      setToken(storedToken);
+      // El interceptor de api.js ya debería estar configurando el header con el token
       try {
         setUser(JSON.parse(storedUser));
         setIsAuthenticated(true);
-        axios.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${storedToken}`;
       } catch (e) {
-        // Si storedUser no es JSON válido
         localStorage.removeItem("user");
         localStorage.removeItem("token");
         setUser(null);
-        setToken(null);
         setIsAuthenticated(false);
       }
     }
-    setIsLoadingAuth(false); // Termina la carga inicial del estado de autenticación
+    setIsLoadingAuth(false);
   }, []);
 
-  useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common["Authorization"];
-    }
-  }, [token]);
+  // Ya no necesitamos el useEffect para axios.defaults.headers.common['Authorization'] aquí
 
   const validateRegisterForm = () => {
+    /* ...sin cambios... */
     const errors = {};
     if (!firstName.trim()) errors.firstName = "El nombre es requerido.";
     if (!lastName.trim()) errors.lastName = "El apellido es requerido.";
-    // dateOfBirth es opcional en el User model, así que no es estrictamente requerido aquí a menos que lo decidas
     if (!registerEmail) errors.email = "El correo electrónico es requerido.";
     else if (!/\S+@\S+\.\S+/.test(registerEmail))
       errors.email = "El correo electrónico no es válido.";
@@ -90,6 +78,7 @@ function App() {
   };
 
   const validateLoginForm = () => {
+    /* ...sin cambios... */
     const errors = {};
     if (!loginEmail) errors.email = "El correo electrónico es requerido.";
     if (!loginPassword) errors.password = "La contraseña es requerida.";
@@ -101,15 +90,14 @@ function App() {
     e.preventDefault();
     if (!validateRegisterForm()) return;
     try {
-      // El backend authController.js -> registerUser espera: username, email, password, firstName, lastName, dateOfBirth
-      // Tu User model tiene username pero no lo estás pidiendo en el form. Usaremos email como username.
-      await axios.post(`/api/auth/register`, {
-        username: registerEmail, // O considera añadir un campo username al formulario si es distinto del email
+      await api.post(`/auth/register`, {
+        // Usar la instancia de api
+        username: registerEmail,
         email: registerEmail,
         password: registerPassword,
         firstName,
         lastName,
-        dateOfBirth: dateOfBirth || undefined, // Enviar solo si tiene valor
+        dateOfBirth: dateOfBirth || undefined,
       });
       toast.success("Registro exitoso. Por favor, inicia sesión.");
       setShowRegisterForm(false);
@@ -130,35 +118,39 @@ function App() {
     e.preventDefault();
     if (!validateLoginForm()) return;
     try {
-      const res = await axios.post(`/api/auth/login`, {
+      const res = await api.post(`/auth/login`, {
         email: loginEmail,
         password: loginPassword,
-      });
+      }); // Usar la instancia de api
       toast.success("Inicio de sesión exitoso.");
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      setToken(res.data.token);
+      // setToken(res.data.token); // Ya no es necesario si api.js maneja el token desde localStorage
       setUser(res.data.user);
       setIsAuthenticated(true);
       setLoginEmail("");
       setLoginPassword("");
       setLoginErrors({});
     } catch (err) {
+      // Aquí es donde se origina el error que ves en la consola (App.js:144 en tu log anterior)
+      // si la petición falla.
       toast.error(
         `Error de inicio de sesión: ${
           err.response?.data?.message || err.message
         }`
       );
+      // Asegúrate de que el backend en Render está accesible y CORS configurado.
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setToken(null);
+    // setToken(null); // Ya no es necesario
     setUser(null);
     setIsAuthenticated(false);
     toast.info("Sesión cerrada.");
+    // El interceptor de api.js se encargará de no enviar el token si no está en localStorage
   };
 
   if (isLoadingAuth) {
@@ -169,7 +161,7 @@ function App() {
       >
         Cargando...
       </div>
-    ); // O un spinner
+    );
   }
 
   return (
@@ -192,6 +184,7 @@ function App() {
             isAuthenticated={isAuthenticated}
             user={user}
           >
+            {/* ... Switch y Routes sin cambios ... */}
             <Switch>
               <Route
                 exact
@@ -209,12 +202,11 @@ function App() {
               />
               <Route path="/reports" component={ReportsPage} />
               <Route path="/settings" component={SettingsPage} />
-              {/* <Route path="/help" component={HelpPage} /> */}
-              {/* <Route path="/educate" component={EducatePage} /> */}
               <Route path="*" render={() => <Redirect to="/dashboard" />} />
             </Switch>
           </Layout>
         ) : (
+          // ... Formulario de Login/Registro sin cambios significativos en la lógica de renderizado ...
           <Container
             className="d-flex flex-column justify-content-center align-items-center"
             style={{
