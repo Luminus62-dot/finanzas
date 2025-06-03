@@ -1,6 +1,5 @@
 // frontend/src/components/Layout.jsx
 import React, { useState, useEffect } from "react";
-// Cambiado: Se importa useHistory en lugar de useNavigate
 import { Link, useHistory, useLocation } from "react-router-dom";
 import { Navbar, Nav, Container, Offcanvas, Button } from "react-bootstrap";
 import {
@@ -20,20 +19,16 @@ import {
 
 const Layout = ({ children, isAuthenticated, user, onLogout }) => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
-  const history = useHistory(); // Cambiado: Se usa useHistory
+  const history = useHistory();
   const location = useLocation();
 
   const handleLogoutInternal = () => {
-    if (onLogout) {
-      onLogout();
-    }
-    // No es necesario history.push('/login') aquí si App.js ya controla la redirección
-    // basada en isAuthenticated.
+    if (onLogout) onLogout();
     setShowOffcanvas(false);
   };
 
   const handleSelect = (path) => {
-    history.push(path); // Cambiado: Se usa history.push()
+    history.push(path);
     setShowOffcanvas(false);
   };
 
@@ -55,13 +50,10 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
     { name: "Metas de Ahorro", path: "/saving-goals", icon: <FaBullseye /> },
     { name: "Educación Financiera", path: "/educate", icon: <FaBookOpen /> },
     { name: "Configuración", path: "/settings", icon: <FaCog /> },
-    { name: "Ayuda y FAQ", path: "/help", icon: <FaQuestionCircle /> },
+    // { name: "Ayuda y FAQ", path: "/help", icon: <FaQuestionCircle /> }, // Comentado si no tienes la página
   ];
 
   const guestLinks = [
-    // Si App.js maneja el renderizado de LoginPage/RegisterPage, estos enlaces podrían no ser necesarios
-    // o deberían navegar a rutas que App.js luego redirige o maneja.
-    // Por ahora, los dejamos para la navegación dentro del Offcanvas si es visible.
     { name: "Iniciar Sesión", path: "/login", icon: <FaSignInAlt /> },
     { name: "Registrarse", path: "/register", icon: <FaUserPlus /> },
     {
@@ -70,9 +62,11 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
       icon: <FaCalculator />,
     },
     { name: "Educación Financiera", path: "/educate", icon: <FaBookOpen /> },
-    { name: "Ayuda y FAQ", path: "/help", icon: <FaQuestionCircle /> },
+    // { name: "Ayuda y FAQ", path: "/help", icon: <FaQuestionCircle /> }, // Comentado si no tienes la página
   ];
 
+  // Si Layout solo se renderiza cuando isAuthenticated es true (según App.js),
+  // activeLinks siempre será navLinks.
   const activeLinks = isAuthenticated ? navLinks : guestLinks;
 
   return (
@@ -91,7 +85,7 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
               Hola, {user.firstName || user.email || "Usuario"}
             </Navbar.Text>
           )}
-          {isAuthenticated ? (
+          {isAuthenticated && ( // El botón de Salir solo si está autenticado
             <Button
               variant="outline-danger"
               onClick={handleLogoutInternal}
@@ -99,24 +93,8 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
             >
               <FaSignOutAlt /> Salir
             </Button>
-          ) : (
-            // En la versión de App.js que me mostraste, esta sección no se mostraría
-            // porque el componente Layout solo se renderiza si isAuthenticated es true.
-            // La mantengo por si la lógica de renderizado de App.js cambia.
-            <Nav className="ms-auto d-none d-sm-flex flex-row">
-              {/* Estos enlaces podrían redirigir a la vista de login/register que maneja App.js */}
-              <Button
-                variant="outline-light"
-                onClick={() => history.push("/login")}
-                className="me-2"
-              >
-                <FaSignInAlt /> Iniciar Sesión
-              </Button>
-              <Button variant="light" onClick={() => history.push("/register")}>
-                <FaUserPlus /> Registrarse
-              </Button>
-            </Nav>
           )}
+          {/* Los botones de Login/Register en la navbar principal no son necesarios si App.js maneja esto */}
         </Container>
       </Navbar>
 
@@ -132,7 +110,9 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
         <Offcanvas.Header closeButton closeVariant="white">
           <Offcanvas.Title id="offcanvasNavbarLabel">Menú</Offcanvas.Title>
         </Offcanvas.Header>
-        <Offcanvas.Body>
+        <Offcanvas.Body className="d-flex flex-column">
+          {" "}
+          {/* Para alinear el logout al final */}
           {isAuthenticated && user && (
             <div className="mb-3 border-bottom pb-3">
               <p className="h5">
@@ -155,8 +135,12 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
                 </Nav.Link>
               </Nav.Item>
             ))}
-            {isAuthenticated && (
-              <Nav.Item className="mt-auto pt-3 border-top d-sm-none">
+          </Nav>
+          {isAuthenticated && ( // Botón de Salir en Offcanvas para móviles
+            <Nav className="flex-column mt-auto">
+              {" "}
+              {/* mt-auto para empujar al final */}
+              <Nav.Item className="pt-3 border-top">
                 <Nav.Link
                   onClick={handleLogoutInternal}
                   className="text-danger d-flex align-items-center sidebar-link"
@@ -165,42 +149,17 @@ const Layout = ({ children, isAuthenticated, user, onLogout }) => {
                   Salir
                 </Nav.Link>
               </Nav.Item>
-            )}
-            {!isAuthenticated && ( // Estos solo se verían si el Offcanvas se muestra cuando no está autenticado
-              <>
-                <Nav.Item className="mt-auto pt-3 border-top d-sm-none">
-                  <Nav.Link
-                    onClick={() => handleSelect("/login")}
-                    className="text-white d-flex align-items-center sidebar-link"
-                  >
-                    <FaSignInAlt className="me-3 icon-container" />
-                    Iniciar Sesión
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item className="d-sm-none">
-                  <Nav.Link
-                    onClick={() => handleSelect("/register")}
-                    className="text-white d-flex align-items-center sidebar-link"
-                  >
-                    <FaUserPlus className="me-3 icon-container" />
-                    Registrarse
-                  </Nav.Link>
-                </Nav.Item>
-              </>
-            )}
-          </Nav>
+            </Nav>
+          )}
+          {/* Los enlaces de Login/Register en el offcanvas no son necesarios si App.js maneja esto y Layout solo se muestra autenticado */}
         </Offcanvas.Body>
       </Offcanvas>
 
       <Container fluid className="pt-5 mt-4" style={{ flexGrow: 1 }}>
-        {" "}
-        {/* Añadido flexGrow para el footer */}
         <main>{children}</main>
       </Container>
 
       <footer className="bg-dark text-white text-center py-3">
-        {" "}
-        {/* Quitado mt-auto, App.js maneja el flex */}
         <Container>
           <p className="mb-0">
             &copy; {new Date().getFullYear()} Gestor de Finanzas. Todos los

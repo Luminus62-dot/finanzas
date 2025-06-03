@@ -1,6 +1,6 @@
 // frontend/src/App.js
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // Asegúrate de tener axios instalado
+import axios from "axios";
 import {
   BrowserRouter as Router,
   Switch,
@@ -9,10 +9,9 @@ import {
 } from "react-router-dom";
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Estilos para react-toastify
+import "react-toastify/dist/ReactToastify.css";
 
-// Importar los componentes de página
-import Layout from "./components/Layout"; // Asegúrate que la ruta sea correcta
+import Layout from "./components/Layout";
 import DashboardPage from "./pages/DashboardPage";
 import AccountsPage from "./pages/AccountsPage";
 import TransactionsPage from "./pages/TransactionsPage";
@@ -21,7 +20,7 @@ import SavingGoalsPage from "./pages/SavingGoalsPage";
 import BudgetCalculatorPage from "./pages/BudgetCalculatorPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
-// Importa tus otras páginas si las tienes (HelpPage, EducatePage)
+// Si tienes estas páginas, descomenta o añade sus imports:
 // import HelpPage from './pages/HelpPage';
 // import EducatePage from './pages/EducatePage';
 
@@ -36,11 +35,10 @@ function App() {
   const [loginPassword, setLoginPassword] = useState("");
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || null
-  ); // Estado para el usuario
-  const [showRegisterForm, setShowRegisterForm] = useState(false); // Estado para mostrar/ocultar formulario de registro
+  const [token, setToken] = useState(null); // Inicializar en null, useEffect lo cargará
+  const [user, setUser] = useState(null); // Inicializar en null
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Para estado de carga inicial
 
   const [registerErrors, setRegisterErrors] = useState({});
   const [loginErrors, setLoginErrors] = useState({});
@@ -50,16 +48,24 @@ function App() {
     const storedUser = localStorage.getItem("user");
     if (storedToken && storedUser) {
       setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`; // Usar Bearer token
-    } else {
-      setIsAuthenticated(false);
-      delete axios.defaults.headers.common["Authorization"];
+      try {
+        setUser(JSON.parse(storedUser));
+        setIsAuthenticated(true);
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${storedToken}`;
+      } catch (e) {
+        // Si storedUser no es JSON válido
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        setUser(null);
+        setToken(null);
+        setIsAuthenticated(false);
+      }
     }
-  }, []); // Ejecutar solo una vez al montar
+    setIsLoadingAuth(false); // Termina la carga inicial del estado de autenticación
+  }, []);
 
-  // Efecto para actualizar axios headers cuando el token cambia
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -70,58 +76,43 @@ function App() {
 
   const validateRegisterForm = () => {
     const errors = {};
-    if (!firstName.trim()) {
-      errors.firstName = "El nombre es requerido.";
-    }
-    if (!lastName.trim()) {
-      errors.lastName = "El apellido es requerido.";
-    }
-    // Puedes añadir más validaciones si es necesario (ej. fecha de nacimiento)
-    if (!registerEmail) {
-      errors.email = "El correo electrónico es requerido.";
-    } else if (!/\S+@\S+\.\S+/.test(registerEmail)) {
+    if (!firstName.trim()) errors.firstName = "El nombre es requerido.";
+    if (!lastName.trim()) errors.lastName = "El apellido es requerido.";
+    // dateOfBirth es opcional en el User model, así que no es estrictamente requerido aquí a menos que lo decidas
+    if (!registerEmail) errors.email = "El correo electrónico es requerido.";
+    else if (!/\S+@\S+\.\S+/.test(registerEmail))
       errors.email = "El correo electrónico no es válido.";
-    }
-    if (!registerPassword) {
-      errors.password = "La contraseña es requerida.";
-    } else if (registerPassword.length < 6) {
+    if (!registerPassword) errors.password = "La contraseña es requerida.";
+    else if (registerPassword.length < 6)
       errors.password = "La contraseña debe tener al menos 6 caracteres.";
-    }
     setRegisterErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const validateLoginForm = () => {
     const errors = {};
-    if (!loginEmail) {
-      errors.email = "El correo electrónico es requerido.";
-    }
-    if (!loginPassword) {
-      errors.password = "La contraseña es requerida.";
-    }
+    if (!loginEmail) errors.email = "El correo electrónico es requerido.";
+    if (!loginPassword) errors.password = "La contraseña es requerida.";
     setLoginErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (!validateRegisterForm()) {
-      return;
-    }
+    if (!validateRegisterForm()) return;
     try {
-      // Tu backend en authController.js, registerUser devuelve el usuario creado (sin token)
-      // No hace login automático.
+      // El backend authController.js -> registerUser espera: username, email, password, firstName, lastName, dateOfBirth
+      // Tu User model tiene username pero no lo estás pidiendo en el form. Usaremos email como username.
       await axios.post(`/api/auth/register`, {
-        // Asumiendo que tienes un proxy o usas la URL completa
-        username: registerEmail, // o el campo que use tu backend para username si es diferente a email
+        username: registerEmail, // O considera añadir un campo username al formulario si es distinto del email
         email: registerEmail,
         password: registerPassword,
         firstName,
         lastName,
-        dateOfBirth, // Asegúrate que el backend espera este campo
+        dateOfBirth: dateOfBirth || undefined, // Enviar solo si tiene valor
       });
       toast.success("Registro exitoso. Por favor, inicia sesión.");
-      setShowRegisterForm(false); // Volver al formulario de login
+      setShowRegisterForm(false);
       setRegisterEmail("");
       setRegisterPassword("");
       setFirstName("");
@@ -137,26 +128,21 @@ function App() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!validateLoginForm()) {
-      return;
-    }
+    if (!validateLoginForm()) return;
     try {
       const res = await axios.post(`/api/auth/login`, {
-        // Asumiendo proxy
         email: loginEmail,
         password: loginPassword,
       });
       toast.success("Inicio de sesión exitoso.");
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user)); // Guardar el objeto user
+      localStorage.setItem("user", JSON.stringify(res.data.user));
       setToken(res.data.token);
-      setUser(res.data.user); // Establecer el usuario
+      setUser(res.data.user);
       setIsAuthenticated(true);
-
       setLoginEmail("");
       setLoginPassword("");
       setLoginErrors({});
-      // No necesitas Redirect aquí, el render condicional de App se encargará
     } catch (err) {
       toast.error(
         `Error de inicio de sesión: ${
@@ -170,15 +156,21 @@ function App() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setToken(null);
-    setUser(null); // Limpiar usuario
+    setUser(null);
     setIsAuthenticated(false);
-    // axios.defaults.headers.common['Authorization'] = null; // Esto se maneja en el useEffect de token
     toast.info("Sesión cerrada.");
-    // No necesitas Redirect aquí, el render condicional de App se encargará
   };
 
-  // Si se está cargando el estado inicial del token, podrías mostrar un loader
-  // if (isLoadingInitial) return <p>Cargando...</p>;
+  if (isLoadingAuth) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "100vh" }}
+      >
+        Cargando...
+      </div>
+    ); // O un spinner
+  }
 
   return (
     <Router>
@@ -217,7 +209,6 @@ function App() {
               />
               <Route path="/reports" component={ReportsPage} />
               <Route path="/settings" component={SettingsPage} />
-              {/* Añade rutas para HelpPage y EducatePage si existen */}
               {/* <Route path="/help" component={HelpPage} /> */}
               {/* <Route path="/educate" component={EducatePage} /> */}
               <Route path="*" render={() => <Redirect to="/dashboard" />} />
@@ -242,10 +233,7 @@ function App() {
                       <>
                         <h2 className="text-center mb-3">Registrarse</h2>
                         <Form onSubmit={handleRegister}>
-                          <Form.Group
-                            className="mb-3"
-                            controlId="formFirstName"
-                          >
+                          <Form.Group className="mb-3">
                             <Form.Label>Nombre:</Form.Label>
                             <Form.Control
                               type="text"
@@ -261,7 +249,7 @@ function App() {
                               {registerErrors.firstName}
                             </Form.Control.Feedback>
                           </Form.Group>
-                          <Form.Group className="mb-3" controlId="formLastName">
+                          <Form.Group className="mb-3">
                             <Form.Label>Apellido:</Form.Label>
                             <Form.Control
                               type="text"
@@ -277,10 +265,7 @@ function App() {
                               {registerErrors.lastName}
                             </Form.Control.Feedback>
                           </Form.Group>
-                          <Form.Group
-                            className="mb-3"
-                            controlId="formDateOfBirth"
-                          >
+                          <Form.Group className="mb-3">
                             <Form.Label>Fecha de Nacimiento:</Form.Label>
                             <Form.Control
                               type="date"
@@ -295,10 +280,7 @@ function App() {
                               {registerErrors.dateOfBirth}
                             </Form.Control.Feedback>
                           </Form.Group>
-                          <Form.Group
-                            className="mb-3"
-                            controlId="formRegisterEmail"
-                          >
+                          <Form.Group className="mb-3">
                             <Form.Label>Email:</Form.Label>
                             <Form.Control
                               type="email"
@@ -314,10 +296,7 @@ function App() {
                               {registerErrors.email}
                             </Form.Control.Feedback>
                           </Form.Group>
-                          <Form.Group
-                            className="mb-4"
-                            controlId="formRegisterPassword"
-                          >
+                          <Form.Group className="mb-4">
                             <Form.Label>Contraseña:</Form.Label>
                             <Form.Control
                               type="password"
@@ -353,10 +332,7 @@ function App() {
                       <>
                         <h2 className="text-center mb-3">Iniciar Sesión</h2>
                         <Form onSubmit={handleLogin}>
-                          <Form.Group
-                            className="mb-3"
-                            controlId="formLoginEmail"
-                          >
+                          <Form.Group className="mb-3">
                             <Form.Label>Email:</Form.Label>
                             <Form.Control
                               type="email"
@@ -372,10 +348,7 @@ function App() {
                               {loginErrors.email}
                             </Form.Control.Feedback>
                           </Form.Group>
-                          <Form.Group
-                            className="mb-4"
-                            controlId="formLoginPassword"
-                          >
+                          <Form.Group className="mb-4">
                             <Form.Label>Contraseña:</Form.Label>
                             <Form.Control
                               type="password"
