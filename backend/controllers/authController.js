@@ -2,198 +2,108 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const asyncHandler = require("express-async-handler");
 
-// @route   POST api/auth/register
-// @desc    Registrar nuevo usuario
-// @access  Public
-exports.registerUser = async (req, res) => {
-  const { email, password, firstName, lastName, dateOfBirth } = req.body;
+// ... (registerUser y loginUser permanecen igual que antes) ...
 
-  try {
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ msg: "El usuario ya existe" });
-    }
+const registerUser = asyncHandler(async (req, res) => {
+  const { username, email, password, firstName, lastName, dateOfBirth } =
+    req.body;
 
-    user = new User({
-      email,
-      password,
-      firstName,
-      lastName,
-      dateOfBirth,
-    });
-
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-
-    await user.save();
-
-    // Crear y devolver JWT al registrarse (comportamiento original)
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token, msg: "Registro exitoso. ¡Bienvenido!" });
-      }
+  if (!username || !email || !password || !firstName || !lastName) {
+    res.status(400);
+    throw new Error(
+      "Por favor, completa todos los campos obligatorios: nombre de usuario, email, contraseña, nombre y apellido."
     );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Error del servidor");
   }
-};
 
-// @route   POST api/auth/login
-// @desc    Autenticar usuario y obtener token
-// @access  Public
-exports.loginUser = async (req, res) => {
+  const userExists = await User.findOne({ $or: [{ email }, { username }] });
+  if (userExists) {
+    res.status(400);
+    throw new Error("El usuario o el correo electrónico ya existe.");
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  const newUser = new User({
+    username,
+    email,
+    password: hashedPassword,
+    firstName,
+    lastName,
+    dateOfBirth,
+  });
+
+  await newUser.save();
+
+  if (newUser) {
+    // No se devuelve token ni se hace login automático aquí, solo la info del usuario creado
+    res.status(201).json({
+      _id: newUser._id,
+      username: newUser.username,
+      email: newUser.email,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      dateOfBirth: newUser.dateOfBirth,
+    });
+  } else {
+    res.status(400);
+    throw new Error("Datos de usuario inválidos.");
+  }
+});
+
+const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  try {
-    let user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ msg: "Credenciales inválidas" });
-    }
+  if (!email || !password) {
+    res.status(400);
+    throw new Error("Por favor, ingresa email y contraseña.");
+  }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ msg: "Credenciales inválidas" });
-    }
+  const user = await User.findOne({ email });
 
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
-
-    jwt.sign(
-      payload,
+  if (user && (await bcrypt.compare(password, user.password))) {
+    const token = jwt.sign(
+      { userId: user._id },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
+      { expiresIn: "1h" } // O el tiempo que prefieras, ej: '30d'
     );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Error del servidor");
-  }
-};
-
-// @route   PUT api/auth/change-password
-// @desc    Cambiar la contraseña del usuario
-// @access  Private
-exports.changePassword = async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-
-  try {
-    let user = await User.findById(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({ msg: "Usuario no encontrado" });
-    }
-
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) {
-      return res
-        .status(400)
-        .json({ msg: "La contraseña actual es incorrecta" });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
-
-    await user.save();
-
-    res.json({ msg: "Contraseña actualizada exitosamente" });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Error del servidor");
-  }
-};
-
-// @route   GET api/auth
-// @desc    Obtener datos del usuario autenticado (con token)
-// @access  Private
-exports.getUser = async (req, res) => {
-  try {
-    // req.user.id viene del middleware de autenticación (auth.js)
-    const user = await User.findById(req.user.id).select("-password"); // Excluir solo la contraseña
-    if (!user) {
-      return res.status(404).json({ msg: "Usuario no encontrado" });
-    }
-    res.json(user);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Error del servidor");
-  }
-};
-// @route   PUT api/auth/profile-picture
-// @desc    Subir y actualizar la URL de la foto de perfil del usuario
-// @access  Private
-exports.uploadProfilePicture = async (req, res) => {
-  try {
-    if (!req.file) {
-      // req.file es añadido por Multer si la subida es exitosa
-      return res
-        .status(400)
-        .json({ msg: "No se ha proporcionado ninguna imagen" });
-    }
-
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ msg: "Usuario no encontrado" });
-    }
-
-    // La URL de la imagen guardada
-    // En desarrollo, será algo como /uploads/nombre-del-archivo.jpg
-    const imageUrl = `/uploads/${req.file.filename}`;
-
-    user.profilePictureUrl = imageUrl;
-    await user.save();
-
     res.json({
-      msg: "Foto de perfil actualizada exitosamente",
-      profilePictureUrl: imageUrl,
+      token,
+      user: {
+        // Enviamos los datos del usuario que el frontend podría necesitar
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        dateOfBirth: user.dateOfBirth,
+      },
     });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Error del servidor al subir foto de perfil");
+  } else {
+    res.status(401); // Unauthorized
+    throw new Error("Credenciales inválidas.");
   }
-};
+});
 
-// @route   PUT api/auth/banner
-// @desc    Subir y actualizar la URL del banner del usuario
+// @desc    Get user profile
+// @route   GET /api/auth/profile
 // @access  Private
-exports.uploadBanner = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res
-        .status(400)
-        .json({ msg: "No se ha proporcionado ninguna imagen" });
-    }
+const getUserProfile = asyncHandler(async (req, res) => {
+  // Gracias al middleware modificado, req.user ya es el objeto del usuario
+  // (o la petición habría sido rechazada antes de llegar aquí).
 
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ msg: "Usuario no encontrado" });
-    }
-
-    const imageUrl = `/uploads/${req.file.filename}`;
-
-    user.bannerUrl = imageUrl;
-    await user.save();
-
-    res.json({ msg: "Banner actualizado exitosamente", bannerUrl: imageUrl });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Error del servidor al subir banner");
+  // req.user fue establecido por el middleware de autenticación y ya contiene
+  // el objeto del usuario sin la contraseña.
+  if (req.user) {
+    res.json(req.user);
+  } else {
+    // Este caso no debería ocurrir si el middleware funciona como se espera,
+    // ya que el middleware devolvería un 401 si el usuario no se encuentra.
+    // Pero lo dejamos como una salvaguarda.
+    res.status(404).json({ message: "Usuario no encontrado." });
   }
-};
+});
+
+module.exports = { registerUser, loginUser, getUserProfile };
