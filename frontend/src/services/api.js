@@ -1,11 +1,29 @@
-// frontend/src/services/api.js
 import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_RENDER_BACKEND_URL; // Sin fallback a localhost para producción
+console.log("[DEBUG VERCEL] Leyendo process.env.REACT_APP_BACKEND_URL...");
+const RENDER_BACKEND_URL_FROM_ENV = process.env.REACT_APP_BACKEND_URL;
+
+if (RENDER_BACKEND_URL_FROM_ENV) {
+  console.log(
+    "[INFO VERCEL] REACT_APP_BACKEND_URL tiene valor:",
+    RENDER_BACKEND_URL_FROM_ENV
+  );
+} else {
+  console.error("[ERROR VERCEL] ¡REACT_APP_BACKEND_URL ES UNDEFINED O VACÍA!");
+  // Podrías incluso lanzar un error aquí para detener la carga si prefieres,
+  // o asignar una URL por defecto solo para ver si el resto funciona, pero no es ideal para producción.
+  // Ejemplo (NO RECOMENDADO PARA PRODUCCIÓN):
+  // if (!RENDER_BACKEND_URL_FROM_ENV) {
+  //   console.warn('[WARN VERCEL] Usando URL de fallback porque REACT_APP_BACKEND_URL no está definida.');
+  //   RENDER_BACKEND_URL_FROM_ENV = "https://tu-url-de-render-aqui.onrender.com"; // ¡SOLO PARA PRUEBAS!
+  // }
+}
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: `${RENDER_BACKEND_URL_FROM_ENV}/api`,
 });
+
+console.log("[DEBUG VERCEL] Axios baseURL es:", api.defaults.baseURL);
 
 api.interceptors.request.use(
   (config) => {
