@@ -1,8 +1,6 @@
 // frontend/src/App.js
-import React, { useState, useEffect } from "react";
-// Ya no importamos axios directamente aquí para las llamadas, usaremos el servicio api
-// import axios from 'axios';
-import api from "./services/api"; // Importar la instancia de api configurada
+import React, { useState, useEffect, useCallback } from "react"; // useCallback añadido
+import api from "./services/api";
 import {
   BrowserRouter as Router,
   Switch,
@@ -34,33 +32,42 @@ function App() {
   const [loginPassword, setLoginPassword] = useState("");
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  // const [token, setToken] = useState(null); // Ya no es necesario gestionar token directamente en App si api.js lo usa de localStorage
   const [user, setUser] = useState(null);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Para estado de carga inicial
 
   const [registerErrors, setRegisterErrors] = useState({});
   const [loginErrors, setLoginErrors] = useState({});
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
-    if (storedToken && storedUser) {
-      // El interceptor de api.js ya debería estar configurando el header con el token
+  const fetchUserProfile = useCallback(async () => {
+    const tokenInStorage = localStorage.getItem("token");
+    if (tokenInStorage) {
       try {
-        setUser(JSON.parse(storedUser));
+        // El interceptor en api.js ya añade el token a los headers
+        const response = await api.get("/auth/profile"); // Llama al endpoint del perfil
+        setUser(response.data);
         setIsAuthenticated(true);
-      } catch (e) {
-        localStorage.removeItem("user");
+      } catch (error) {
+        console.error(
+          "Error al obtener perfil o token inválido:",
+          error.response ? error.response.data : error.message
+        );
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
         setUser(null);
         setIsAuthenticated(false);
+        // No mostramos toast aquí para no ser intrusivos al cargar,
+        // pero la app se comportará como si no estuviera logueado.
+        // La notificación "Token no encontrado..." podría venir de un componente
+        // que intente acceder a `user` y lo encuentre null.
       }
     }
     setIsLoadingAuth(false);
   }, []);
 
-  // Ya no necesitamos el useEffect para axios.defaults.headers.common['Authorization'] aquí
+  useEffect(() => {
+    fetchUserProfile();
+  }, [fetchUserProfile]);
 
   const validateRegisterForm = () => {
     /* ...sin cambios... */
@@ -87,11 +94,11 @@ function App() {
   };
 
   const handleRegister = async (e) => {
+    /* ...sin cambios... */
     e.preventDefault();
     if (!validateRegisterForm()) return;
     try {
       await api.post(`/auth/register`, {
-        // Usar la instancia de api
         username: registerEmail,
         email: registerEmail,
         password: registerPassword,
@@ -121,36 +128,39 @@ function App() {
       const res = await api.post(`/auth/login`, {
         email: loginEmail,
         password: loginPassword,
-      }); // Usar la instancia de api
+      });
       toast.success("Inicio de sesión exitoso.");
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      // setToken(res.data.token); // Ya no es necesario si api.js maneja el token desde localStorage
+      localStorage.setItem("user", JSON.stringify(res.data.user)); // Guardamos el usuario del login
       setUser(res.data.user);
       setIsAuthenticated(true);
+      // No es necesario llamar a fetchUserProfile aquí si la respuesta de login ya es confiable
+      // y el interceptor de api.js se actualiza con el nuevo token para futuras llamadas.
       setLoginEmail("");
       setLoginPassword("");
       setLoginErrors({});
     } catch (err) {
-      // Aquí es donde se origina el error que ves en la consola (App.js:144 en tu log anterior)
-      // si la petición falla.
       toast.error(
         `Error de inicio de sesión: ${
           err.response?.data?.message || err.message
         }`
       );
-      // Asegúrate de que el backend en Render está accesible y CORS configurado.
+      // Limpiar cualquier estado previo en caso de error de login
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setUser(null);
+      setIsAuthenticated(false);
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    // setToken(null); // Ya no es necesario
     setUser(null);
     setIsAuthenticated(false);
     toast.info("Sesión cerrada.");
-    // El interceptor de api.js se encargará de no enviar el token si no está en localStorage
+    // Considera redirigir al login si estás en una página protegida
+    // history.push('/login'); // Si tienes acceso a history aquí
   };
 
   if (isLoadingAuth) {
@@ -184,7 +194,6 @@ function App() {
             isAuthenticated={isAuthenticated}
             user={user}
           >
-            {/* ... Switch y Routes sin cambios ... */}
             <Switch>
               <Route
                 exact
@@ -206,7 +215,6 @@ function App() {
             </Switch>
           </Layout>
         ) : (
-          // ... Formulario de Login/Registro sin cambios significativos en la lógica de renderizado ...
           <Container
             className="d-flex flex-column justify-content-center align-items-center"
             style={{
@@ -216,6 +224,7 @@ function App() {
               paddingBottom: "2rem",
             }}
           >
+            {/* ... Formulario de Login/Registro sin cambios ... */}
             <Row className="w-100 justify-content-center">
               <Col md={6} lg={5} xl={4}>
                 <h1 className="text-center mb-4">Mi Dinero Hoy</h1>
