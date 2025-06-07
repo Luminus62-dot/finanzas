@@ -1,26 +1,22 @@
-// backend/controllers/authController.js
+// File: backend/controllers/authController.js
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 
-// ... (registerUser y loginUser permanecen igual que antes) ...
-
+// Registrar usuario
 const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password, firstName, lastName, dateOfBirth } =
     req.body;
-
   if (!username || !email || !password || !firstName || !lastName) {
-    res.status(400);
-    throw new Error(
-      "Por favor, completa todos los campos obligatorios: nombre de usuario, email, contraseña, nombre y apellido."
-    );
+    return res
+      .status(400)
+      .json({ message: "Completa todos los campos obligatorios." });
   }
 
   const userExists = await User.findOne({ $or: [{ email }, { username }] });
   if (userExists) {
-    res.status(400);
-    throw new Error("El usuario o el correo electrónico ya existe.");
+    return res.status(400).json({ message: "Usuario o correo ya registrado." });
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -34,45 +30,39 @@ const registerUser = asyncHandler(async (req, res) => {
     lastName,
     dateOfBirth,
   });
-
   await newUser.save();
 
-  if (newUser) {
-    // No se devuelve token ni se hace login automático aquí, solo la info del usuario creado
-    res.status(201).json({
+  const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
+  res.status(201).json({
+    token,
+    user: {
       _id: newUser._id,
       username: newUser.username,
       email: newUser.email,
       firstName: newUser.firstName,
       lastName: newUser.lastName,
       dateOfBirth: newUser.dateOfBirth,
-    });
-  } else {
-    res.status(400);
-    throw new Error("Datos de usuario inválidos.");
-  }
+    },
+  });
 });
 
+// Login usuario
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
   if (!email || !password) {
-    res.status(400);
-    throw new Error("Por favor, ingresa email y contraseña.");
+    return res.status(400).json({ message: "Email y contraseña requeridos." });
   }
 
   const user = await User.findOne({ email });
-
   if (user && (await bcrypt.compare(password, user.password))) {
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" } // O el tiempo que prefieras, ej: '30d'
-    );
-    res.json({
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+    return res.json({
       token,
       user: {
-        // Enviamos los datos del usuario que el frontend podría necesitar
         _id: user._id,
         username: user.username,
         email: user.email,
@@ -81,29 +71,13 @@ const loginUser = asyncHandler(async (req, res) => {
         dateOfBirth: user.dateOfBirth,
       },
     });
-  } else {
-    res.status(401); // Unauthorized
-    throw new Error("Credenciales inválidas.");
   }
+  res.status(401).json({ message: "Credenciales inválidas." });
 });
 
-// @desc    Get user profile
-// @route   GET /api/auth/profile
-// @access  Private
-const getUserProfile = asyncHandler(async (req, res) => {
-  // Gracias al middleware modificado, req.user ya es el objeto del usuario
-  // (o la petición habría sido rechazada antes de llegar aquí).
-
-  // req.user fue establecido por el middleware de autenticación y ya contiene
-  // el objeto del usuario sin la contraseña.
-  if (req.user) {
-    res.json(req.user);
-  } else {
-    // Este caso no debería ocurrir si el middleware funciona como se espera,
-    // ya que el middleware devolvería un 401 si el usuario no se encuentra.
-    // Pero lo dejamos como una salvaguarda.
-    res.status(404).json({ message: "Usuario no encontrado." });
-  }
+// Obtener perfil autenticado
+const getUser = asyncHandler(async (req, res) => {
+  res.json(req.user);
 });
 
-module.exports = { registerUser, loginUser, getUserProfile };
+module.exports = { registerUser, loginUser, getUser };
