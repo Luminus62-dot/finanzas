@@ -69,6 +69,8 @@ const loginUser = asyncHandler(async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         dateOfBirth: user.dateOfBirth,
+        profilePictureUrl: user.profilePictureUrl, // Asegúrese de incluir estas en el login
+        bannerUrl: user.bannerUrl, // Asegúrese de incluir estas en el login
       },
     });
   }
@@ -77,7 +79,94 @@ const loginUser = asyncHandler(async (req, res) => {
 
 // Obtener perfil autenticado
 const getUser = asyncHandler(async (req, res) => {
+  // `req.user` ya contiene el usuario sin la contraseña gracias al middleware `auth`
   res.json(req.user);
 });
 
-module.exports = { registerUser, loginUser, getUser };
+// Cambiar la contraseña del usuario
+const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  // Validaciones básicas de entrada
+  if (!currentPassword || !newPassword) {
+    return res
+      .status(400)
+      .json({
+        msg: "Por favor, ingrese la contraseña actual y la nueva contraseña.",
+      });
+  }
+  if (newPassword.length < 6) {
+    return res
+      .status(400)
+      .json({ msg: "La nueva contraseña debe tener al menos 6 caracteres." });
+  }
+
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    return res.status(404).json({ msg: "Usuario no encontrado." });
+  }
+
+  // Verificar la contraseña actual
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) {
+    return res.status(400).json({ msg: "La contraseña actual es incorrecta." });
+  }
+
+  // Hashear y guardar la nueva contraseña
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(newPassword, salt);
+  await user.save();
+
+  res.json({ msg: "Contraseña actualizada exitosamente." });
+});
+
+// Subir y actualizar la foto de perfil
+const uploadProfilePicture = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ msg: "No se subió ninguna imagen." });
+  }
+
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return res.status(404).json({ msg: "Usuario no encontrado." });
+  }
+
+  // La ruta se guarda relativa a la carpeta 'uploads'
+  user.profilePictureUrl = `/uploads/${req.file.filename}`;
+  await user.save();
+
+  // Devolver la URL completa para el frontend si es necesario
+  res.json({
+    msg: "Foto de perfil actualizada",
+    profilePictureUrl: user.profilePictureUrl,
+  });
+});
+
+// Subir y actualizar el banner del perfil
+const uploadBanner = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ msg: "No se subió ningún banner." });
+  }
+
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return res.status(404).json({ msg: "Usuario no encontrado." });
+  }
+
+  // La ruta se guarda relativa a la carpeta 'uploads'
+  user.bannerUrl = `/uploads/${req.file.filename}`;
+  await user.save();
+
+  // Devolver la URL completa para el frontend si es necesario
+  res.json({ msg: "Banner actualizado", bannerUrl: user.bannerUrl });
+});
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getUser,
+  changePassword, // <-- Exportar esta función
+  uploadProfilePicture, // <-- Exportar esta función
+  uploadBanner, // <-- Exportar esta función
+};
