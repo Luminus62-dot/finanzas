@@ -84,19 +84,19 @@ const SettingsPage = () => {
         return;
       }
       // console.log(
-        "DEBUG: SettingsPage - Enviando PUT a /api/auth/change-password..."
-//       );
-//       const res = await api.put(
+      //   "DEBUG: SettingsPage - Enviando PUT a /api/auth/change-password..."
+      // );
+      const res = await api.put(
         `/auth/change-password`,
         {
           currentPassword,
           newPassword,
         }
       );
-//       // console.log(
-//         "DEBUG: SettingsPage - Respuesta de cambio de contraseña:",
-//         res.data
-      );
+      // console.log(
+      //   "DEBUG: SettingsPage - Respuesta de cambio de contraseña:",
+      //   res.data
+      // );
       toast.success(res.data.msg);
       setCurrentPassword("");
       setNewPassword("");
