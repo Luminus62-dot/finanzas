@@ -1,5 +1,5 @@
 // frontend/src/pages/ReportsPage.jsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import api from "../services/api";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import {
@@ -16,6 +16,7 @@ import {
   Legend,
 } from "recharts";
 import { toast } from "react-toastify";
+import { AuthContext } from "../context/AuthContext";
 
 const COLORS = [
   "#0088FE",
@@ -32,7 +33,8 @@ const COLORS = [
   "#2ECC71",
 ];
 
-const ReportsPage = ({ token }) => {
+const ReportsPage = () => {
+  const { token } = useContext(AuthContext);
   const [reportType, setReportType] = useState("monthly");
   const [selectedMonth, setSelectedMonth] = useState(
     new Date().toISOString().slice(0, 7)

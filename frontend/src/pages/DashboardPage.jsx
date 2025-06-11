@@ -1,10 +1,12 @@
 // frontend/src/pages/DashboardPage.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import api from '../services/api';
 import { Container, Row, Col, Card, Alert, ListGroup, Image } from 'react-bootstrap';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../context/AuthContext';
 
-const DashboardPage = ({ token }) => {
+const DashboardPage = () => {
+  const { token } = useContext(AuthContext);
   const [totalBalance, setTotalBalance] = useState(0);
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [userProfile, setUserProfile] = useState(null);

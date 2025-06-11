@@ -1,11 +1,13 @@
 // frontend/src/pages/TransactionsPage.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import api from '../services/api';
 import { Container, Row, Col, Form, Button, Card, ListGroup } from 'react-bootstrap';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../context/AuthContext';
 
-const TransactionsPage = ({ token }) => {
+const TransactionsPage = () => {
+  const { token } = useContext(AuthContext);
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
