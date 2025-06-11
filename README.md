@@ -16,7 +16,11 @@ Aplicación full-stack para gestión de finanzas personales.
 ```
 MONGO_URI=
 JWT_SECRET=
+# FRONTEND_URL puede ser una URL o varias separadas por comas
 FRONTEND_URL=https://tu-frontend.vercel.app
+# Para comodines se puede usar FRONTEND_URL_REGEX
+# Ejemplo para aceptar cualquier subdominio de Vercel
+# FRONTEND_URL_REGEX=^https://.*\.vercel\.app$
 PORT=5000
 ```
 
