@@ -169,9 +169,11 @@ const AccountsPage = () => {
     <Container className="py-4">
       <h2 className="mb-4 text-center page-title">Gestión de Cuentas</h2>
 
-      {/* Formulario para Añadir/Editar Cuenta */}
-      <Card className="mb-4 shadow-sm">
-        <Card.Body>
+      <Row className="g-4">
+        <Col md={6}>
+          {/* Formulario para Añadir/Editar Cuenta */}
+          <Card className="mb-4 shadow-sm h-100">
+            <Card.Body>
           <Card.Title className="text-center mb-3">
             {editingAccount ? "Editar Cuenta" : "Añadir Nueva Cuenta"}
           </Card.Title>
@@ -325,9 +327,11 @@ const AccountsPage = () => {
         </Card.Body>
       </Card>
 
-      {/* Listado de Cuentas */}
-      <Card className="shadow-sm">
-        <Card.Body>
+        {/* Listado de Cuentas */}
+        </Col>
+        <Col md={6}>
+          <Card className="shadow-sm h-100">
+            <Card.Body>
           <Card.Title className="text-center mb-3">Tus Cuentas</Card.Title>
           {accounts.length === 0 ? (
             <p className="text-center">
@@ -368,6 +372,8 @@ const AccountsPage = () => {
           )}
         </Card.Body>
       </Card>
+        </Col>
+      </Row>
     </Container>
   );
 };

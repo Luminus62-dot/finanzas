@@ -1,7 +1,16 @@
 // frontend/src/pages/SettingsPage.jsx
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import api from "../services/api";
-import { Container, Card, Form, Button, Alert, Image } from "react-bootstrap";
+import {
+  Container,
+  Card,
+  Form,
+  Button,
+  Alert,
+  Image,
+  Tabs,
+  Tab,
+} from "react-bootstrap";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
 
@@ -205,15 +214,16 @@ const SettingsPage = () => {
     <Container className="py-4">
       <h2 className="mb-4 text-center page-title">Configuración de Usuario</h2>
 
-      {/* Tarjeta para Cambiar Contraseña */}
-      <Card className="shadow-sm mx-auto mb-4" style={{ maxWidth: "500px" }}>
-        <Card.Body>
-          <Card.Title className="text-center mb-3">
-            Cambiar Contraseña
-          </Card.Title>
-          {formError && <Alert variant="danger">{formError}</Alert>}{" "}
-          {/* Error de contraseña */}
-          <Form onSubmit={handleChangePassword}>
+      <Tabs defaultActiveKey="password" className="mb-4" fill>
+        <Tab eventKey="password" title="Seguridad">
+          <Card className="shadow-sm mx-auto mb-4" style={{ maxWidth: "500px" }}>
+            <Card.Body>
+              <Card.Title className="text-center mb-3">
+                Cambiar Contraseña
+              </Card.Title>
+              {formError && <Alert variant="danger">{formError}</Alert>}{" "}
+              {/* Error de contraseña */}
+              <Form onSubmit={handleChangePassword}>
             <Form.Group className="mb-3" controlId="currentPassword">
               <Form.Label>Contraseña Actual:</Form.Label>
               <Form.Control
@@ -264,11 +274,12 @@ const SettingsPage = () => {
           </Form>
         </Card.Body>
       </Card>
+        </Tab>
 
-      {/* Tarjeta para Subir Foto de Perfil */}
-      <Card className="shadow-sm mx-auto mb-4" style={{ maxWidth: "500px" }}>
-        <Card.Body>
-          <Card.Title className="text-center mb-3">Foto de Perfil</Card.Title>
+        <Tab eventKey="profile" title="Foto de Perfil">
+          <Card className="shadow-sm mx-auto mb-4" style={{ maxWidth: "500px" }}>
+            <Card.Body>
+              <Card.Title className="text-center mb-3">Foto de Perfil</Card.Title>
           <div className="text-center mb-3">
             {userProfile?.profilePictureUrl ? (
               <Image
@@ -323,13 +334,14 @@ const SettingsPage = () => {
           </Form>
         </Card.Body>
       </Card>
+        </Tab>
 
-      {/* Tarjeta para Subir Banner */}
-      <Card className="shadow-sm mx-auto mb-4" style={{ maxWidth: "500px" }}>
-        <Card.Body>
-          <Card.Title className="text-center mb-3">
-            Banner del Perfil
-          </Card.Title>
+        <Tab eventKey="banner" title="Banner">
+          <Card className="shadow-sm mx-auto mb-4" style={{ maxWidth: "500px" }}>
+            <Card.Body>
+              <Card.Title className="text-center mb-3">
+                Banner del Perfil
+              </Card.Title>
           <div className="text-center mb-3">
             {userProfile?.bannerUrl ? (
               <Image
@@ -379,6 +391,8 @@ const SettingsPage = () => {
           </Form>
         </Card.Body>
       </Card>
+        </Tab>
+      </Tabs>
     </Container>
   );
 };
