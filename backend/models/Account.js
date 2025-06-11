@@ -12,7 +12,7 @@ const AccountSchema = new Schema({
     type: String,
     required: true,
     trim: true, // Elimina espacios en blanco al inicio/final
-    unique: true, // El nombre de la cuenta debe ser único por usuario (consideraremos esto en el controlador)
+    // La unicidad se maneja por usuario mediante un índice compuesto
   },
   type: {
     type: String,
@@ -42,5 +42,8 @@ const AccountSchema = new Schema({
     default: Date.now,
   },
 });
+
+// Índice compuesto para asegurar que cada usuario tenga nombres de cuenta únicos
+AccountSchema.index({ user: 1, name: 1 }, { unique: true });
 
 module.exports = mongoose.model("Account", AccountSchema);

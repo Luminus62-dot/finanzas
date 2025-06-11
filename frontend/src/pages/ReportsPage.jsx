@@ -85,7 +85,7 @@ const ReportsPage = ({ token }) => {
 
       const [expenseRes, incomeRes, netFlowRes] = await Promise.all([
         axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/transactions/summary`,
+          `${process.env.REACT_APP_API_URL}/api/transactions/summary`,
           {
             params: {
               startDate: startDateISO,
@@ -95,7 +95,7 @@ const ReportsPage = ({ token }) => {
           }
         ),
         axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/transactions/summary`,
+          `${process.env.REACT_APP_API_URL}/api/transactions/summary`,
           {
             params: {
               startDate: startDateISO,
@@ -105,7 +105,7 @@ const ReportsPage = ({ token }) => {
           }
         ),
         axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/transactions/summary`,
+          `${process.env.REACT_APP_API_URL}/api/transactions/summary`,
           {
             params: { startDate: startDateISO, endDate: endDateISO },
           }

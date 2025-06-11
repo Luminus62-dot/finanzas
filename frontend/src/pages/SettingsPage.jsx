@@ -31,7 +31,7 @@ const SettingsPage = ({ token }) => {
         "DEBUG: SettingsPage - Enviando GET a /api/auth para perfil..."
       );
       const res = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/auth`
+        `${process.env.REACT_APP_API_URL}/api/auth`
       );
       console.log("DEBUG: SettingsPage - Respuesta de /api/auth:", res.data);
       setUserProfile(res.data);
@@ -89,7 +89,7 @@ const SettingsPage = ({ token }) => {
         "DEBUG: SettingsPage - Enviando PUT a /api/auth/change-password..."
       );
       const res = await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/auth/change-password`,
+        `${process.env.REACT_APP_API_URL}/api/auth/change-password`,
         {
           currentPassword,
           newPassword,
@@ -140,7 +140,7 @@ const SettingsPage = ({ token }) => {
         "DEBUG: SettingsPage - Enviando PUT a /api/auth/profile-picture..."
       );
       const res = await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/auth/profile-picture`,
+        `${process.env.REACT_APP_API_URL}/api/auth/profile-picture`,
         formData
       );
       console.log(
@@ -183,7 +183,7 @@ const SettingsPage = ({ token }) => {
       axios.defaults.headers.common["x-auth-token"] = token;
       console.log("DEBUG: SettingsPage - Enviando PUT a /api/auth/banner...");
       const res = await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/auth/banner`,
+        `${process.env.REACT_APP_API_URL}/api/auth/banner`,
         formData
       );
       console.log(

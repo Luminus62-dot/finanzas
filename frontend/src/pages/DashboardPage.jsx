@@ -20,7 +20,7 @@ const DashboardPage = ({ token }) => {
       }
       axios.defaults.headers.common['x-auth-token'] = token;
       console.log('DEBUG: DashboardPage - Enviando GET a /api/auth para perfil...'); // Debug
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/auth`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth`);
       console.log('DEBUG: DashboardPage - Respuesta de /api/auth:', res.data); // Debug
       setUserProfile(res.data);
     } catch (err) {
@@ -36,7 +36,7 @@ const DashboardPage = ({ token }) => {
       if (!token) return;
       axios.defaults.headers.common['x-auth-token'] = token;
       console.log('DEBUG: DashboardPage - Enviando GET a /api/accounts para balance...'); // Debug
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/accounts`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/accounts`);
       console.log('DEBUG: DashboardPage - Respuesta de /api/accounts (balance):', res.data); // Debug
       // Asegurarse de que res.data sea un array antes de reducir
       if (Array.isArray(res.data)) {
@@ -60,7 +60,7 @@ const DashboardPage = ({ token }) => {
       if (!token) return;
       axios.defaults.headers.common['x-auth-token'] = token;
       console.log('DEBUG: DashboardPage - Enviando GET a /api/transactions para recientes...'); // Debug
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/transactions`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/transactions`);
       console.log('DEBUG: DashboardPage - Respuesta de /api/transactions (recientes):', res.data); // Debug
       // Asegurarse de que res.data sea un array
       if (Array.isArray(res.data)) {
@@ -108,7 +108,7 @@ const DashboardPage = ({ token }) => {
                 style={{
                   height: '150px',
                   backgroundColor: '#3498db',
-                  backgroundImage: userProfile?.bannerUrl ? `url(${process.env.REACT_APP_BACKEND_URL}${userProfile.bannerUrl})` : 'url(https://via.placeholder.com/800x150/3498db/ffffff?text=Tu+Banner+Aqui)',
+                  backgroundImage: userProfile?.bannerUrl ? `url(${process.env.REACT_APP_API_URL}${userProfile.bannerUrl})` : 'url(https://via.placeholder.com/800x150/3498db/ffffff?text=Tu+Banner+Aqui)',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   position: 'relative'
@@ -116,7 +116,7 @@ const DashboardPage = ({ token }) => {
               >
                 {/* Foto de Perfil */}
                 <Image
-                  src={userProfile?.profilePictureUrl ? `${process.env.REACT_APP_BACKEND_URL}${userProfile.profilePictureUrl}` : `https://via.placeholder.com/100/ecf0f1/2c3e50?text=${userProfile?.firstName?.charAt(0) || 'U'}${userProfile?.lastName?.charAt(0) || 'S'}`}
+                  src={userProfile?.profilePictureUrl ? `${process.env.REACT_APP_API_URL}${userProfile.profilePictureUrl}` : `https://via.placeholder.com/100/ecf0f1/2c3e50?text=${userProfile?.firstName?.charAt(0) || 'U'}${userProfile?.lastName?.charAt(0) || 'S'}`}
                   roundedCircle
                   className="border border-white border-3"
                   style={{

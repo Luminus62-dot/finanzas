@@ -12,7 +12,7 @@ const CategorySchema = new Schema({
     type: String,
     required: true,
     trim: true,
-    unique: true, // El nombre de la categoría debe ser único por usuario
+    // La unicidad por usuario se define con un índice compuesto más abajo
   },
   type: {
     type: String,
@@ -24,5 +24,8 @@ const CategorySchema = new Schema({
     default: Date.now,
   },
 });
+
+// Índice compuesto: nombre de categoría único por usuario y tipo
+CategorySchema.index({ user: 1, name: 1, type: 1 }, { unique: true });
 
 module.exports = mongoose.model("Category", CategorySchema);
