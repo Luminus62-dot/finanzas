@@ -322,13 +322,13 @@ exports.getTransactionsSummary = async (req, res) => {
   // console.log(
     "Usuario que se usará en el match (ObjectId):",
     userId.toString()
-  );
+  // );
   // console.log(
     "Rango de Fechas Solicitado por Frontend (ISO):",
     startDate,
     "a",
     endDate
-  );
+  // );
   // console.log("Rango de Fechas para Match en DB (Objetos Date UTC):");
   // console.log("  $gte (Inicio del día):", startOfDay.toISOString());
   // console.log("  $lte (Fin del día):", endOfDay.toISOString());
