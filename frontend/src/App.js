@@ -39,6 +39,9 @@ function App() {
   const [registerErrors, setRegisterErrors] = useState({});
   const [loginErrors, setLoginErrors] = useState({});
 
+  // Obtener el token almacenado (si existe) en cada render
+  const token = localStorage.getItem("token");
+
   const fetchUserProfile = useCallback(async () => {
     const tokenInStorage = localStorage.getItem("token");
     if (tokenInStorage) {
@@ -200,17 +203,17 @@ function App() {
                 path="/"
                 render={() => <Redirect to="/dashboard" />}
               />
-              <Route path="/dashboard" component={DashboardPage} />
-              <Route path="/accounts" component={AccountsPage} />
-              <Route path="/transactions" component={TransactionsPage} />
-              <Route path="/categories" component={CategoriesPage} />
-              <Route path="/saving-goals" component={SavingGoalsPage} />
+              <Route path="/dashboard" render={() => <DashboardPage token={token} />} />
+              <Route path="/accounts" render={() => <AccountsPage token={token} />} />
+              <Route path="/transactions" render={() => <TransactionsPage token={token} />} />
+              <Route path="/categories" render={() => <CategoriesPage token={token} />} />
+              <Route path="/saving-goals" render={() => <SavingGoalsPage token={token} />} />
               <Route
                 path="/budget-calculator"
                 component={BudgetCalculatorPage}
               />
-              <Route path="/reports" component={ReportsPage} />
-              <Route path="/settings" component={SettingsPage} />
+              <Route path="/reports" render={() => <ReportsPage token={token} />} />
+              <Route path="/settings" render={() => <SettingsPage token={token} />} />
               <Route path="*" render={() => <Redirect to="/dashboard" />} />
             </Switch>
           </Layout>
