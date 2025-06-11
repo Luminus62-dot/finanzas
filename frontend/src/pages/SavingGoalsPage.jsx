@@ -11,7 +11,7 @@ import {
   ListGroup,
   ProgressBar,
 } from "react-bootstrap";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaEdit, FaTrashAlt, FaPiggyBank } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
 
@@ -34,14 +34,18 @@ const SavingGoalsPage = () => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      // console.log(
-      //   "DEBUG: SavingGoalsPage - Enviando GET a /api/savinggoals..."
-      // );
+      /*
+      console.log(
+        "DEBUG: SavingGoalsPage - Enviando GET a /api/savinggoals..."
+      );
+      */
       const res = await api.get(`/savinggoals`);
-      // console.log(
-      //   "DEBUG: SavingGoalsPage - Respuesta de /api/savinggoals:",
-      //   res.data
-      // );
+      /*
+      console.log(
+        "DEBUG: SavingGoalsPage - Respuesta de /api/savinggoals:",
+        res.data
+      );
+      */
       if (Array.isArray(res.data)) {
         setGoals(res.data);
       } else {
@@ -66,7 +70,7 @@ const SavingGoalsPage = () => {
   }, [token]);
 
   useEffect(() => {
-    // console.log("DEBUG: SavingGoalsPage - Iniciando carga inicial de datos...");
+    /* console.log("DEBUG: SavingGoalsPage - Iniciando carga inicial de datos..."); */
     fetchSavingGoals();
   }, [fetchSavingGoals]);
 
@@ -115,9 +119,11 @@ const SavingGoalsPage = () => {
       return;
     }
     try {
-      // console.log(
-      //   "DEBUG: SavingGoalsPage - Enviando POST a /api/savinggoals..."
-      // );
+      /*
+      console.log(
+        "DEBUG: SavingGoalsPage - Enviando POST a /api/savinggoals..."
+      );
+      */
       const goalData = {
         name: newGoalName,
         targetAmount: parseFloat(newGoalTargetAmount),
@@ -165,9 +171,11 @@ const SavingGoalsPage = () => {
     }
 
     try {
-      // console.log(
-      //   "DEBUG: SavingGoalsPage - Enviando PUT a /api/savinggoals/:id..."
-      // );
+      /*
+      console.log(
+        "DEBUG: SavingGoalsPage - Enviando PUT a /api/savinggoals/:id..."
+      );
+      */
       const updatedGoalData = {
         name: editingGoal.name,
         targetAmount: parseFloat(editingGoal.targetAmount),
@@ -203,7 +211,7 @@ const SavingGoalsPage = () => {
     setGoalFormErrors({}); // Limpiar si pasa la validación
 
     try {
-      // console.log("DEBUG: SavingGoalsPage - Añadiendo monto a meta...");
+      /* console.log("DEBUG: SavingGoalsPage - Añadiendo monto a meta..."); */
       const goalToUpdate = goals.find((g) => g._id === goalId);
       if (!goalToUpdate) return;
 
@@ -231,9 +239,11 @@ const SavingGoalsPage = () => {
       )
     ) {
       try {
-        // console.log(
-        //   "DEBUG: SavingGoalsPage - Enviando DELETE a /api/savinggoals/:id..."
-        // );
+        /*
+        console.log(
+          "DEBUG: SavingGoalsPage - Enviando DELETE a /api/savinggoals/:id..."
+        );
+        */
         await api.delete(`/savinggoals/${id}`);
         toast.success("Meta de ahorro eliminada exitosamente!");
         fetchSavingGoals();
@@ -249,7 +259,11 @@ const SavingGoalsPage = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4 text-center">Mis Metas de Ahorro</h2>
+      <div className="hero-section">
+        <FaPiggyBank className="hero-icon" />
+        <h2 className="mb-2">Mis Metas de Ahorro</h2>
+        <p className="mb-0">Gestiona y cumple tus objetivos financieros</p>
+      </div>
 
       {/* Formulario para Añadir/Editar Meta de Ahorro */}
       <Card className="mb-4 shadow-sm">
