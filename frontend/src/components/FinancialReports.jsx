@@ -1,6 +1,6 @@
 // frontend/src/components/FinancialReports.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../services/api";
 import {
   PieChart,
   Pie,
@@ -66,11 +66,11 @@ const FinancialReports = ({ token, setMessage }) => {
         setLoading(false);
         return;
       }
-      axios.defaults.headers.common["x-auth-token"] = token;
+      api.defaults.headers.common["x-auth-token"] = token;
 
       // Obtener resumen de gastos por categoría
-      const expenseRes = await axios.get(
-        "http://localhost:5000/api/transactions/summary",
+      const expenseRes = await api.get(
+        "/api/transactions/summary",
         {
           params: {
             startDate: startDate.toISOString(),
@@ -81,8 +81,8 @@ const FinancialReports = ({ token, setMessage }) => {
       );
 
       // Obtener resumen de ingresos por categoría (aunque no lo mostremos en PieChart, es útil para el flujo neto)
-      const incomeRes = await axios.get(
-        "http://localhost:5000/api/transactions/summary",
+      const incomeRes = await api.get(
+        "/api/transactions/summary",
         {
           params: {
             startDate: startDate.toISOString(),
@@ -93,8 +93,8 @@ const FinancialReports = ({ token, setMessage }) => {
       );
 
       // Flujo Neto y totales
-      const netFlowRes = await axios.get(
-        "http://localhost:5000/api/transactions/summary",
+      const netFlowRes = await api.get(
+        "/api/transactions/summary",
         {
           params: {
             startDate: startDate.toISOString(),
