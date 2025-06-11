@@ -1,7 +1,22 @@
 // frontend/src/pages/ReportsPage.jsx
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import api from "../services/api";
-import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  Table,
+} from "react-bootstrap";
+import {
+  FaMoneyBillWave,
+  FaShoppingCart,
+  FaExchangeAlt,
+  FaReceipt,
+  FaChartLine,
+} from "react-icons/fa";
 import {
   PieChart,
   Pie,
@@ -44,6 +59,10 @@ const ReportsPage = () => {
   ); // YYYY
   const [summaryData, setSummaryData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState({
+    totalTransactions: 0,
+    averageAmount: 0,
+  });
 
   const fetchReportData = useCallback(async () => {
     // console.log("\n--- Frontend Debugging Reporte (fetchReportData) ---");
@@ -83,7 +102,7 @@ const ReportsPage = () => {
       }
       // console.log("DEBUG: ReportsPage - Realizando peticiones Axios...");
 
-      const [expenseRes, incomeRes, netFlowRes] = await Promise.all([
+      const [expenseRes, incomeRes, netFlowRes, transactionsRes] = await Promise.all([
         api.get("/transactions/summary", {
           params: {
             startDate: startDateISO,
@@ -101,12 +120,19 @@ const ReportsPage = () => {
         api.get("/transactions/summary", {
           params: { startDate: startDateISO, endDate: endDateISO },
         }),
+        api.get("/transactions", {
+          params: { startDate: startDateISO, endDate: endDateISO },
+        }),
       ]);
 
       // console.log("DEBUG: ReportsPage - Respuestas recibidas:");
       // console.log("  expenseRes.data:", expenseRes.data);
       // console.log("  incomeRes.data:", incomeRes.data);
       // console.log("  netFlowRes.data:", netFlowRes.data);
+
+      const transactions = Array.isArray(transactionsRes.data)
+        ? transactionsRes.data
+        : [];
 
       const processedSummaryData = {
         expenseSummary: Array.isArray(expenseRes.data.categorySummary)
@@ -125,6 +151,16 @@ const ReportsPage = () => {
         expenseTotal: netFlowRes.data.expenseTotal || 0,
         netFlow: netFlowRes.data.netFlow || 0,
       };
+
+      const totalTransactions = transactions.length;
+      const averageAmount =
+        totalTransactions > 0
+          ?
+            transactions.reduce((acc, t) => acc + Math.abs(t.amount), 0) /
+            totalTransactions
+          : 0;
+
+      setStats({ totalTransactions, averageAmount });
 
       setSummaryData(processedSummaryData);
       toast.success("Reporte generado exitosamente!");
@@ -257,17 +293,19 @@ const ReportsPage = () => {
               <Card.Body className="text-center">
                 <Card.Title className="mb-3">Resumen General</Card.Title>
                 <Row>
-                  <Col xs={12} md={4}>
+                  <Col xs={12} md={4} className="mb-2">
                     <h5 className="text-success">
+                      <FaMoneyBillWave className="me-2" />
                       Ingresos: {summaryData.incomeTotal.toFixed(2)} USD
                     </h5>
                   </Col>
-                  <Col xs={12} md={4}>
+                  <Col xs={12} md={4} className="mb-2">
                     <h5 className="text-danger">
+                      <FaShoppingCart className="me-2" />
                       Gastos: {summaryData.expenseTotal.toFixed(2)} USD
                     </h5>
                   </Col>
-                  <Col xs={12} md={4}>
+                  <Col xs={12} md={4} className="mb-2">
                     <h5
                       className={
                         summaryData.netFlow >= 0
@@ -275,8 +313,23 @@ const ReportsPage = () => {
                           : "text-danger"
                       }
                     >
+                      <FaExchangeAlt className="me-2" />
                       Flujo Neto: {summaryData.netFlow.toFixed(2)} USD
                     </h5>
+                  </Col>
+                </Row>
+                <Row className="mt-3">
+                  <Col xs={12} md={6} className="mb-2">
+                    <h6>
+                      <FaReceipt className="me-2" />
+                      Total Transacciones: {stats.totalTransactions}
+                    </h6>
+                  </Col>
+                  <Col xs={12} md={6} className="mb-2">
+                    <h6>
+                      <FaChartLine className="me-2" />
+                      Promedio por Transacción: {stats.averageAmount.toFixed(2)} USD
+                    </h6>
                   </Col>
                 </Row>
               </Card.Body>
@@ -356,6 +409,49 @@ const ReportsPage = () => {
                     No hay datos de ingresos para este período.
                   </p>
                 )}
+              </Card.Body>
+            </Card>
+          </Col>
+
+          {/* Tabla Detallada por Categoría */}
+          <Col xs={12} className="mt-4">
+            <Card className="shadow-sm">
+              <Card.Body>
+                <Card.Title className="text-center mb-3">
+                  Detalle por Categoría
+                </Card.Title>
+                <Row>
+                  <Col xs={12} md={6} className="mb-3">
+                    <h6 className="text-center">Gastos</h6>
+                    <Table striped bordered hover size="sm">
+                      <tbody>
+                        {summaryData.expenseSummary.map((item) => (
+                          <tr key={`exp-${item.name}`}>
+                            <td>{item.name}</td>
+                            <td className="text-end">
+                              {item.value.toFixed(2)} USD
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </Col>
+                  <Col xs={12} md={6} className="mb-3">
+                    <h6 className="text-center">Ingresos</h6>
+                    <Table striped bordered hover size="sm">
+                      <tbody>
+                        {summaryData.incomeSummary.map((item) => (
+                          <tr key={`inc-${item.name}`}>
+                            <td>{item.name}</td>
+                            <td className="text-end">
+                              {item.value.toFixed(2)} USD
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </Col>
+                </Row>
               </Card.Body>
             </Card>
           </Col>
