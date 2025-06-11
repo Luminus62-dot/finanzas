@@ -401,11 +401,12 @@ const SavingGoalsPage = () => {
               <Button
                 variant={editingGoal ? "warning" : "success"}
                 type="submit"
+                className="fancy-btn"
               >
                 {editingGoal ? "Guardar Cambios" : "Crear Meta"}
               </Button>
               {editingGoal && (
-                <Button variant="secondary" onClick={cancelEditGoal}>
+                <Button variant="secondary" onClick={cancelEditGoal} className="fancy-btn">
                   Cancelar
                 </Button>
               )}
@@ -499,7 +500,7 @@ const SavingGoalsPage = () => {
                       </Form.Control.Feedback>
                       <Button
                         variant="info"
-                        className="me-auto"
+                        className="me-auto fancy-btn"
                         onClick={() =>
                           handleAddAmountToGoal(goal._id, goal.currentAmount)
                         }
@@ -509,7 +510,7 @@ const SavingGoalsPage = () => {
                       <Button
                         variant="warning"
                         size="sm"
-                        className="me-2"
+                        className="me-2 fancy-btn"
                         onClick={() => startEditGoal(goal)}
                       >
                         <FaEdit /> Editar
@@ -518,6 +519,7 @@ const SavingGoalsPage = () => {
                         variant="danger"
                         size="sm"
                         onClick={() => handleDeleteGoal(goal._id)}
+                        className="fancy-btn"
                       >
                         <FaTrashAlt /> Eliminar
                       </Button>

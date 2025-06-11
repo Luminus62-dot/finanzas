@@ -274,7 +274,7 @@ const ReportsPage = () => {
                 )}
               </Col>
               <Col md={4} className="d-grid">
-                <Button onClick={fetchReportData} variant="primary">
+                <Button onClick={fetchReportData} variant="primary" className="fancy-btn">
                   Generar Reporte
                 </Button>
               </Col>

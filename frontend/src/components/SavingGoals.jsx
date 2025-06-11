@@ -347,6 +347,7 @@ const SavingGoals = ({ token, setMessage }) => {
           >
             <button
               type="submit"
+              className="fancy-btn"
               style={{
                 padding: "10px 20px",
                 backgroundColor: editingGoal ? "#ffc107" : "#28a745",
@@ -363,6 +364,7 @@ const SavingGoals = ({ token, setMessage }) => {
               <button
                 type="button"
                 onClick={cancelEditGoal}
+                className="fancy-btn"
                 style={{
                   padding: "10px 20px",
                   backgroundColor: "#6c757d",
@@ -507,6 +509,7 @@ const SavingGoals = ({ token, setMessage }) => {
                       onClick={() =>
                         handleAddAmountToGoal(goal._id, goal.currentAmount)
                       }
+                      className="fancy-btn"
                       style={{
                         padding: "8px 15px",
                         backgroundColor: "#17a2b8",
@@ -520,6 +523,7 @@ const SavingGoals = ({ token, setMessage }) => {
                     </button>
                     <button
                       onClick={() => startEditGoal(goal)}
+                      className="fancy-btn"
                       style={{
                         padding: "8px 15px",
                         backgroundColor: "#ffc107",
@@ -534,6 +538,7 @@ const SavingGoals = ({ token, setMessage }) => {
                     </button>
                     <button
                       onClick={() => handleDeleteGoal(goal._id)}
+                      className="fancy-btn"
                       style={{
                         padding: "8px 15px",
                         backgroundColor: "#dc3545",

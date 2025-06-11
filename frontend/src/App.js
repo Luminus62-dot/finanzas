@@ -263,7 +263,7 @@ function App() {
                             </Form.Control.Feedback>
                           </Form.Group>
                           <div className="d-grid gap-2">
-                            <Button variant="success" type="submit">
+                            <Button variant="success" type="submit" className="fancy-btn">
                               Registrarme
                             </Button>
                           </div>
@@ -273,6 +273,7 @@ function App() {
                           <Button
                             variant="link"
                             onClick={() => setShowRegisterForm(false)}
+                            className="fancy-btn"
                           >
                             Inicia Sesión
                           </Button>
@@ -315,7 +316,7 @@ function App() {
                             </Form.Control.Feedback>
                           </Form.Group>
                           <div className="d-grid gap-2">
-                            <Button variant="primary" type="submit">
+                            <Button variant="primary" type="submit" className="fancy-btn">
                               Iniciar Sesión
                             </Button>
                           </div>
@@ -325,6 +326,7 @@ function App() {
                           <Button
                             variant="link"
                             onClick={() => setShowRegisterForm(true)}
+                            className="fancy-btn"
                           >
                             Regístrate aquí
                           </Button>

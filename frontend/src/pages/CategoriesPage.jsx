@@ -239,11 +239,12 @@ const CategoriesPage = () => {
                 <Button
                   variant={editingCategory ? "warning" : "primary"}
                   type="submit"
+                  className="fancy-btn"
                 >
                   {editingCategory ? "Guardar Cambios" : "Añadir Categoría"}
                 </Button>
                 {editingCategory && (
-                  <Button variant="secondary" onClick={cancelEditCategory}>
+                  <Button variant="secondary" onClick={cancelEditCategory} className="fancy-btn">
                     Cancelar
                   </Button>
                 )}
@@ -275,7 +276,7 @@ const CategoriesPage = () => {
                     <Button
                       variant="info"
                       size="sm"
-                      className="me-2"
+                      className="me-2 fancy-btn"
                       onClick={() => startEditCategory(category)}
                     >
                       <FaEdit /> Editar
@@ -284,6 +285,7 @@ const CategoriesPage = () => {
                       variant="danger"
                       size="sm"
                       onClick={() => handleDeleteCategory(category._id)}
+                      className="fancy-btn"
                     >
                       <FaTrashAlt /> Eliminar
                     </Button>

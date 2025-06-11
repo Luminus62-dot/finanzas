@@ -270,7 +270,7 @@ const BudgetCalculatorPage = () => {
               </Row>
 
               <div className="d-grid gap-2">
-                <Button variant="primary" type="submit">
+                <Button variant="primary" type="submit" className="fancy-btn">
                   <FaCalculator /> Calcular Presupuesto
                 </Button>
               </div>
