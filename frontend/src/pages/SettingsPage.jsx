@@ -183,9 +183,9 @@ const SettingsPage = () => {
 //         formData
       );
       // console.log(
-        "DEBUG: SettingsPage - Respuesta de subida de banner:",
-        res.data
-//       );
+      //   "DEBUG: SettingsPage - Respuesta de subida de banner:",
+      //   res.data
+      // );
       toast.success(res.data.msg);
       setBannerFile(null); // Limpiar el input de archivo
       setBannerError(""); // Limpiar error
