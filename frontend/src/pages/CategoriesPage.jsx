@@ -28,12 +28,8 @@ const CategoriesPage = ({ token }) => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      console.log("DEBUG: CategoriesPage - Enviando GET a /api/categories...");
+      // console.log("DEBUG: CategoriesPage - Enviando GET a /api/categories...");
       const res = await api.get(`/categories`);
-      console.log(
-        "DEBUG: CategoriesPage - Respuesta de /api/categories:",
-        res.data
-      );
       if (Array.isArray(res.data)) {
         setCategories(res.data);
       } else {
@@ -58,7 +54,7 @@ const CategoriesPage = ({ token }) => {
   }, [token]);
 
   useEffect(() => {
-    console.log("DEBUG: CategoriesPage - Iniciando carga inicial de datos...");
+    // console.log("DEBUG: CategoriesPage - Iniciando carga inicial de datos...");
     fetchCategories();
   }, [fetchCategories]);
 
@@ -87,7 +83,7 @@ const CategoriesPage = ({ token }) => {
       return;
     }
     try {
-      console.log("DEBUG: CategoriesPage - Enviando POST a /api/categories...");
+      // console.log("DEBUG: CategoriesPage - Enviando POST a /api/categories...");
       await api.post(`/categories`, {
         name: newCategoryName,
         type: newCategoryType,
@@ -123,9 +119,9 @@ const CategoriesPage = ({ token }) => {
     }
 
     try {
-      console.log(
-        "DEBUG: CategoriesPage - Enviando PUT a /api/categories/:id..."
-      );
+      // console.log(
+//         "DEBUG: CategoriesPage - Enviando PUT a /api/categories/:id..."
+//       );
       await api.put(`/categories/${editingCategory._id}`, {
         name: editingCategory.name,
         type: editingCategory.type,
@@ -144,9 +140,9 @@ const CategoriesPage = ({ token }) => {
   const handleDeleteCategory = async (id) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
       try {
-        console.log(
-          "DEBUG: CategoriesPage - Enviando DELETE a /api/categories/:id..."
-        );
+        // console.log(
+//           "DEBUG: CategoriesPage - Enviando DELETE a /api/categories/:id..."
+//         );
         await api.delete(`/categories/${id}`);
         toast.success("Category deleted successfully!");
         fetchCategories();
@@ -259,10 +255,6 @@ const CategoriesPage = ({ token }) => {
       <Card className="shadow-sm">
         <Card.Body>
           <Card.Title className="text-center mb-3">Tus Categorías</Card.Title>
-          {console.log(
-            "DEBUG: CategoriesPage - Estado de categories ANTES del map:",
-            categories
-          )}
           {categories.length === 0 ? (
             <p className="text-center">
               No tienes categorías personalizadas. ¡Añade una!

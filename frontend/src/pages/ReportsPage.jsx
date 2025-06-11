@@ -44,8 +44,8 @@ const ReportsPage = ({ token }) => {
   const [loading, setLoading] = useState(false);
 
   const fetchReportData = useCallback(async () => {
-    console.log("\n--- Frontend Debugging Reporte (fetchReportData) ---");
-    console.log("Token en ReportsPage:", token);
+    // console.log("\n--- Frontend Debugging Reporte (fetchReportData) ---");
+    // console.log("Token en ReportsPage:", token);
 
     setLoading(true);
     let startMoment, endMoment;
@@ -66,12 +66,12 @@ const ReportsPage = ({ token }) => {
     const startDateISO = startMoment.toISOString();
     const endDateISO = endMoment.toISOString();
 
-    console.log("Fechas generadas para API:");
-    console.log("  startMoment (UTC Date obj):", startMoment);
-    console.log("  endMoment (UTC Date obj):", endMoment);
-    console.log("  startDateISO (para backend):", startDateISO);
-    console.log("  endDateISO (para backend):", endDateISO);
-    console.log("------------------------------------\n");
+    // console.log("Fechas generadas para API:");
+    // console.log("  startMoment (UTC Date obj):", startMoment);
+    // console.log("  endMoment (UTC Date obj):", endMoment);
+    // console.log("  startDateISO (para backend):", startDateISO);
+    // console.log("  endDateISO (para backend):", endDateISO);
+    // console.log("------------------------------------\n");
 
     try {
       if (!token) {
@@ -79,7 +79,7 @@ const ReportsPage = ({ token }) => {
         setLoading(false);
         return;
       }
-      console.log("DEBUG: ReportsPage - Realizando peticiones Axios...");
+      // console.log("DEBUG: ReportsPage - Realizando peticiones Axios...");
 
       const [expenseRes, incomeRes, netFlowRes] = await Promise.all([
         api.get("/transactions/summary", {
@@ -101,10 +101,10 @@ const ReportsPage = ({ token }) => {
         }),
       ]);
 
-      console.log("DEBUG: ReportsPage - Respuestas recibidas:");
-      console.log("  expenseRes.data:", expenseRes.data);
-      console.log("  incomeRes.data:", incomeRes.data);
-      console.log("  netFlowRes.data:", netFlowRes.data);
+      // console.log("DEBUG: ReportsPage - Respuestas recibidas:");
+      // console.log("  expenseRes.data:", expenseRes.data);
+      // console.log("  incomeRes.data:", incomeRes.data);
+      // console.log("  netFlowRes.data:", netFlowRes.data);
 
       const processedSummaryData = {
         expenseSummary: Array.isArray(expenseRes.data.categorySummary)
@@ -126,10 +126,10 @@ const ReportsPage = ({ token }) => {
 
       setSummaryData(processedSummaryData);
       toast.success("Reporte generado exitosamente!");
-      console.log(
-        "DEBUG: ReportsPage - summaryData establecido:",
-        processedSummaryData
-      );
+      // console.log(
+//         "DEBUG: ReportsPage - summaryData establecido:",
+//         processedSummaryData
+//       );
     } catch (err) {
       console.error(
         "DEBUG: ReportsPage - Error CATCH en fetchReportData:",
@@ -143,9 +143,9 @@ const ReportsPage = ({ token }) => {
       setSummaryData(null);
     } finally {
       setLoading(false);
-      console.log(
-        "DEBUG: ReportsPage - fetchReportData finalizado. Loading a false."
-      );
+      // console.log(
+//         "DEBUG: ReportsPage - fetchReportData finalizado. Loading a false."
+//       );
     }
   }, [token, selectedMonth, selectedYear, reportType]);
 
@@ -181,12 +181,12 @@ const ReportsPage = ({ token }) => {
     );
   };
 
-  console.log(
-    "DEBUG: ReportsPage - Render JSX. Current summaryData:",
-    summaryData,
-    "Current loading:",
-    loading
-  );
+  // console.log(
+//     "DEBUG: ReportsPage - Render JSX. Current summaryData:",
+//     summaryData,
+//     "Current loading:",
+//     loading
+//   );
 
   return (
     <Container className="py-4">

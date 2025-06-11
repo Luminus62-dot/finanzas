@@ -317,37 +317,37 @@ exports.getTransactionsSummary = async (req, res) => {
   }
 
   // --- Debugging en la terminal del Backend (Render.com) ---
-  console.log("\n--- Backend Debugging Reporte Sumario ---");
-  console.log("Usuario que realiza la petición (ID del Token):", req.user.id);
-  console.log(
+  // console.log("\n--- Backend Debugging Reporte Sumario ---");
+  // console.log("Usuario que realiza la petición (ID del Token):", req.user.id);
+  // console.log(
     "Usuario que se usará en el match (ObjectId):",
     userId.toString()
   );
-  console.log(
+  // console.log(
     "Rango de Fechas Solicitado por Frontend (ISO):",
     startDate,
     "a",
     endDate
   );
-  console.log("Rango de Fechas para Match en DB (Objetos Date UTC):");
-  console.log("  $gte (Inicio del día):", startOfDay.toISOString());
-  console.log("  $lte (Fin del día):", endOfDay.toISOString());
-  console.log("Condiciones de Match Finales enviadas a MongoDB:");
-  console.log(
-    JSON.stringify(
-      {
-        user: userId.toString(),
-        date: {
-          $gte: startOfDay.toISOString(),
-          $lte: endOfDay.toISOString(),
-        },
-        type: matchConditions.type,
-      },
-      null,
-      2
-    )
-  );
-  console.log("-------------------------------------------\n");
+  // console.log("Rango de Fechas para Match en DB (Objetos Date UTC):");
+  // console.log("  $gte (Inicio del día):", startOfDay.toISOString());
+  // console.log("  $lte (Fin del día):", endOfDay.toISOString());
+  // console.log("Condiciones de Match Finales enviadas a MongoDB:");
+  // console.log(
+//     JSON.stringify(
+//       {
+//         user: userId.toString(),
+//         date: {
+//           $gte: startOfDay.toISOString(),
+//           $lte: endOfDay.toISOString(),
+//         },
+//         type: matchConditions.type,
+//       },
+//       null,
+//       2
+//     )
+//   );
+  // console.log("-------------------------------------------\n");
 
   try {
     const summary = await Transaction.aggregate([
