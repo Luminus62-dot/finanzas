@@ -87,7 +87,7 @@ const BudgetCalculatorPage = () => {
   return (
     <Container className="py-4">
       <>
-        <h2 className="mb-4 text-center">
+        <h2 className="mb-4 text-center page-title">
           Calculadora de Presupuestos (Regla 50/30/20)
         </h2>
 

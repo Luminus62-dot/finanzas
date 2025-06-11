@@ -247,7 +247,7 @@ const TransactionsPage = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4 text-center">Gestión de Transacciones</h2>
+      <h2 className="mb-4 text-center page-title">Gestión de Transacciones</h2>
 
       {/* Formulario para Añadir/Editar Transacción */}
       <Card className="mb-4 shadow-sm">

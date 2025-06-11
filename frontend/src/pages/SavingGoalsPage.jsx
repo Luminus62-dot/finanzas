@@ -261,7 +261,7 @@ const SavingGoalsPage = () => {
     <Container className="py-4">
       <div className="hero-section">
         <FaPiggyBank className="hero-icon" />
-        <h2 className="mb-2">Mis Metas de Ahorro</h2>
+        <h2 className="mb-2 page-title">Mis Metas de Ahorro</h2>
         <p className="mb-0">Gestiona y cumple tus objetivos financieros</p>
       </div>
 
