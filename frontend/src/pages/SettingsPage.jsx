@@ -203,7 +203,7 @@ const SettingsPage = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4 text-center">Configuración de Usuario</h2>
+      <h2 className="mb-4 text-center page-title">Configuración de Usuario</h2>
 
       {/* Tarjeta para Cambiar Contraseña */}
       <Card className="shadow-sm mx-auto mb-4" style={{ maxWidth: "500px" }}>

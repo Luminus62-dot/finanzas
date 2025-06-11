@@ -167,7 +167,7 @@ const AccountsPage = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4 text-center">Gestión de Cuentas</h2>
+      <h2 className="mb-4 text-center page-title">Gestión de Cuentas</h2>
 
       {/* Formulario para Añadir/Editar Cuenta */}
       <Card className="mb-4 shadow-sm">

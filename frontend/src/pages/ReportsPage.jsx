@@ -228,7 +228,7 @@ const ReportsPage = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4 text-center">Reportes Financieros</h2>
+      <h2 className="mb-4 text-center page-title">Reportes Financieros</h2>
 
       <Card className="mb-4 shadow-sm">
         <Card.Body>

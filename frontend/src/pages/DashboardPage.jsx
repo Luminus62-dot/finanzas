@@ -116,7 +116,7 @@ const DashboardPage = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4 text-center">Dashboard de Mi Dinero Hoy</h2>
+      <h2 className="mb-4 text-center page-title">Dashboard de Mi Dinero Hoy</h2>
 
       {error && <Alert variant="danger" className="text-center">{error}</Alert>}
 

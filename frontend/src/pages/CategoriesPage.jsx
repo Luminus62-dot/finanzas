@@ -158,7 +158,7 @@ const CategoriesPage = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4 text-center">Gestión de Categorías</h2>
+      <h2 className="mb-4 text-center page-title">Gestión de Categorías</h2>
 
       {/* Formulario para Añadir/Editar Categoría */}
       <Card className="mb-4 shadow-sm">
