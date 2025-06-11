@@ -1,5 +1,5 @@
 // frontend/src/components/Layout.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import { Navbar, Nav, Container, Offcanvas, Button } from "react-bootstrap";
 import {
@@ -16,14 +16,17 @@ import {
   FaQuestionCircle,
   FaBookOpen,
 } from "react-icons/fa";
+import { AuthContext } from "../context/AuthContext";
 
-const Layout = ({ children, isAuthenticated, user, onLogout }) => {
+const Layout = ({ children }) => {
+  const { user, token, logout } = useContext(AuthContext);
+  const isAuthenticated = !!token;
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const history = useHistory();
   const location = useLocation();
 
   const handleLogoutInternal = () => {
-    if (onLogout) onLogout();
+    logout();
     setShowOffcanvas(false);
   };
 

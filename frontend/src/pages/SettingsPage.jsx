@@ -1,10 +1,12 @@
 // frontend/src/pages/SettingsPage.jsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import api from "../services/api";
 import { Container, Card, Form, Button, Alert, Image } from "react-bootstrap";
 import { toast } from "react-toastify";
+import { AuthContext } from "../context/AuthContext";
 
-const SettingsPage = ({ token }) => {
+const SettingsPage = () => {
+  const { token } = useContext(AuthContext);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");

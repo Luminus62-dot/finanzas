@@ -1,5 +1,5 @@
 // frontend/src/pages/CategoriesPage.jsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import api from "../services/api";
 import {
   Container,
@@ -12,8 +12,10 @@ import {
 } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { AuthContext } from "../context/AuthContext";
 
-const CategoriesPage = ({ token }) => {
+const CategoriesPage = () => {
+  const { token } = useContext(AuthContext);
   const [categories, setCategories] = useState([]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryType, setNewCategoryType] = useState("Gasto");

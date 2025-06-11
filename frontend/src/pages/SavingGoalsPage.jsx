@@ -1,5 +1,5 @@
 // frontend/src/pages/SavingGoalsPage.jsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import api from "../services/api";
 import {
   Container,
@@ -13,8 +13,10 @@ import {
 } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { AuthContext } from "../context/AuthContext";
 
-const SavingGoalsPage = ({ token }) => {
+const SavingGoalsPage = () => {
+  const { token } = useContext(AuthContext);
   const [goals, setGoals] = useState([]);
   const [newGoalName, setNewGoalName] = useState("");
   const [newGoalTargetAmount, setNewGoalTargetAmount] = useState("");

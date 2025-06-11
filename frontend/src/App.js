@@ -1,5 +1,5 @@
 // frontend/src/App.js
-import React, { useState, useEffect, useCallback } from "react"; // useCallback añadido
+import React, { useState, useContext } from "react";
 import api from "./services/api";
 import {
   BrowserRouter as Router,
@@ -20,6 +20,8 @@ import SavingGoalsPage from "./pages/SavingGoalsPage";
 import BudgetCalculatorPage from "./pages/BudgetCalculatorPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
+import { AuthContext } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const [registerEmail, setRegisterEmail] = useState("");
@@ -31,46 +33,13 @@ function App() {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Para estado de carga inicial
 
   const [registerErrors, setRegisterErrors] = useState({});
   const [loginErrors, setLoginErrors] = useState({});
 
-  // Obtener el token almacenado (si existe) en cada render
-  const token = localStorage.getItem("token");
-
-  const fetchUserProfile = useCallback(async () => {
-    const tokenInStorage = localStorage.getItem("token");
-    if (tokenInStorage) {
-      try {
-        // El interceptor en api.js ya añade el token a los headers
-        const response = await api.get("/auth"); // Obtiene el perfil del usuario
-        setUser(response.data);
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error(
-          "Error al obtener perfil o token inválido:",
-          error.response ? error.response.data : error.message
-        );
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        setUser(null);
-        setIsAuthenticated(false);
-        // No mostramos toast aquí para no ser intrusivos al cargar,
-        // pero la app se comportará como si no estuviera logueado.
-        // La notificación "Token no encontrado..." podría venir de un componente
-        // que intente acceder a `user` y lo encuentre null.
-      }
-    }
-    setIsLoadingAuth(false);
-  }, []);
-
-  useEffect(() => {
-    fetchUserProfile();
-  }, [fetchUserProfile]);
+  const { user, token, login, logout, loading } = useContext(AuthContext);
+  const isAuthenticated = !!token;
 
   const validateRegisterForm = () => {
     /* ...sin cambios... */
@@ -128,17 +97,8 @@ function App() {
     e.preventDefault();
     if (!validateLoginForm()) return;
     try {
-      const res = await api.post(`/auth/login`, {
-        email: loginEmail,
-        password: loginPassword,
-      });
+      await login(loginEmail, loginPassword);
       toast.success("Inicio de sesión exitoso.");
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user)); // Guardamos el usuario del login
-      setUser(res.data.user);
-      setIsAuthenticated(true);
-      // No es necesario llamar a fetchUserProfile aquí si la respuesta de login ya es confiable
-      // y el interceptor de api.js se actualiza con el nuevo token para futuras llamadas.
       setLoginEmail("");
       setLoginPassword("");
       setLoginErrors({});
@@ -148,25 +108,15 @@ function App() {
           err.response?.data?.message || err.message
         }`
       );
-      // Limpiar cualquier estado previo en caso de error de login
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      setUser(null);
-      setIsAuthenticated(false);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-    setIsAuthenticated(false);
+    logout();
     toast.info("Sesión cerrada.");
-    // Considera redirigir al login si estás en una página protegida
-    // history.push('/login'); // Si tienes acceso a history aquí
   };
 
-  if (isLoadingAuth) {
+  if (loading) {
     return (
       <div
         className="d-flex justify-content-center align-items-center"
@@ -192,28 +142,24 @@ function App() {
         }}
       >
         {isAuthenticated ? (
-          <Layout
-            onLogout={handleLogout}
-            isAuthenticated={isAuthenticated}
-            user={user}
-          >
+          <Layout>
             <Switch>
               <Route
                 exact
                 path="/"
                 render={() => <Redirect to="/dashboard" />}
               />
-              <Route path="/dashboard" render={() => <DashboardPage token={token} />} />
-              <Route path="/accounts" render={() => <AccountsPage token={token} />} />
-              <Route path="/transactions" render={() => <TransactionsPage token={token} />} />
-              <Route path="/categories" render={() => <CategoriesPage token={token} />} />
-              <Route path="/saving-goals" render={() => <SavingGoalsPage token={token} />} />
+              <ProtectedRoute path="/dashboard" component={DashboardPage} />
+              <ProtectedRoute path="/accounts" component={AccountsPage} />
+              <ProtectedRoute path="/transactions" component={TransactionsPage} />
+              <ProtectedRoute path="/categories" component={CategoriesPage} />
+              <ProtectedRoute path="/saving-goals" component={SavingGoalsPage} />
               <Route
                 path="/budget-calculator"
                 component={BudgetCalculatorPage}
               />
-              <Route path="/reports" render={() => <ReportsPage token={token} />} />
-              <Route path="/settings" render={() => <SettingsPage token={token} />} />
+              <ProtectedRoute path="/reports" component={ReportsPage} />
+              <ProtectedRoute path="/settings" component={SettingsPage} />
               <Route path="*" render={() => <Redirect to="/dashboard" />} />
             </Switch>
           </Layout>
