@@ -311,11 +311,12 @@ const AccountsPage = () => {
               <Button
                 variant={editingAccount ? "warning" : "success"}
                 type="submit"
+                className="fancy-btn"
               >
                 {editingAccount ? "Guardar Cambios" : "Añadir Cuenta"}
               </Button>
               {editingAccount && (
-                <Button variant="secondary" onClick={cancelEditAccount}>
+                <Button variant="secondary" onClick={cancelEditAccount} className="fancy-btn">
                   Cancelar
                 </Button>
               )}
@@ -348,6 +349,7 @@ const AccountsPage = () => {
                       variant="info"
                       size="sm"
                       onClick={() => startEditAccount(account)}
+                      className="fancy-btn"
                     >
                       <FaEdit /> Editar
                     </Button>
@@ -355,6 +357,7 @@ const AccountsPage = () => {
                       variant="danger"
                       size="sm"
                       onClick={() => handleDeleteAccount(account._id)}
+                      className="fancy-btn"
                     >
                       <FaTrashAlt /> Eliminar
                     </Button>

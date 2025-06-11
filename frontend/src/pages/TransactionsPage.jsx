@@ -406,11 +406,11 @@ const TransactionsPage = () => {
               />
             </Form.Group>
             <div className="d-grid gap-2">
-              <Button variant={editingTransaction ? 'warning' : 'primary'} type="submit">
+              <Button variant={editingTransaction ? 'warning' : 'primary'} type="submit" className="fancy-btn">
                 {editingTransaction ? 'Guardar Cambios' : 'Añadir Transacción'}
               </Button>
               {editingTransaction && (
-                <Button variant="secondary" onClick={cancelEditTransaction}>
+                <Button variant="secondary" onClick={cancelEditTransaction} className="fancy-btn">
                   Cancelar
                 </Button>
               )}
@@ -438,10 +438,10 @@ const TransactionsPage = () => {
                   </div>
                   <small className="text-muted">{new Date(trans.date).toLocaleDateString()}</small>
                   <div className="d-flex gap-2 mt-2 mt-md-0">
-                    <Button variant="info" size="sm" onClick={() => startEditTransaction(trans)}>
+                    <Button variant="info" size="sm" onClick={() => startEditTransaction(trans)} className="fancy-btn">
                       <FaEdit /> Editar
                     </Button>
-                    <Button variant="danger" size="sm" onClick={() => handleDeleteTransaction(trans._id)}>
+                    <Button variant="danger" size="sm" onClick={() => handleDeleteTransaction(trans._id)} className="fancy-btn">
                       <FaTrashAlt /> Eliminar
                     </Button>
                   </div>

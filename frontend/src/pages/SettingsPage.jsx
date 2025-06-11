@@ -257,7 +257,7 @@ const SettingsPage = () => {
             </Form.Group>
 
             <div className="d-grid gap-2">
-              <Button variant="primary" type="submit">
+              <Button variant="primary" type="submit" className="fancy-btn">
                 Cambiar Contraseña
               </Button>
             </div>
@@ -315,6 +315,7 @@ const SettingsPage = () => {
                 variant="success"
                 type="submit"
                 disabled={!profilePictureFile}
+                className="fancy-btn"
               >
                 Subir Foto de Perfil
               </Button>
@@ -371,7 +372,7 @@ const SettingsPage = () => {
               </Form.Control.Feedback>
             </Form.Group>
             <div className="d-grid gap-2">
-              <Button variant="success" type="submit" disabled={!bannerFile}>
+              <Button variant="success" type="submit" disabled={!bannerFile} className="fancy-btn">
                 Subir Banner
               </Button>
             </div>

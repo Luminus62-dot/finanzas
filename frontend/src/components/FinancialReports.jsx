@@ -245,6 +245,7 @@ const FinancialReports = ({ token, setMessage }) => {
         )}
         <button
           onClick={fetchReportData}
+          className="fancy-btn"
           style={{
             padding: "8px 15px",
             backgroundColor: "#007bff",

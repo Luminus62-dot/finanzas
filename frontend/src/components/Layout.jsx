@@ -92,7 +92,7 @@ const Layout = ({ children }) => {
             <Button
               variant="outline-danger"
               onClick={handleLogoutInternal}
-              className="d-none d-sm-block"
+              className="d-none d-sm-block fancy-btn"
             >
               <FaSignOutAlt /> Salir
             </Button>

@@ -206,6 +206,7 @@ const CategoryManagement = ({ token, setMessage }) => {
           </div>
           <button
             type="submit"
+            className="fancy-btn"
             style={{
               padding: "8px 15px",
               backgroundColor: editingCategory ? "#ffc107" : "#007bff",
@@ -221,6 +222,7 @@ const CategoryManagement = ({ token, setMessage }) => {
             <button
               type="button"
               onClick={cancelEditCategory}
+              className="fancy-btn"
               style={{
                 padding: "8px 15px",
                 backgroundColor: "#6c757d",
@@ -264,6 +266,7 @@ const CategoryManagement = ({ token, setMessage }) => {
                 <div>
                   <button
                     onClick={() => startEditCategory(category)}
+                    className="fancy-btn"
                     style={{
                       padding: "4px 8px",
                       backgroundColor: "#17a2b8",
@@ -279,6 +282,7 @@ const CategoryManagement = ({ token, setMessage }) => {
                   </button>
                   <button
                     onClick={() => handleDeleteCategory(category._id)}
+                    className="fancy-btn"
                     style={{
                       padding: "4px 8px",
                       backgroundColor: "#dc3545",
