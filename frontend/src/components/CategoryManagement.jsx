@@ -1,6 +1,6 @@
 // frontend/src/components/CategoryManagement.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../services/api";
 
 const CategoryManagement = ({ token, setMessage }) => {
   const [categories, setCategories] = useState([]);
@@ -12,13 +12,13 @@ const CategoryManagement = ({ token, setMessage }) => {
   const fetchCategories = useCallback(async () => {
     try {
       if (token) {
-        axios.defaults.headers.common["x-auth-token"] = token;
+        api.defaults.headers.common["x-auth-token"] = token;
       } else {
         // Handle token absence, though App.js should catch this
         // For robustness, you might want to call onLogout() here if token is explicitly missing
         return;
       }
-      const res = await axios.get("http://localhost:5000/api/categories");
+      const res = await api.get("/api/categories");
       setCategories(res.data);
     } catch (err) {
       console.error(
@@ -47,7 +47,7 @@ const CategoryManagement = ({ token, setMessage }) => {
   const handleAddCategory = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/categories", {
+      await api.post("/api/categories", {
         name: newCategoryName,
         type: newCategoryType,
       });
@@ -78,8 +78,8 @@ const CategoryManagement = ({ token, setMessage }) => {
     if (!editingCategory) return;
 
     try {
-      await axios.put(
-        `http://localhost:5000/api/categories/${editingCategory._id}`,
+      await api.put(
+        `/api/categories/${editingCategory._id}`,
         {
           name: editingCategory.name,
           type: editingCategory.type,
@@ -99,7 +99,7 @@ const CategoryManagement = ({ token, setMessage }) => {
   const handleDeleteCategory = async (id) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/categories/${id}`);
+        await api.delete(`/api/categories/${id}`);
         setMessage("Category deleted successfully!");
         fetchCategories(); // Refresh categories list
       } catch (err) {

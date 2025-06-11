@@ -1,6 +1,6 @@
 // frontend/src/components/SavingGoals.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../services/api";
 
 const SavingGoals = ({ token, setMessage }) => {
   const [goals, setGoals] = useState([]);
@@ -18,8 +18,8 @@ const SavingGoals = ({ token, setMessage }) => {
         setMessage("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      axios.defaults.headers.common["x-auth-token"] = token;
-      const res = await axios.get("http://localhost:5000/api/savinggoals");
+      api.defaults.headers.common["x-auth-token"] = token;
+      const res = await api.get("/api/savinggoals");
       setGoals(res.data);
       setMessage(""); // Clear any previous messages
     } catch (err) {
@@ -49,7 +49,7 @@ const SavingGoals = ({ token, setMessage }) => {
         dueDate: newGoalDueDate || undefined, // Send as undefined if empty
         description: newGoalDescription,
       };
-      await axios.post("http://localhost:5000/api/savinggoals", goalData);
+      await api.post("/api/savinggoals", goalData);
       setMessage("Meta de ahorro creada exitosamente!");
       // Clear form
       setNewGoalName("");
@@ -95,8 +95,8 @@ const SavingGoals = ({ token, setMessage }) => {
         description: editingGoal.description,
         isCompleted: editingGoal.isCompleted,
       };
-      await axios.put(
-        `http://localhost:5000/api/savinggoals/${editingGoal._id}`,
+      await api.put(
+        `/api/savinggoals/${editingGoal._id}`,
         updatedGoalData
       );
       setMessage("Meta de ahorro actualizada exitosamente!");
@@ -122,7 +122,7 @@ const SavingGoals = ({ token, setMessage }) => {
       if (!goalToUpdate) return;
 
       const newCurrentAmount = currentAmount + parseFloat(addAmount);
-      await axios.put(`http://localhost:5000/api/savinggoals/${goalId}`, {
+      await api.put(`/api/savinggoals/${goalId}`, {
         currentAmount: newCurrentAmount,
         isCompleted: newCurrentAmount >= goalToUpdate.targetAmount, // Update completion status
       });
@@ -146,7 +146,7 @@ const SavingGoals = ({ token, setMessage }) => {
       )
     ) {
       try {
-        await axios.delete(`http://localhost:5000/api/savinggoals/${id}`);
+        await api.delete(`/api/savinggoals/${id}`);
         setMessage("Meta de ahorro eliminada exitosamente!");
         fetchSavingGoals(); // Refresh goals list
       } catch (err) {
