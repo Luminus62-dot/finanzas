@@ -1,0 +1,34 @@
+.login-background {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4caf50, #81c784, #4caf50);
+  background-size: 400% 400%;
+  animation: login-bg-gradient 15s ease infinite;
+}
+
+@keyframes login-bg-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.login-card {
+  animation: login-fade-in 0.8s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes login-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
