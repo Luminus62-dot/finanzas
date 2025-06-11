@@ -1,7 +1,7 @@
 // frontend/src/pages/DashboardPage.jsx
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import api from '../services/api';
-import { Container, Row, Col, Card, Alert, ListGroup, Image } from 'react-bootstrap';
+import { Container, Row, Col, Card, Alert, ListGroup, Image, ProgressBar } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 
@@ -10,6 +10,7 @@ const DashboardPage = () => {
   const [totalBalance, setTotalBalance] = useState(0);
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
+  const [savingGoals, setSavingGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -76,18 +77,42 @@ const DashboardPage = () => {
     }
   }, [token]);
 
+  // Función para cargar las metas de ahorro
+  const fetchSavingGoals = useCallback(async () => {
+    try {
+      if (!token) return;
+      const res = await api.get('/savinggoals');
+      if (Array.isArray(res.data)) {
+        setSavingGoals(res.data);
+      } else {
+        console.error('DEBUG: DashboardPage - La respuesta de /api/savinggoals NO es un array:', res.data);
+        setSavingGoals([]);
+        toast.error('Formato de datos de metas de ahorro inesperado.');
+      }
+    } catch (err) {
+      console.error('DEBUG: DashboardPage - Error al cargar metas de ahorro:', err.response?.data || err.message);
+      setError('Error al cargar las metas de ahorro.');
+      toast.error(`Error al cargar metas de ahorro: ${err.response?.data?.msg || 'Error de red'}`);
+    }
+  }, [token]);
+
   useEffect(() => {
     const loadDashboardData = async () => {
       setLoading(true);
       setError('');
       // console.log('DEBUG: DashboardPage - Iniciando carga de datos...'); // Debug
-      await Promise.all([fetchUserProfile(), fetchTotalBalance(), fetchRecentTransactions()]);
+      await Promise.all([
+        fetchUserProfile(),
+        fetchTotalBalance(),
+        fetchRecentTransactions(),
+        fetchSavingGoals(),
+      ]);
       setLoading(false);
       // console.log('DEBUG: DashboardPage - Carga de datos finalizada.'); // Debug
     };
 
     loadDashboardData();
-  }, [fetchUserProfile, fetchTotalBalance, fetchRecentTransactions]);
+  }, [fetchUserProfile, fetchTotalBalance, fetchRecentTransactions, fetchSavingGoals]);
 
   return (
     <Container className="py-4">
@@ -174,6 +199,38 @@ const DashboardPage = () => {
                         <small className="text-muted">{new Date(trans.date).toLocaleDateString()}</small>
                       </ListGroup.Item>
                     ))}
+                  </ListGroup>
+                )}
+              </Card.Body>
+            </Card>
+          </Col>
+
+          {/* Tarjeta de Metas de Ahorro */}
+          <Col xs={12}>
+            <Card className="shadow-sm h-100">
+              <Card.Body>
+                <Card.Title className="mb-3 text-center">Progreso de Metas de Ahorro</Card.Title>
+                {savingGoals.length === 0 ? (
+                  <p className="text-center text-muted">No tienes metas de ahorro.</p>
+                ) : (
+                  <ListGroup variant="flush">
+                    {savingGoals.slice(0, 3).map(goal => {
+                      const progress = (goal.currentAmount / goal.targetAmount) * 100;
+                      return (
+                        <ListGroup.Item key={goal._id}>
+                          <div className="d-flex justify-content-between">
+                            <strong>{goal.name}</strong>
+                            <span>{progress.toFixed(0)}%</span>
+                          </div>
+                          <ProgressBar
+                            now={Math.min(100, progress)}
+                            variant={progress >= 100 ? 'success' : 'primary'}
+                            className="mt-1"
+                            style={{ height: '8px' }}
+                          />
+                        </ListGroup.Item>
+                      );
+                    })}
                   </ListGroup>
                 )}
               </Card.Body>
