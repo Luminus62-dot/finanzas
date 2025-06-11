@@ -30,9 +30,9 @@ const TransactionsPage = ({ token }) => {
         toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
-      console.log('DEBUG: TransactionsPage - Enviando GET a /api/accounts...');
+      // console.log('DEBUG: TransactionsPage - Enviando GET a /api/accounts...');
       const res = await api.get('/accounts');
-      console.log('DEBUG: TransactionsPage - Respuesta de /api/accounts:', res.data);
+      // console.log('DEBUG: TransactionsPage - Respuesta de /api/accounts:', res.data);
       if (Array.isArray(res.data)) {
         setAccounts(res.data);
         // Seleccionar la primera cuenta por defecto si no hay ninguna seleccionada
@@ -58,9 +58,9 @@ const TransactionsPage = ({ token }) => {
         toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
-      console.log('DEBUG: TransactionsPage - Enviando GET a /api/transactions...');
+      // console.log('DEBUG: TransactionsPage - Enviando GET a /api/transactions...');
       const res = await api.get('/transactions');
-      console.log('DEBUG: TransactionsPage - Respuesta de /api/transactions:', res.data);
+      // console.log('DEBUG: TransactionsPage - Respuesta de /api/transactions:', res.data);
       if (Array.isArray(res.data)) {
         setTransactions(res.data);
       } else {
@@ -80,9 +80,9 @@ const TransactionsPage = ({ token }) => {
         toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
-      console.log('DEBUG: TransactionsPage - Enviando GET a /api/categories...');
+      // console.log('DEBUG: TransactionsPage - Enviando GET a /api/categories...');
       const res = await api.get('/categories');
-      console.log('DEBUG: CategoriesPage - Respuesta de /api/categories:', res.data);
+      // console.log('DEBUG: CategoriesPage - Respuesta de /api/categories:', res.data);
       if (Array.isArray(res.data)) {
         setCategories(res.data);
       } else {
@@ -97,7 +97,7 @@ const TransactionsPage = ({ token }) => {
   }, [token]);
 
   useEffect(() => {
-    console.log('DEBUG: TransactionsPage - Iniciando carga inicial de datos...');
+    // console.log('DEBUG: TransactionsPage - Iniciando carga inicial de datos...');
     fetchAccounts();
     fetchTransactions();
     fetchCategories();
@@ -142,7 +142,7 @@ const TransactionsPage = ({ token }) => {
       return;
     }
     try {
-      console.log('DEBUG: TransactionsPage - Enviando POST a /api/transactions...');
+      // console.log('DEBUG: TransactionsPage - Enviando POST a /api/transactions...');
       const transactionData = {
         account: selectedAccountId,
         type: transactionType,
@@ -205,7 +205,7 @@ const TransactionsPage = ({ token }) => {
     }
 
     try {
-      console.log('DEBUG: TransactionsPage - Enviando PUT a /api/transactions/:id...');
+      // console.log('DEBUG: TransactionsPage - Enviando PUT a /api/transactions/:id...');
       const updatedTransactionData = {
         account: selectedAccountId,
         type: transactionType,
@@ -230,7 +230,7 @@ const TransactionsPage = ({ token }) => {
   const handleDeleteTransaction = async (id) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta transacción?')) {
       try {
-        console.log('DEBUG: TransactionsPage - Enviando DELETE a /api/transactions/:id...');
+        // console.log('DEBUG: TransactionsPage - Enviando DELETE a /api/transactions/:id...');
         await api.delete(`/transactions/${id}`);
         toast.success('Transacción eliminada y saldos actualizados!');
         fetchAccounts();
@@ -420,7 +420,6 @@ const TransactionsPage = ({ token }) => {
       <Card className="shadow-sm">
         <Card.Body>
           <Card.Title className="text-center mb-3">Historial de Transacciones</Card.Title>
-          {console.log('DEBUG: TransactionsPage - Estado de transactions ANTES del map:', transactions)}
           {transactions.length === 0 ? (
             <p className="text-center">No tienes transacciones registradas. ¡Añade una para empezar!</p>
           ) : (

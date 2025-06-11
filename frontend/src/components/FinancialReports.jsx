@@ -38,8 +38,8 @@ const FinancialReports = ({ token, setMessage }) => {
   const [loading, setLoading] = useState(false);
 
   const fetchReportData = useCallback(async () => {
-    console.log("Intentando cargar datos de reporte...");
-    console.log("Token recibido en FinancialReports:", token);
+    // console.log("Intentando cargar datos de reporte...");
+    // console.log("Token recibido en FinancialReports:", token);
     setLoading(true);
     let startDate, endDate;
 
@@ -55,10 +55,10 @@ const FinancialReports = ({ token, setMessage }) => {
       endDate = new Date(year, 11, 31);
     }
 
-    console.log("Fecha de inicio (startDate):", startDate); // <-- AÑADE ESTA LÍNEA
-    console.log("Fecha de fin (endDate):", endDate); // <-- AÑADE ESTA LÍNEA
-    console.log("startDate.toISOString():", startDate.toISOString()); // <-- AÑADE ESTA LÍNEA
-    console.log("endDate.toISOString():", endDate.toISOString());
+    // console.log("Fecha de inicio (startDate):", startDate); // <-- AÑADE ESTA LÍNEA
+    // console.log("Fecha de fin (endDate):", endDate); // <-- AÑADE ESTA LÍNEA
+    // console.log("startDate.toISOString():", startDate.toISOString()); // <-- AÑADE ESTA LÍNEA
+    // console.log("endDate.toISOString():", endDate.toISOString());
 
     try {
       if (!token) {

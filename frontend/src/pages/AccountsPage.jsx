@@ -30,9 +30,9 @@ const AccountsPage = ({ token }) => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      console.log("DEBUG: AccountsPage - Enviando GET a /api/accounts...");
+      // console.log("DEBUG: AccountsPage - Enviando GET a /api/accounts...");
       const res = await api.get(`/accounts`);
-      console.log(
+      // console.log(
         "DEBUG: AccountsPage - Respuesta de /api/accounts:",
         res.data
       );
@@ -331,10 +331,6 @@ const AccountsPage = ({ token }) => {
       <Card className="shadow-sm">
         <Card.Body>
           <Card.Title className="text-center mb-3">Tus Cuentas</Card.Title>
-          {console.log(
-            "DEBUG: AccountsPage - Estado de accounts ANTES del map:",
-            accounts
-          )}
           {accounts.length === 0 ? (
             <p className="text-center">
               No tienes cuentas añadidas. ¡Añade una para empezar!

@@ -26,11 +26,11 @@ const SettingsPage = ({ token }) => {
         );
         return;
       }
-      console.log(
-        "DEBUG: SettingsPage - Enviando GET a /api/auth para perfil..."
-      );
+      // console.log(
+//         "DEBUG: SettingsPage - Enviando GET a /api/auth para perfil..."
+//       );
       const res = await api.get(`/auth`);
-      console.log("DEBUG: SettingsPage - Respuesta de /api/auth:", res.data);
+      // console.log("DEBUG: SettingsPage - Respuesta de /api/auth:", res.data);
       setUserProfile(res.data);
     } catch (err) {
       console.error(
@@ -81,19 +81,19 @@ const SettingsPage = ({ token }) => {
         toast.error("No autenticado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      console.log(
+      // console.log(
         "DEBUG: SettingsPage - Enviando PUT a /api/auth/change-password..."
-      );
-      const res = await api.put(
+//       );
+//       const res = await api.put(
         `/auth/change-password`,
         {
           currentPassword,
           newPassword,
         }
       );
-      console.log(
-        "DEBUG: SettingsPage - Respuesta de cambio de contraseña:",
-        res.data
+//       // console.log(
+//         "DEBUG: SettingsPage - Respuesta de cambio de contraseña:",
+//         res.data
       );
       toast.success(res.data.msg);
       setCurrentPassword("");
@@ -131,16 +131,16 @@ const SettingsPage = ({ token }) => {
         toast.error("No autenticado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      console.log(
-        "DEBUG: SettingsPage - Enviando PUT a /api/auth/profile-picture..."
-      );
+      // console.log(
+//         "DEBUG: SettingsPage - Enviando PUT a /api/auth/profile-picture..."
+//       );
       const res = await api.put(
         `/auth/profile-picture`,
         formData
       );
-      console.log(
-        "DEBUG: SettingsPage - Respuesta de subida de foto:",
-        res.data
+      // console.log(
+//         "DEBUG: SettingsPage - Respuesta de subida de foto:",
+//         res.data
       );
       toast.success(res.data.msg);
       setProfilePictureFile(null); // Limpiar el input de archivo
@@ -175,15 +175,15 @@ const SettingsPage = ({ token }) => {
         toast.error("No autenticado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      console.log("DEBUG: SettingsPage - Enviando PUT a /api/auth/banner...");
+      // console.log("DEBUG: SettingsPage - Enviando PUT a /api/auth/banner...");
       const res = await api.put(
-        `/auth/banner`,
-        formData
+//         `/auth/banner`,
+//         formData
       );
-      console.log(
+      // console.log(
         "DEBUG: SettingsPage - Respuesta de subida de banner:",
         res.data
-      );
+//       );
       toast.success(res.data.msg);
       setBannerFile(null); // Limpiar el input de archivo
       setBannerError(""); // Limpiar error

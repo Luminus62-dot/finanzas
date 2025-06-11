@@ -18,9 +18,9 @@ const DashboardPage = ({ token }) => {
         toast.error('Token no encontrado para el perfil. Por favor, inicia sesión de nuevo.');
         return;
       }
-      console.log('DEBUG: DashboardPage - Enviando GET a /api/auth para perfil...'); // Debug
+      // console.log('DEBUG: DashboardPage - Enviando GET a /api/auth para perfil...'); // Debug
       const res = await api.get('/auth');
-      console.log('DEBUG: DashboardPage - Respuesta de /api/auth:', res.data); // Debug
+      // console.log('DEBUG: DashboardPage - Respuesta de /api/auth:', res.data); // Debug
       setUserProfile(res.data);
     } catch (err) {
       console.error('DEBUG: DashboardPage - Error al cargar perfil de usuario:', err.response?.data || err.message); // Debug
@@ -33,9 +33,9 @@ const DashboardPage = ({ token }) => {
   const fetchTotalBalance = useCallback(async () => {
     try {
       if (!token) return;
-      console.log('DEBUG: DashboardPage - Enviando GET a /api/accounts para balance...'); // Debug
+      // console.log('DEBUG: DashboardPage - Enviando GET a /api/accounts para balance...'); // Debug
       const res = await api.get('/accounts');
-      console.log('DEBUG: DashboardPage - Respuesta de /api/accounts (balance):', res.data); // Debug
+      // console.log('DEBUG: DashboardPage - Respuesta de /api/accounts (balance):', res.data); // Debug
       // Asegurarse de que res.data sea un array antes de reducir
       if (Array.isArray(res.data)) {
         const sum = res.data.reduce((acc, account) => acc + account.balance, 0);
@@ -56,9 +56,9 @@ const DashboardPage = ({ token }) => {
   const fetchRecentTransactions = useCallback(async () => {
     try {
       if (!token) return;
-      console.log('DEBUG: DashboardPage - Enviando GET a /api/transactions para recientes...'); // Debug
+      // console.log('DEBUG: DashboardPage - Enviando GET a /api/transactions para recientes...'); // Debug
       const res = await api.get('/transactions');
-      console.log('DEBUG: DashboardPage - Respuesta de /api/transactions (recientes):', res.data); // Debug
+      // console.log('DEBUG: DashboardPage - Respuesta de /api/transactions (recientes):', res.data); // Debug
       // Asegurarse de que res.data sea un array
       if (Array.isArray(res.data)) {
         setRecentTransactions(res.data.slice(0, 5)); // Mostrar solo las 5 más recientes
@@ -78,10 +78,10 @@ const DashboardPage = ({ token }) => {
     const loadDashboardData = async () => {
       setLoading(true);
       setError('');
-      console.log('DEBUG: DashboardPage - Iniciando carga de datos...'); // Debug
+      // console.log('DEBUG: DashboardPage - Iniciando carga de datos...'); // Debug
       await Promise.all([fetchUserProfile(), fetchTotalBalance(), fetchRecentTransactions()]);
       setLoading(false);
-      console.log('DEBUG: DashboardPage - Carga de datos finalizada.'); // Debug
+      // console.log('DEBUG: DashboardPage - Carga de datos finalizada.'); // Debug
     };
 
     loadDashboardData();

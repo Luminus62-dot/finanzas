@@ -32,11 +32,11 @@ const SavingGoalsPage = ({ token }) => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      console.log(
+      // console.log(
         "DEBUG: SavingGoalsPage - Enviando GET a /api/savinggoals..."
       );
       const res = await api.get(`/savinggoals`);
-      console.log(
+      // console.log(
         "DEBUG: SavingGoalsPage - Respuesta de /api/savinggoals:",
         res.data
       );
@@ -64,7 +64,7 @@ const SavingGoalsPage = ({ token }) => {
   }, [token]);
 
   useEffect(() => {
-    console.log("DEBUG: SavingGoalsPage - Iniciando carga inicial de datos...");
+    // console.log("DEBUG: SavingGoalsPage - Iniciando carga inicial de datos...");
     fetchSavingGoals();
   }, [fetchSavingGoals]);
 
@@ -113,7 +113,7 @@ const SavingGoalsPage = ({ token }) => {
       return;
     }
     try {
-      console.log(
+      // console.log(
         "DEBUG: SavingGoalsPage - Enviando POST a /api/savinggoals..."
       );
       const goalData = {
@@ -163,7 +163,7 @@ const SavingGoalsPage = ({ token }) => {
     }
 
     try {
-      console.log(
+      // console.log(
         "DEBUG: SavingGoalsPage - Enviando PUT a /api/savinggoals/:id..."
       );
       const updatedGoalData = {
@@ -201,7 +201,7 @@ const SavingGoalsPage = ({ token }) => {
     setGoalFormErrors({}); // Limpiar si pasa la validación
 
     try {
-      console.log("DEBUG: SavingGoalsPage - Añadiendo monto a meta...");
+      // console.log("DEBUG: SavingGoalsPage - Añadiendo monto a meta...");
       const goalToUpdate = goals.find((g) => g._id === goalId);
       if (!goalToUpdate) return;
 
@@ -229,9 +229,9 @@ const SavingGoalsPage = ({ token }) => {
       )
     ) {
       try {
-        console.log(
-          "DEBUG: SavingGoalsPage - Enviando DELETE a /api/savinggoals/:id..."
-        );
+        // console.log(
+//           "DEBUG: SavingGoalsPage - Enviando DELETE a /api/savinggoals/:id..."
+// //         );
         await api.delete(`/savinggoals/${id}`);
         toast.success("Meta de ahorro eliminada exitosamente!");
         fetchSavingGoals();
@@ -402,9 +402,6 @@ const SavingGoalsPage = ({ token }) => {
       <Card className="shadow-sm">
         <Card.Body>
           <Card.Title className="text-center mb-3">Tus Metas</Card.Title>
-          {console.log(
-            "DEBUG: SavingGoalsPage - Estado de goals ANTES del map:",
-            goals
           )}
           {goals.length === 0 ? (
             <p className="text-center">
