@@ -156,7 +156,7 @@ const FinancialReports = ({ token, setMessage }) => {
       <text
         x={x}
         y={y}
-        fill="white"
+        fill="#000"
         textAnchor={x > cx ? "start" : "end"}
         dominantBaseline="central"
       >

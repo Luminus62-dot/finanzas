@@ -418,7 +418,6 @@ const SavingGoalsPage = () => {
       <Card className="shadow-sm">
         <Card.Body>
           <Card.Title className="text-center mb-3">Tus Metas</Card.Title>
-          )}
           {goals.length === 0 ? (
             <p className="text-center">
               No tienes metas de ahorro. ¡Crea una para empezar a ahorrar!
