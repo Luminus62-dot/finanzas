@@ -25,6 +25,8 @@ PORT=5000
 ```
 REACT_APP_API_URL=https://tu-backend.onrender.com
 ```
+**Importante:** no añadas una barra al final de `REACT_APP_API_URL` para evitar
+URLs duplicadas al construir las rutas.
 
 ## Scripts
 
