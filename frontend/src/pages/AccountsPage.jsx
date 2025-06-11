@@ -35,9 +35,9 @@ const AccountsPage = () => {
       // console.log("DEBUG: AccountsPage - Enviando GET a /api/accounts...");
       const res = await api.get(`/accounts`);
       // console.log(
-        "DEBUG: AccountsPage - Respuesta de /api/accounts:",
-        res.data
-      );
+      //   "DEBUG: AccountsPage - Respuesta de /api/accounts:",
+      //   res.data
+      // );
       if (Array.isArray(res.data)) {
         setAccounts(res.data);
       } else {
