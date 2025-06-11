@@ -35,13 +35,13 @@ const SavingGoalsPage = () => {
         return;
       }
       // console.log(
-        "DEBUG: SavingGoalsPage - Enviando GET a /api/savinggoals..."
-      );
+      //   "DEBUG: SavingGoalsPage - Enviando GET a /api/savinggoals..."
+      // );
       const res = await api.get(`/savinggoals`);
       // console.log(
-        "DEBUG: SavingGoalsPage - Respuesta de /api/savinggoals:",
-        res.data
-      );
+      //   "DEBUG: SavingGoalsPage - Respuesta de /api/savinggoals:",
+      //   res.data
+      // );
       if (Array.isArray(res.data)) {
         setGoals(res.data);
       } else {
@@ -116,8 +116,8 @@ const SavingGoalsPage = () => {
     }
     try {
       // console.log(
-        "DEBUG: SavingGoalsPage - Enviando POST a /api/savinggoals..."
-      );
+      //   "DEBUG: SavingGoalsPage - Enviando POST a /api/savinggoals..."
+      // );
       const goalData = {
         name: newGoalName,
         targetAmount: parseFloat(newGoalTargetAmount),
@@ -166,8 +166,8 @@ const SavingGoalsPage = () => {
 
     try {
       // console.log(
-        "DEBUG: SavingGoalsPage - Enviando PUT a /api/savinggoals/:id..."
-      );
+      //   "DEBUG: SavingGoalsPage - Enviando PUT a /api/savinggoals/:id..."
+      // );
       const updatedGoalData = {
         name: editingGoal.name,
         targetAmount: parseFloat(editingGoal.targetAmount),
@@ -232,8 +232,8 @@ const SavingGoalsPage = () => {
     ) {
       try {
         // console.log(
-//           "DEBUG: SavingGoalsPage - Enviando DELETE a /api/savinggoals/:id..."
-// //         );
+        //   "DEBUG: SavingGoalsPage - Enviando DELETE a /api/savinggoals/:id..."
+        // );
         await api.delete(`/savinggoals/${id}`);
         toast.success("Meta de ahorro eliminada exitosamente!");
         fetchSavingGoals();
