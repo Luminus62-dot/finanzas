@@ -1,11 +1,28 @@
 .login-background {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #4caf50, #81c784, #4caf50);
   background-size: 400% 400%;
+  overflow: hidden;
   animation: login-bg-gradient 15s ease infinite;
+}
+
+.login-background::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.3), transparent 60%),
+    radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.15), transparent 60%),
+    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.2), transparent 60%);
+  animation: login-bubbles 20s linear infinite;
+  pointer-events: none;
 }
 
 @keyframes login-bg-gradient {
@@ -24,6 +41,18 @@
   animation: login-fade-in 0.8s ease-out forwards;
   opacity: 0;
   transform: translateY(20px);
+}
+
+@keyframes login-bubbles {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-25%, -10%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
 }
 
 @keyframes login-fade-in {
