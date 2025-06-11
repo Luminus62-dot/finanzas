@@ -1,6 +1,6 @@
 // frontend/src/pages/DashboardPage.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { Container, Row, Col, Card, Alert, ListGroup, Image } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
@@ -18,9 +18,8 @@ const DashboardPage = ({ token }) => {
         toast.error('Token no encontrado para el perfil. Por favor, inicia sesión de nuevo.');
         return;
       }
-      axios.defaults.headers.common['x-auth-token'] = token;
       console.log('DEBUG: DashboardPage - Enviando GET a /api/auth para perfil...'); // Debug
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth`);
+      const res = await api.get('/auth');
       console.log('DEBUG: DashboardPage - Respuesta de /api/auth:', res.data); // Debug
       setUserProfile(res.data);
     } catch (err) {
@@ -34,9 +33,8 @@ const DashboardPage = ({ token }) => {
   const fetchTotalBalance = useCallback(async () => {
     try {
       if (!token) return;
-      axios.defaults.headers.common['x-auth-token'] = token;
       console.log('DEBUG: DashboardPage - Enviando GET a /api/accounts para balance...'); // Debug
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/accounts`);
+      const res = await api.get('/accounts');
       console.log('DEBUG: DashboardPage - Respuesta de /api/accounts (balance):', res.data); // Debug
       // Asegurarse de que res.data sea un array antes de reducir
       if (Array.isArray(res.data)) {
@@ -58,9 +56,8 @@ const DashboardPage = ({ token }) => {
   const fetchRecentTransactions = useCallback(async () => {
     try {
       if (!token) return;
-      axios.defaults.headers.common['x-auth-token'] = token;
       console.log('DEBUG: DashboardPage - Enviando GET a /api/transactions para recientes...'); // Debug
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/transactions`);
+      const res = await api.get('/transactions');
       console.log('DEBUG: DashboardPage - Respuesta de /api/transactions (recientes):', res.data); // Debug
       // Asegurarse de que res.data sea un array
       if (Array.isArray(res.data)) {

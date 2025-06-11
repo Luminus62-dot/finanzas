@@ -1,6 +1,6 @@
 // frontend/src/pages/ReportsPage.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../services/api";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import {
   PieChart,
@@ -79,37 +79,26 @@ const ReportsPage = ({ token }) => {
         setLoading(false);
         return;
       }
-      axios.defaults.headers.common["x-auth-token"] = token;
-
       console.log("DEBUG: ReportsPage - Realizando peticiones Axios...");
 
       const [expenseRes, incomeRes, netFlowRes] = await Promise.all([
-        axios.get(
-          `${process.env.REACT_APP_API_URL}/api/transactions/summary`,
-          {
-            params: {
-              startDate: startDateISO,
-              endDate: endDateISO,
-              type: "Gasto",
-            },
-          }
-        ),
-        axios.get(
-          `${process.env.REACT_APP_API_URL}/api/transactions/summary`,
-          {
-            params: {
-              startDate: startDateISO,
-              endDate: endDateISO,
-              type: "Ingreso",
-            },
-          }
-        ),
-        axios.get(
-          `${process.env.REACT_APP_API_URL}/api/transactions/summary`,
-          {
-            params: { startDate: startDateISO, endDate: endDateISO },
-          }
-        ),
+        api.get("/transactions/summary", {
+          params: {
+            startDate: startDateISO,
+            endDate: endDateISO,
+            type: "Gasto",
+          },
+        }),
+        api.get("/transactions/summary", {
+          params: {
+            startDate: startDateISO,
+            endDate: endDateISO,
+            type: "Ingreso",
+          },
+        }),
+        api.get("/transactions/summary", {
+          params: { startDate: startDateISO, endDate: endDateISO },
+        }),
       ]);
 
       console.log("DEBUG: ReportsPage - Respuestas recibidas:");
