@@ -1,6 +1,6 @@
 // frontend/src/pages/SettingsPage.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../services/api";
 import { Container, Card, Form, Button, Alert, Image } from "react-bootstrap";
 import { toast } from "react-toastify";
 
@@ -26,13 +26,10 @@ const SettingsPage = ({ token }) => {
         );
         return;
       }
-      axios.defaults.headers.common["x-auth-token"] = token;
       console.log(
         "DEBUG: SettingsPage - Enviando GET a /api/auth para perfil..."
       );
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/auth`
-      );
+      const res = await api.get(`/auth`);
       console.log("DEBUG: SettingsPage - Respuesta de /api/auth:", res.data);
       setUserProfile(res.data);
     } catch (err) {
@@ -84,12 +81,11 @@ const SettingsPage = ({ token }) => {
         toast.error("No autenticado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      axios.defaults.headers.common["x-auth-token"] = token;
       console.log(
         "DEBUG: SettingsPage - Enviando PUT a /api/auth/change-password..."
       );
-      const res = await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/auth/change-password`,
+      const res = await api.put(
+        `/auth/change-password`,
         {
           currentPassword,
           newPassword,
@@ -135,12 +131,11 @@ const SettingsPage = ({ token }) => {
         toast.error("No autenticado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      axios.defaults.headers.common["x-auth-token"] = token;
       console.log(
         "DEBUG: SettingsPage - Enviando PUT a /api/auth/profile-picture..."
       );
-      const res = await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/auth/profile-picture`,
+      const res = await api.put(
+        `/auth/profile-picture`,
         formData
       );
       console.log(
@@ -180,10 +175,9 @@ const SettingsPage = ({ token }) => {
         toast.error("No autenticado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      axios.defaults.headers.common["x-auth-token"] = token;
       console.log("DEBUG: SettingsPage - Enviando PUT a /api/auth/banner...");
-      const res = await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/auth/banner`,
+      const res = await api.put(
+        `/auth/banner`,
         formData
       );
       console.log(

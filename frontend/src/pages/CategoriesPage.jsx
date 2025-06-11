@@ -1,6 +1,6 @@
 // frontend/src/pages/CategoriesPage.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../services/api";
 import {
   Container,
   Row,
@@ -24,16 +24,12 @@ const CategoriesPage = ({ token }) => {
 
   const fetchCategories = useCallback(async () => {
     try {
-      if (token) {
-        axios.defaults.headers.common["x-auth-token"] = token;
-      } else {
+      if (!token) {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
       console.log("DEBUG: CategoriesPage - Enviando GET a /api/categories...");
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/categories`
-      );
+      const res = await api.get(`/categories`);
       console.log(
         "DEBUG: CategoriesPage - Respuesta de /api/categories:",
         res.data
@@ -92,7 +88,7 @@ const CategoriesPage = ({ token }) => {
     }
     try {
       console.log("DEBUG: CategoriesPage - Enviando POST a /api/categories...");
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/categories`, {
+      await api.post(`/categories`, {
         name: newCategoryName,
         type: newCategoryType,
       });
@@ -130,13 +126,10 @@ const CategoriesPage = ({ token }) => {
       console.log(
         "DEBUG: CategoriesPage - Enviando PUT a /api/categories/:id..."
       );
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/categories/${editingCategory._id}`,
-        {
-          name: editingCategory.name,
-          type: editingCategory.type,
-        }
-      );
+      await api.put(`/categories/${editingCategory._id}`, {
+        name: editingCategory.name,
+        type: editingCategory.type,
+      });
       toast.success("Category updated successfully!");
       setEditingCategory(null);
       fetchCategories();
@@ -154,9 +147,7 @@ const CategoriesPage = ({ token }) => {
         console.log(
           "DEBUG: CategoriesPage - Enviando DELETE a /api/categories/:id..."
         );
-        await axios.delete(
-          `${process.env.REACT_APP_API_URL}/api/categories/${id}`
-        );
+        await api.delete(`/categories/${id}`);
         toast.success("Category deleted successfully!");
         fetchCategories();
       } catch (err) {

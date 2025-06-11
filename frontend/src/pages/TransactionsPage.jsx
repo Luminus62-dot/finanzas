@@ -1,6 +1,6 @@
 // frontend/src/pages/TransactionsPage.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { Container, Row, Col, Form, Button, Card, ListGroup } from 'react-bootstrap';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
@@ -26,14 +26,12 @@ const TransactionsPage = ({ token }) => {
   // Funciones de Carga de Datos (Cuentas, Transacciones, Categorías)
   const fetchAccounts = useCallback(async () => {
     try {
-      if (token) {
-        axios.defaults.headers.common['x-auth-token'] = token;
-      } else {
+      if (!token) {
         toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
       console.log('DEBUG: TransactionsPage - Enviando GET a /api/accounts...');
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/accounts`);
+      const res = await api.get('/accounts');
       console.log('DEBUG: TransactionsPage - Respuesta de /api/accounts:', res.data);
       if (Array.isArray(res.data)) {
         setAccounts(res.data);
@@ -56,14 +54,12 @@ const TransactionsPage = ({ token }) => {
 
   const fetchTransactions = useCallback(async () => {
     try {
-      if (token) {
-        axios.defaults.headers.common['x-auth-token'] = token;
-      } else {
+      if (!token) {
         toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
       console.log('DEBUG: TransactionsPage - Enviando GET a /api/transactions...');
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/transactions`);
+      const res = await api.get('/transactions');
       console.log('DEBUG: TransactionsPage - Respuesta de /api/transactions:', res.data);
       if (Array.isArray(res.data)) {
         setTransactions(res.data);
@@ -80,14 +76,12 @@ const TransactionsPage = ({ token }) => {
 
   const fetchCategories = useCallback(async () => {
     try {
-      if (token) {
-        axios.defaults.headers.common['x-auth-token'] = token;
-      } else {
+      if (!token) {
         toast.error('Token no encontrado. Por favor, inicia sesión de nuevo.');
         return;
       }
       console.log('DEBUG: TransactionsPage - Enviando GET a /api/categories...');
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/categories`);
+      const res = await api.get('/categories');
       console.log('DEBUG: CategoriesPage - Respuesta de /api/categories:', res.data);
       if (Array.isArray(res.data)) {
         setCategories(res.data);
@@ -161,7 +155,7 @@ const TransactionsPage = ({ token }) => {
         transactionData.toAccount = toAccountId;
       }
 
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/transactions`, transactionData);
+      await api.post('/transactions', transactionData);
       toast.success('Transacción registrada exitosamente!');
       fetchAccounts();
       fetchTransactions();
@@ -222,7 +216,7 @@ const TransactionsPage = ({ token }) => {
         toAccount: transactionType === 'Transferencia' ? toAccountId : undefined,
       };
 
-      await axios.put(`${process.env.REACT_APP_API_URL}/api/transactions/${editingTransaction._id}`, updatedTransactionData);
+      await api.put(`/transactions/${editingTransaction._id}`, updatedTransactionData);
       toast.success('Transacción actualizada exitosamente!');
       fetchAccounts();
       fetchTransactions();
@@ -237,7 +231,7 @@ const TransactionsPage = ({ token }) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta transacción?')) {
       try {
         console.log('DEBUG: TransactionsPage - Enviando DELETE a /api/transactions/:id...');
-        await axios.delete(`${process.env.REACT_APP_API_URL}/api/transactions/${id}`);
+        await api.delete(`/transactions/${id}`);
         toast.success('Transacción eliminada y saldos actualizados!');
         fetchAccounts();
         fetchTransactions();

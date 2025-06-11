@@ -1,6 +1,6 @@
 // frontend/src/pages/SavingGoalsPage.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../services/api";
 import {
   Container,
   Row,
@@ -32,13 +32,10 @@ const SavingGoalsPage = ({ token }) => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      axios.defaults.headers.common["x-auth-token"] = token;
       console.log(
         "DEBUG: SavingGoalsPage - Enviando GET a /api/savinggoals..."
       );
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/savinggoals`
-      );
+      const res = await api.get(`/savinggoals`);
       console.log(
         "DEBUG: SavingGoalsPage - Respuesta de /api/savinggoals:",
         res.data
@@ -125,10 +122,7 @@ const SavingGoalsPage = ({ token }) => {
         dueDate: newGoalDueDate || undefined,
         description: newGoalDescription,
       };
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/savinggoals`,
-        goalData
-      );
+      await api.post(`/savinggoals`, goalData);
       toast.success("Meta de ahorro creada exitosamente!");
       setNewGoalName("");
       setNewGoalTargetAmount("");
@@ -180,10 +174,7 @@ const SavingGoalsPage = ({ token }) => {
         description: editingGoal.description,
         isCompleted: editingGoal.isCompleted,
       };
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/savinggoals/${editingGoal._id}`,
-        updatedGoalData
-      );
+      await api.put(`/savinggoals/${editingGoal._id}`, updatedGoalData);
       toast.success("Meta de ahorro actualizada exitosamente!");
       setEditingGoal(null);
       fetchSavingGoals();
@@ -215,13 +206,10 @@ const SavingGoalsPage = ({ token }) => {
       if (!goalToUpdate) return;
 
       const newCurrentAmount = currentAmount + parseFloat(addAmount);
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/savinggoals/${goalId}`,
-        {
-          currentAmount: newCurrentAmount,
-          isCompleted: newCurrentAmount >= goalToUpdate.targetAmount,
-        }
-      );
+      await api.put(`/savinggoals/${goalId}`, {
+        currentAmount: newCurrentAmount,
+        isCompleted: newCurrentAmount >= goalToUpdate.targetAmount,
+      });
       toast.success(
         `Monto de ${parseFloat(addAmount).toFixed(2)} añadido a la meta!`
       );
@@ -244,9 +232,7 @@ const SavingGoalsPage = ({ token }) => {
         console.log(
           "DEBUG: SavingGoalsPage - Enviando DELETE a /api/savinggoals/:id..."
         );
-        await axios.delete(
-          `${process.env.REACT_APP_API_URL}/api/savinggoals/${id}`
-        );
+        await api.delete(`/savinggoals/${id}`);
         toast.success("Meta de ahorro eliminada exitosamente!");
         fetchSavingGoals();
       } catch (err) {

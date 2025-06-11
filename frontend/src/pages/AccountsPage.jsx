@@ -1,6 +1,6 @@
 // frontend/src/pages/AccountsPage.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../services/api";
 import {
   Container,
   Row,
@@ -26,16 +26,12 @@ const AccountsPage = ({ token }) => {
 
   const fetchAccounts = useCallback(async () => {
     try {
-      if (token) {
-        axios.defaults.headers.common["x-auth-token"] = token;
-      } else {
+      if (!token) {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
       console.log("DEBUG: AccountsPage - Enviando GET a /api/accounts...");
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/accounts`
-      );
+      const res = await api.get(`/accounts`);
       console.log(
         "DEBUG: AccountsPage - Respuesta de /api/accounts:",
         res.data
@@ -98,7 +94,7 @@ const AccountsPage = ({ token }) => {
       return;
     }
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/accounts`, {
+      await api.post(`/accounts`, {
         name: newAccountName,
         type: newAccountType,
         balance: newAccountBalance,
@@ -137,15 +133,12 @@ const AccountsPage = ({ token }) => {
     }
 
     try {
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/accounts/${editingAccount._id}`,
-        {
-          name: editingAccount.name,
-          type: editingAccount.type,
-          balance: editingAccount.balance,
-          currency: editingAccount.currency,
-        }
-      );
+      await api.put(`/accounts/${editingAccount._id}`, {
+        name: editingAccount.name,
+        type: editingAccount.type,
+        balance: editingAccount.balance,
+        currency: editingAccount.currency,
+      });
       fetchAccounts();
       toast.success("Cuenta actualizada exitosamente!");
       setEditingAccount(null);
@@ -164,9 +157,7 @@ const AccountsPage = ({ token }) => {
       )
     ) {
       try {
-        await axios.delete(
-          `${process.env.REACT_APP_API_URL}/api/accounts/${id}`
-        );
+        await api.delete(`/accounts/${id}`);
         fetchAccounts();
         toast.success("Cuenta eliminada exitosamente!");
       } catch (err) {
