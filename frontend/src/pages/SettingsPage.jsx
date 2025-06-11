@@ -294,7 +294,7 @@ const SettingsPage = () => {
               />
             ) : (
               <Image
-                src="https://via.placeholder.com/120/ecf0f1/2c3e50?text=NP"
+                src="https://picsum.photos/120"
                 roundedCircle
                 style={{
                   width: "120px",
@@ -356,7 +356,7 @@ const SettingsPage = () => {
               />
             ) : (
               <Image
-                src="https://via.placeholder.com/500x150/f8f9fa/6c757d?text=Sin+Banner"
+                src="https://picsum.photos/500/150"
                 fluid
                 style={{
                   maxHeight: "150px",
