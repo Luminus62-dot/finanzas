@@ -32,7 +32,7 @@ const CategoriesPage = ({ token }) => {
       }
       console.log("DEBUG: CategoriesPage - Enviando GET a /api/categories...");
       const res = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/categories`
+        `${process.env.REACT_APP_API_URL}/api/categories`
       );
       console.log(
         "DEBUG: CategoriesPage - Respuesta de /api/categories:",
@@ -92,7 +92,7 @@ const CategoriesPage = ({ token }) => {
     }
     try {
       console.log("DEBUG: CategoriesPage - Enviando POST a /api/categories...");
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/categories`, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/categories`, {
         name: newCategoryName,
         type: newCategoryType,
       });
@@ -131,7 +131,7 @@ const CategoriesPage = ({ token }) => {
         "DEBUG: CategoriesPage - Enviando PUT a /api/categories/:id..."
       );
       await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/categories/${editingCategory._id}`,
+        `${process.env.REACT_APP_API_URL}/api/categories/${editingCategory._id}`,
         {
           name: editingCategory.name,
           type: editingCategory.type,
@@ -155,7 +155,7 @@ const CategoriesPage = ({ token }) => {
           "DEBUG: CategoriesPage - Enviando DELETE a /api/categories/:id..."
         );
         await axios.delete(
-          `${process.env.REACT_APP_BACKEND_URL}/api/categories/${id}`
+          `${process.env.REACT_APP_API_URL}/api/categories/${id}`
         );
         toast.success("Category deleted successfully!");
         fetchCategories();

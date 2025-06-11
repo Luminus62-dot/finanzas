@@ -12,7 +12,7 @@ const SavingGoalSchema = new Schema({
     type: String,
     required: true,
     trim: true,
-    unique: true, // El nombre de la meta debe ser único por usuario
+    // La unicidad se garantiza mediante un índice compuesto por usuario
   },
   targetAmount: {
     type: Number,
@@ -42,5 +42,8 @@ const SavingGoalSchema = new Schema({
     default: false,
   },
 });
+
+// Índice compuesto para que cada usuario tenga metas con nombres únicos
+SavingGoalSchema.index({ user: 1, name: 1 }, { unique: true });
 
 module.exports = mongoose.model("SavingGoal", SavingGoalSchema);

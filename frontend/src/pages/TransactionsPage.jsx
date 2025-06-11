@@ -33,7 +33,7 @@ const TransactionsPage = ({ token }) => {
         return;
       }
       console.log('DEBUG: TransactionsPage - Enviando GET a /api/accounts...');
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/accounts`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/accounts`);
       console.log('DEBUG: TransactionsPage - Respuesta de /api/accounts:', res.data);
       if (Array.isArray(res.data)) {
         setAccounts(res.data);
@@ -63,7 +63,7 @@ const TransactionsPage = ({ token }) => {
         return;
       }
       console.log('DEBUG: TransactionsPage - Enviando GET a /api/transactions...');
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/transactions`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/transactions`);
       console.log('DEBUG: TransactionsPage - Respuesta de /api/transactions:', res.data);
       if (Array.isArray(res.data)) {
         setTransactions(res.data);
@@ -87,7 +87,7 @@ const TransactionsPage = ({ token }) => {
         return;
       }
       console.log('DEBUG: TransactionsPage - Enviando GET a /api/categories...');
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/categories`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/categories`);
       console.log('DEBUG: CategoriesPage - Respuesta de /api/categories:', res.data);
       if (Array.isArray(res.data)) {
         setCategories(res.data);
@@ -161,7 +161,7 @@ const TransactionsPage = ({ token }) => {
         transactionData.toAccount = toAccountId;
       }
 
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/transactions`, transactionData);
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/transactions`, transactionData);
       toast.success('Transacción registrada exitosamente!');
       fetchAccounts();
       fetchTransactions();
@@ -222,7 +222,7 @@ const TransactionsPage = ({ token }) => {
         toAccount: transactionType === 'Transferencia' ? toAccountId : undefined,
       };
 
-      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/transactions/${editingTransaction._id}`, updatedTransactionData);
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/transactions/${editingTransaction._id}`, updatedTransactionData);
       toast.success('Transacción actualizada exitosamente!');
       fetchAccounts();
       fetchTransactions();
@@ -237,7 +237,7 @@ const TransactionsPage = ({ token }) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta transacción?')) {
       try {
         console.log('DEBUG: TransactionsPage - Enviando DELETE a /api/transactions/:id...');
-        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/transactions/${id}`);
+        await axios.delete(`${process.env.REACT_APP_API_URL}/api/transactions/${id}`);
         toast.success('Transacción eliminada y saldos actualizados!');
         fetchAccounts();
         fetchTransactions();

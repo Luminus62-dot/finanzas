@@ -34,7 +34,7 @@ const AccountsPage = ({ token }) => {
       }
       console.log("DEBUG: AccountsPage - Enviando GET a /api/accounts...");
       const res = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/accounts`
+        `${process.env.REACT_APP_API_URL}/api/accounts`
       );
       console.log(
         "DEBUG: AccountsPage - Respuesta de /api/accounts:",
@@ -98,7 +98,7 @@ const AccountsPage = ({ token }) => {
       return;
     }
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/accounts`, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/accounts`, {
         name: newAccountName,
         type: newAccountType,
         balance: newAccountBalance,
@@ -138,7 +138,7 @@ const AccountsPage = ({ token }) => {
 
     try {
       await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/accounts/${editingAccount._id}`,
+        `${process.env.REACT_APP_API_URL}/api/accounts/${editingAccount._id}`,
         {
           name: editingAccount.name,
           type: editingAccount.type,
@@ -165,7 +165,7 @@ const AccountsPage = ({ token }) => {
     ) {
       try {
         await axios.delete(
-          `${process.env.REACT_APP_BACKEND_URL}/api/accounts/${id}`
+          `${process.env.REACT_APP_API_URL}/api/accounts/${id}`
         );
         fetchAccounts();
         toast.success("Cuenta eliminada exitosamente!");
