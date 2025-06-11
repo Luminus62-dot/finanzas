@@ -44,7 +44,7 @@ function App() {
     if (tokenInStorage) {
       try {
         // El interceptor en api.js ya añade el token a los headers
-        const response = await api.get("/auth/profile"); // Llama al endpoint del perfil
+        const response = await api.get("/auth"); // Obtiene el perfil del usuario
         setUser(response.data);
         setIsAuthenticated(true);
       } catch (error) {
