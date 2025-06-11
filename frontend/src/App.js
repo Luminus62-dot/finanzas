@@ -18,6 +18,7 @@ import AccountsPage from "./pages/AccountsPage";
 import TransactionsPage from "./pages/TransactionsPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import SavingGoalsPage from "./pages/SavingGoalsPage";
+import SubscriptionsPage from "./pages/SubscriptionsPage";
 import BudgetCalculatorPage from "./pages/BudgetCalculatorPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -155,6 +156,7 @@ function App() {
               <ProtectedRoute path="/transactions" component={TransactionsPage} />
               <ProtectedRoute path="/categories" component={CategoriesPage} />
               <ProtectedRoute path="/saving-goals" component={SavingGoalsPage} />
+              <ProtectedRoute path="/subscriptions" component={SubscriptionsPage} />
               <Route
                 path="/budget-calculator"
                 component={BudgetCalculatorPage}
