@@ -10,6 +10,7 @@ import {
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./Login.css";
 
 import Layout from "./components/Layout";
 import DashboardPage from "./pages/DashboardPage";
@@ -165,10 +166,9 @@ function App() {
           </Layout>
         ) : (
           <Container
-            className="d-flex flex-column justify-content-center align-items-center"
+            className="login-background d-flex flex-column justify-content-center align-items-center"
             style={{
               flexGrow: 1,
-              backgroundColor: "#f8f9fa",
               paddingTop: "2rem",
               paddingBottom: "2rem",
             }}
@@ -177,7 +177,7 @@ function App() {
             <Row className="w-100 justify-content-center">
               <Col md={6} lg={5} xl={4}>
                 <h1 className="text-center mb-4">Mi Dinero Hoy</h1>
-                <Card className="shadow-sm">
+                <Card className="shadow-sm login-card">
                   <Card.Body>
                     {showRegisterForm ? (
                       <>
