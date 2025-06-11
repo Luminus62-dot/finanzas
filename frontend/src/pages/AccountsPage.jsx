@@ -32,12 +32,7 @@ const AccountsPage = () => {
         toast.error("Token no encontrado. Por favor, inicia sesión de nuevo.");
         return;
       }
-      // console.log("DEBUG: AccountsPage - Enviando GET a /api/accounts...");
       const res = await api.get(`/accounts`);
-      // console.log(
-      //   "DEBUG: AccountsPage - Respuesta de /api/accounts:",
-      //   res.data
-      // );
       if (Array.isArray(res.data)) {
         setAccounts(res.data);
       } else {
