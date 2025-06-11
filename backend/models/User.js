@@ -27,14 +27,16 @@ const UserSchema = new Schema({
     required: false,
   },
   profilePictureUrl: {
-    // <-- NUEVO: URL de la foto de perfil
     type: String,
     required: false,
+    default:
+      "https://via.placeholder.com/100/ecf0f1/2c3e50?text=Perfil", // Imagen por defecto
   },
   bannerUrl: {
-    // <-- NUEVO: URL del banner
     type: String,
     required: false,
+    default:
+      "https://via.placeholder.com/800x150/3498db/ffffff?text=Banner", // Imagen por defecto
   },
   date: {
     type: Date,
