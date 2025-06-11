@@ -29,14 +29,14 @@ const UserSchema = new Schema({
   profilePictureUrl: {
     type: String,
     required: false,
-    default:
-      "https://via.placeholder.com/100/ecf0f1/2c3e50?text=Perfil", // Imagen por defecto
+    // Se usa picsum.photos porque placeholder.com fallaba en el dashboard
+    default: "https://picsum.photos/100", // Imagen por defecto
   },
   bannerUrl: {
     type: String,
     required: false,
-    default:
-      "https://via.placeholder.com/800x150/3498db/ffffff?text=Banner", // Imagen por defecto
+    // Banner genérico desde picsum.photos
+    default: "https://picsum.photos/800/150", // Imagen por defecto
   },
   date: {
     type: Date,

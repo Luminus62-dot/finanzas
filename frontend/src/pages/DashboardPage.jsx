@@ -11,6 +11,7 @@ const DashboardPage = () => {
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
   const [savingGoals, setSavingGoals] = useState([]);
+  const [upcomingSubs, setUpcomingSubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -96,6 +97,30 @@ const DashboardPage = () => {
     }
   }, [token]);
 
+  // Suscripciones próximas a vencer (siguientes 7 días)
+  const fetchUpcomingSubs = useCallback(async () => {
+    try {
+      if (!token) return;
+      const res = await api.get('/subscriptions');
+      if (Array.isArray(res.data)) {
+        const today = new Date();
+        const inSeven = new Date();
+        inSeven.setDate(today.getDate() + 7);
+        const upcoming = res.data.filter(sub => {
+          const date = new Date(sub.nextBillingDate);
+          return date >= today && date <= inSeven;
+        }).slice(0, 5);
+        setUpcomingSubs(upcoming);
+      } else {
+        console.error('DEBUG: DashboardPage - La respuesta de /subscriptions NO es un array:', res.data);
+        setUpcomingSubs([]);
+      }
+    } catch (err) {
+      console.error('DEBUG: DashboardPage - Error al cargar suscripciones próximas:', err.response?.data || err.message);
+      toast.error(`Error al cargar suscripciones: ${err.response?.data?.msg || 'Error de red'}`);
+    }
+  }, [token]);
+
   useEffect(() => {
     const loadDashboardData = async () => {
       setLoading(true);
@@ -106,13 +131,20 @@ const DashboardPage = () => {
         fetchTotalBalance(),
         fetchRecentTransactions(),
         fetchSavingGoals(),
+        fetchUpcomingSubs(),
       ]);
       setLoading(false);
       // console.log('DEBUG: DashboardPage - Carga de datos finalizada.'); // Debug
     };
 
     loadDashboardData();
-  }, [fetchUserProfile, fetchTotalBalance, fetchRecentTransactions, fetchSavingGoals]);
+  }, [
+    fetchUserProfile,
+    fetchTotalBalance,
+    fetchRecentTransactions,
+    fetchSavingGoals,
+    fetchUpcomingSubs,
+  ]);
 
   return (
     <Container className="py-4">
@@ -132,7 +164,9 @@ const DashboardPage = () => {
                 style={{
                   height: '150px',
                   backgroundColor: '#3498db',
-                  backgroundImage: userProfile?.bannerUrl ? `url(${process.env.REACT_APP_API_URL}${userProfile.bannerUrl})` : 'url(https://via.placeholder.com/800x150/3498db/ffffff?text=Tu+Banner+Aqui)',
+                  backgroundImage: userProfile?.bannerUrl
+                    ? `url(${process.env.REACT_APP_API_URL}${userProfile.bannerUrl})`
+                    : 'url(https://picsum.photos/800/150)',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   position: 'relative'
@@ -140,7 +174,9 @@ const DashboardPage = () => {
               >
                 {/* Foto de Perfil */}
                 <Image
-                  src={userProfile?.profilePictureUrl ? `${process.env.REACT_APP_API_URL}${userProfile.profilePictureUrl}` : `https://via.placeholder.com/100/ecf0f1/2c3e50?text=${userProfile?.firstName?.charAt(0) || 'U'}${userProfile?.lastName?.charAt(0) || 'S'}`}
+                  src={userProfile?.profilePictureUrl
+                    ? `${process.env.REACT_APP_API_URL}${userProfile.profilePictureUrl}`
+                    : 'https://picsum.photos/100'}
                   roundedCircle
                   className="border border-white border-3"
                   style={{
@@ -231,6 +267,31 @@ const DashboardPage = () => {
                         </ListGroup.Item>
                       );
                     })}
+                  </ListGroup>
+                )}
+              </Card.Body>
+            </Card>
+          </Col>
+
+          {/* Suscripciones próximas a pagar */}
+          <Col xs={12}>
+            <Card className="shadow-sm h-100">
+              <Card.Body>
+                <Card.Title className="mb-3 text-center">Suscripciones por vencer</Card.Title>
+                {upcomingSubs.length === 0 ? (
+                  <p className="text-center text-muted">Sin pagos próximos.</p>
+                ) : (
+                  <ListGroup variant="flush">
+                    {upcomingSubs.map(sub => (
+                      <ListGroup.Item key={sub._id} className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <strong>{sub.name}</strong>
+                          <div className="text-muted" style={{ fontSize: '0.85em' }}>
+                            {new Date(sub.nextBillingDate).toLocaleDateString()} - ${sub.amount.toFixed(2)}
+                          </div>
+                        </div>
+                      </ListGroup.Item>
+                    ))}
                   </ListGroup>
                 )}
               </Card.Body>
