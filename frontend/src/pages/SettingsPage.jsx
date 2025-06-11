@@ -143,7 +143,7 @@ const SettingsPage = () => {
       // console.log(
 //         "DEBUG: SettingsPage - Respuesta de subida de foto:",
 //         res.data
-      );
+//       );
       toast.success(res.data.msg);
       setProfilePictureFile(null); // Limpiar el input de archivo
       setProfilePicError(""); // Limpiar error
