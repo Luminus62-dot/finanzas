@@ -45,15 +45,14 @@ URLs duplicadas al construir las rutas.
 
 ## Endpoints destacados
 
-- **`/api/reminders`** `GET/POST/PUT/DELETE`
-  - Gestiona recordatorios del usuario (listar, crear, editar y eliminar).
-  - `GET /api/reminders/upcoming?days=7` devuelve los próximos recordatorios.
-- **`/api/currency/convert`** `GET`
-  - Convierte cantidades entre USD, EUR, COP y MXN.
+### Suscripciones
+- **`/api/subscriptions`** `GET/POST/PUT/DELETE`
+  - Administra las suscripciones guardadas del usuario.
+- **`POST /api/subscriptions/:id/charge`**
+  - Registra un cobro creando una transacción con categoría "Suscripción".
 
 ## Páginas de React
 
-- **`/reminders`**: página para crear y administrar recordatorios.
-- **`/converter`**: convertidor de monedas utilizando el endpoint anterior.
+- **`/subscriptions`**: módulo para gestionar y registrar cobros periódicos.
 
 _V1.0 (funcional)_

@@ -8,5 +8,6 @@ router.get("/", auth, controller.getSubscriptions);
 router.post("/", auth, controller.createSubscription);
 router.put("/:id", auth, controller.updateSubscription);
 router.delete("/:id", auth, controller.deleteSubscription);
+router.post("/:id/charge", auth, controller.chargeSubscription);
 
 module.exports = router;
