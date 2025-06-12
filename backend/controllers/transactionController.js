@@ -86,6 +86,9 @@ exports.createTransaction = async (req, res) => {
       description,
       amount: parseFloat(amount),
       date: transDate,
+
+      date: date || Date.now(),
+
       subscription: subscriptionId || undefined,
     });
 
@@ -138,6 +141,7 @@ exports.createTransaction = async (req, res) => {
       const nextDate = new Date(transaction.date);
       nextDate.setMonth(nextDate.getMonth() + 1);
       nextDate.setUTCHours(0, 0, 0, 0);
+
       const sub = new Subscription({
         user: req.user.id,
         name: description || "Suscripción",

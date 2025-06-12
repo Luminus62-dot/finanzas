@@ -117,7 +117,11 @@ exports.chargeSubscription = async (req, res) => {
       category: "Suscripción",
       description: sub.name,
       amount: sub.amount,
+
       date: chargeDate,
+
+      date: date || Date.now(),
+
       subscription: sub._id,
     });
 
@@ -132,6 +136,8 @@ exports.chargeSubscription = async (req, res) => {
       nextDate.setMonth(nextDate.getMonth() + 1);
     }
     nextDate.setUTCHours(0, 0, 0, 0);
+
+
     sub.nextBillingDate = nextDate;
     await sub.save();
 
