@@ -36,6 +36,7 @@ URLs duplicadas al construir las rutas.
 
 - `npm run dev`: corre frontend y backend en desarrollo (concurrently)
 - `npm run start`: inicia la aplicación en producción
+- `npm run start-frontend`: usa `cross-env` para configurar variables de entorno antes de ejecutar React
 
 ## Despliegue
 
