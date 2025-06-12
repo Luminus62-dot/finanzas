@@ -46,8 +46,10 @@ const SubscriptionsPage = () => {
 
   useEffect(() => {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
     subs.forEach((s) => {
       const date = new Date(s.nextBillingDate);
+      date.setHours(0, 0, 0, 0);
       const diff = (date - today) / (1000 * 60 * 60 * 24);
       if (diff >= 0 && diff <= 3) {
         toast.info(

@@ -18,12 +18,15 @@ exports.getSubscriptions = async (req, res) => {
 exports.createSubscription = async (req, res) => {
   const { name, amount, nextBillingDate, frequency, notes } = req.body;
 
+  const billingDate = new Date(nextBillingDate);
+  billingDate.setUTCHours(0, 0, 0, 0);
+
   try {
     const sub = new Subscription({
       user: req.user.id,
       name,
       amount: parseFloat(amount),
-      nextBillingDate,
+      nextBillingDate: billingDate,
       frequency,
       notes,
     });
@@ -52,7 +55,11 @@ exports.updateSubscription = async (req, res) => {
 
     sub.name = name || sub.name;
     sub.amount = amount !== undefined ? parseFloat(amount) : sub.amount;
-    sub.nextBillingDate = nextBillingDate || sub.nextBillingDate;
+    if (nextBillingDate) {
+      const nb = new Date(nextBillingDate);
+      nb.setUTCHours(0, 0, 0, 0);
+      sub.nextBillingDate = nb;
+    }
     sub.frequency = frequency || sub.frequency;
     sub.notes = notes !== undefined ? notes : sub.notes;
 
@@ -85,6 +92,8 @@ exports.deleteSubscription = async (req, res) => {
 // Registrar el cobro de una suscripción y crear una transacción
 exports.chargeSubscription = async (req, res) => {
   const { accountId, date } = req.body;
+  const chargeDate = date ? new Date(date) : new Date();
+  chargeDate.setUTCHours(0, 0, 0, 0);
   try {
     const sub = await Subscription.findById(req.params.id);
     if (!sub) {
@@ -108,7 +117,11 @@ exports.chargeSubscription = async (req, res) => {
       category: "Suscripción",
       description: sub.name,
       amount: sub.amount,
+
+      date: chargeDate,
+
       date: date || Date.now(),
+
       subscription: sub._id,
     });
 
@@ -122,6 +135,9 @@ exports.chargeSubscription = async (req, res) => {
     } else {
       nextDate.setMonth(nextDate.getMonth() + 1);
     }
+    nextDate.setUTCHours(0, 0, 0, 0);
+
+
     sub.nextBillingDate = nextDate;
     await sub.save();
 

@@ -104,12 +104,17 @@ const DashboardPage = () => {
       const res = await api.get('/subscriptions');
       if (Array.isArray(res.data)) {
         const today = new Date();
-        const inSeven = new Date();
-        inSeven.setDate(today.getDate() + 7);
-        const upcoming = res.data.filter(sub => {
-          const date = new Date(sub.nextBillingDate);
-          return date >= today && date <= inSeven;
-        }).slice(0, 5);
+        today.setHours(0, 0, 0, 0);
+        const inSeven = new Date(today);
+        inSeven.setDate(inSeven.getDate() + 7);
+        inSeven.setHours(23, 59, 59, 999);
+
+        const upcoming = res.data
+          .filter((sub) => {
+            const date = new Date(sub.nextBillingDate);
+            return date >= today && date <= inSeven;
+          })
+          .slice(0, 5);
         setUpcomingSubs(upcoming);
       } else {
         console.error('DEBUG: DashboardPage - La respuesta de /subscriptions NO es un array:', res.data);
