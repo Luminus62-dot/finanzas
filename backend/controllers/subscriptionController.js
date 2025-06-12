@@ -1,5 +1,7 @@
 // backend/controllers/subscriptionController.js
 const Subscription = require("../models/Subscription");
+const Transaction = require("../models/Transaction");
+const Account = require("../models/Account");
 
 // Obtener todas las suscripciones del usuario
 exports.getSubscriptions = async (req, res) => {
@@ -16,12 +18,15 @@ exports.getSubscriptions = async (req, res) => {
 exports.createSubscription = async (req, res) => {
   const { name, amount, nextBillingDate, frequency, notes } = req.body;
 
+  const billingDate = new Date(nextBillingDate);
+  billingDate.setUTCHours(0, 0, 0, 0);
+
   try {
     const sub = new Subscription({
       user: req.user.id,
       name,
       amount: parseFloat(amount),
-      nextBillingDate,
+      nextBillingDate: billingDate,
       frequency,
       notes,
     });
@@ -50,7 +55,11 @@ exports.updateSubscription = async (req, res) => {
 
     sub.name = name || sub.name;
     sub.amount = amount !== undefined ? parseFloat(amount) : sub.amount;
-    sub.nextBillingDate = nextBillingDate || sub.nextBillingDate;
+    if (nextBillingDate) {
+      const nb = new Date(nextBillingDate);
+      nb.setUTCHours(0, 0, 0, 0);
+      sub.nextBillingDate = nb;
+    }
     sub.frequency = frequency || sub.frequency;
     sub.notes = notes !== undefined ? notes : sub.notes;
 
@@ -74,6 +83,59 @@ exports.deleteSubscription = async (req, res) => {
     }
     await Subscription.deleteOne({ _id: req.params.id });
     res.json({ msg: "Suscripción eliminada" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error del servidor");
+  }
+};
+
+// Registrar el cobro de una suscripción y crear una transacción
+exports.chargeSubscription = async (req, res) => {
+  const { accountId, date } = req.body;
+  const chargeDate = date ? new Date(date) : new Date();
+  chargeDate.setUTCHours(0, 0, 0, 0);
+  try {
+    const sub = await Subscription.findById(req.params.id);
+    if (!sub) {
+      return res.status(404).json({ msg: "Suscripción no encontrada" });
+    }
+    if (sub.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: "No autorizado" });
+    }
+
+    const account = await Account.findOne({ _id: accountId, user: req.user.id });
+    if (!account) {
+      return res
+        .status(404)
+        .json({ msg: "Cuenta no encontrada o no pertenece al usuario" });
+    }
+
+    const transaction = new Transaction({
+      user: req.user.id,
+      account: accountId,
+      type: "Gasto",
+      category: "Suscripción",
+      description: sub.name,
+      amount: sub.amount,
+      date: chargeDate,
+      subscription: sub._id,
+    });
+
+    account.balance -= sub.amount;
+    await account.save();
+    await transaction.save();
+
+    const nextDate = new Date(sub.nextBillingDate);
+    if (sub.frequency === "Anual") {
+      nextDate.setFullYear(nextDate.getFullYear() + 1);
+    } else {
+      nextDate.setMonth(nextDate.getMonth() + 1);
+    }
+    nextDate.setUTCHours(0, 0, 0, 0);
+    sub.nextBillingDate = nextDate;
+    await sub.save();
+
+    res.status(201).json(transaction);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error del servidor");

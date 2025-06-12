@@ -51,8 +51,16 @@ exports.getTransactions = async (req, res) => {
 // @desc    Crear una nueva transacción
 // @access  Private
 exports.createTransaction = async (req, res) => {
-  const { account, type, category, description, amount, date, toAccount } =
-    req.body;
+  const {
+    account,
+    type,
+    category,
+    description,
+    amount,
+    date,
+    toAccount,
+    subscriptionId,
+  } = req.body;
 
   try {
     const fromAccount = await Account.findOne({
@@ -67,6 +75,9 @@ exports.createTransaction = async (req, res) => {
         });
     }
 
+    const transDate = date ? new Date(date) : new Date();
+    transDate.setUTCHours(0, 0, 0, 0);
+
     const newTransaction = new Transaction({
       user: req.user.id,
       account,
@@ -74,7 +85,8 @@ exports.createTransaction = async (req, res) => {
       category,
       description,
       amount: parseFloat(amount),
-      date: date || Date.now(),
+      date: transDate,
+      subscription: subscriptionId || undefined,
     });
 
     if (type === "Ingreso") {
@@ -118,6 +130,25 @@ exports.createTransaction = async (req, res) => {
 
     await fromAccount.save();
     const transaction = await newTransaction.save();
+
+    // Si la transacción es una suscripción y no se proporcionó ID,
+    // crear registro en la colección de suscripciones
+    if (category === "Suscripción" && !subscriptionId) {
+      const Subscription = require("../models/Subscription");
+      const nextDate = new Date(transaction.date);
+      nextDate.setMonth(nextDate.getMonth() + 1);
+      nextDate.setUTCHours(0, 0, 0, 0);
+      const sub = new Subscription({
+        user: req.user.id,
+        name: description || "Suscripción",
+        amount: transaction.amount,
+        nextBillingDate: nextDate,
+        frequency: "Mensual",
+      });
+      await sub.save();
+      transaction.subscription = sub._id;
+      await transaction.save();
+    }
 
     res.status(201).json(transaction);
   } catch (err) {

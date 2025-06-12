@@ -46,6 +46,10 @@ const TransactionSchema = new Schema({
       return this.type === "Transferencia";
     },
   },
+  subscription: {
+    type: Schema.Types.ObjectId,
+    ref: "Subscription",
+  },
 });
 
 module.exports = mongoose.model("Transaction", TransactionSchema);
