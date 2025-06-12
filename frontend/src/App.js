@@ -22,6 +22,7 @@ import SubscriptionsPage from "./pages/SubscriptionsPage";
 import BudgetCalculatorPage from "./pages/BudgetCalculatorPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
+import CurrencyConverterPage from "./pages/CurrencyConverterPage";
 import { AuthContext } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -157,6 +158,7 @@ function App() {
               <ProtectedRoute path="/categories" component={CategoriesPage} />
               <ProtectedRoute path="/saving-goals" component={SavingGoalsPage} />
               <ProtectedRoute path="/subscriptions" component={SubscriptionsPage} />
+              <ProtectedRoute path="/converter" component={CurrencyConverterPage} />
               <Route
                 path="/budget-calculator"
                 component={BudgetCalculatorPage}
