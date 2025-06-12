@@ -19,6 +19,7 @@ import TransactionsPage from "./pages/TransactionsPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import SavingGoalsPage from "./pages/SavingGoalsPage";
 import SubscriptionsPage from "./pages/SubscriptionsPage";
+import RemindersPage from "./pages/RemindersPage";
 import BudgetCalculatorPage from "./pages/BudgetCalculatorPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -158,6 +159,9 @@ function App() {
               <ProtectedRoute path="/categories" component={CategoriesPage} />
               <ProtectedRoute path="/saving-goals" component={SavingGoalsPage} />
               <ProtectedRoute path="/subscriptions" component={SubscriptionsPage} />
+
+              <ProtectedRoute path="/reminders" component={RemindersPage} />
+                main
               <ProtectedRoute path="/converter" component={CurrencyConverterPage} />
               <Route
                 path="/budget-calculator"
