@@ -8,6 +8,7 @@ Aplicación full-stack para gestión de finanzas personales.
 
 - **backend/**: API REST en Node.js + Express
 - **frontend/**: SPA con React
+- **mobile/**: app móvil con React Native (Expo)
 
 ## Variables de entorno
 
@@ -37,6 +38,7 @@ URLs duplicadas al construir las rutas.
 - `npm run dev`: corre frontend y backend en desarrollo (concurrently)
 - `npm run start`: inicia la aplicación en producción
 - `npm run start-frontend`: usa `cross-env` para configurar variables de entorno antes de ejecutar React
+- `npm run start-mobile`: inicia la app móvil con Expo
 
 ## Despliegue
 
