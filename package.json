@@ -6,7 +6,8 @@
   "scripts": {
     "start-backend": "cd backend && node server.js",
     "start-frontend": "cd frontend && cross-env NODE_OPTIONS=--openssl-legacy-provider CHOKIDAR_USEPOLLING=true npm start",
-    "dev": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
+    "dev": "concurrently \"npm run start-backend\" \"npm run start-frontend\"",
+    "start-mobile": "cd mobile && expo start"
   },
   "keywords": [],
   "author": "",
