@@ -159,7 +159,9 @@ function App() {
               <ProtectedRoute path="/categories" component={CategoriesPage} />
               <ProtectedRoute path="/saving-goals" component={SavingGoalsPage} />
               <ProtectedRoute path="/subscriptions" component={SubscriptionsPage} />
+
               <ProtectedRoute path="/reminders" component={RemindersPage} />
+                main
               <ProtectedRoute path="/converter" component={CurrencyConverterPage} />
               <Route
                 path="/budget-calculator"
