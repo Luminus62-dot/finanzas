@@ -48,6 +48,7 @@ app.use("/api/categories", require("./routes/category"));
 app.use("/api/savinggoals", require("./routes/savingGoal"));
 app.use("/api/subscriptions", require("./routes/subscription"));
 app.use("/api/currency", require("./routes/currency"));
+app.use("/api/reminders", require("./routes/reminder"));
 
 app.get("/", (req, res) => {
   res.send("API de Mi Dinero Hoy funcionando!");
