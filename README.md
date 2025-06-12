@@ -42,4 +42,17 @@ URLs duplicadas al construir las rutas.
 - Configura variables de entorno en Render (backend) y Vercel (frontend).
 - Usa `FRONTEND_URL` y `REACT_APP_API_URL` para enlazar ambos.
 
+## Endpoints destacados
+
+- **`/api/reminders`** `GET/POST/PUT/DELETE`
+  - Gestiona recordatorios del usuario (listar, crear, editar y eliminar).
+  - `GET /api/reminders/upcoming?days=7` devuelve los próximos recordatorios.
+- **`/api/currency/convert`** `GET`
+  - Convierte cantidades entre USD, EUR, COP y MXN.
+
+## Páginas de React
+
+- **`/reminders`**: página para crear y administrar recordatorios.
+- **`/converter`**: convertidor de monedas utilizando el endpoint anterior.
+
 _V1.0 (funcional)_
