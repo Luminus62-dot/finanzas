@@ -54,8 +54,6 @@ const Layout = ({ children }) => {
     },
     { name: "Metas de Ahorro", path: "/saving-goals", icon: <FaBullseye /> },
     { name: "Suscripciones", path: "/subscriptions", icon: <FaBell /> },
-    { name: "Recordatorios", path: "/reminders", icon: <FaBell /> },
-    { name: "Convertidor", path: "/converter", icon: <FaExchangeAlt /> },
     { name: "Educación Financiera", path: "/educate", icon: <FaBookOpen /> },
     { name: "Configuración", path: "/settings", icon: <FaCog /> },
     // { name: "Ayuda y FAQ", path: "/help", icon: <FaQuestionCircle /> }, // Comentado si no tienes la página
@@ -69,8 +67,6 @@ const Layout = ({ children }) => {
       path: "/budget-calculator",
       icon: <FaCalculator />,
     },
-    { name: "Recordatorios", path: "/reminders", icon: <FaBell /> },
-    { name: "Convertidor", path: "/converter", icon: <FaExchangeAlt /> },
     { name: "Educación Financiera", path: "/educate", icon: <FaBookOpen /> },
     // { name: "Ayuda y FAQ", path: "/help", icon: <FaQuestionCircle /> }, // Comentado si no tienes la página
   ];
